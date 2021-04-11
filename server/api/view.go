@@ -14,12 +14,4 @@
    limitations under the License.
 */
 
-package main
-
-import (
-	"fairyla/api"
-)
-
-func main() {
-	api.StartApi()
-}
+package api
