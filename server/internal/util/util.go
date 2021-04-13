@@ -14,37 +14,17 @@
    limitations under the License.
 */
 
-package api
+package util
 
-import (
-	"fmt"
+import "regexp"
 
-	"fairyla/internal/db"
-
-	"github.com/labstack/echo/v4"
+var (
+	namePat = regexp.MustCompile(`^[a-z][0-9a-z\_\-]{1,31}$`)
 )
 
-var rc *db.Conn
-
-func StartApi(redis_url, host string, port uint) {
-	c, err := db.New(redis_url)
-	if err != nil {
-		panic(err)
+func IsName(name string) bool {
+	if name != "" && namePat.MatchString(name) {
+		return true
 	}
-	rc = c
-
-	e := echo.New()
-    e.Debug = true
-	e.HTTPErrorHandler = customHTTPErrorHandler
-    e.Use(serverHeader)
-
-
-	auth := e.Group("/auth")
-	auth.POST("/signup", signUpView)
-	auth.POST("/signin", signInView)
-
-	test := e.Group("/test", testMD)
-	test.POST("/check", signCheckView)
-
-	e.Logger.Fatal(e.Start(fmt.Sprintf("%s:%d", host, port)))
+	return false
 }

@@ -15,3 +15,72 @@
 */
 
 package api
+
+import (
+	"fairyla/internal/user/auth"
+	"fmt"
+
+	"github.com/labstack/echo/v4"
+)
+
+type res struct {
+	Success bool   `json:"success"`
+	Message string `json:"message"`
+}
+
+type resToken struct {
+	res
+	Token string `json:"token"`
+}
+
+func resOK() res {
+	return res{true, "ok"}
+}
+
+func resErr(msg string) res {
+	return res{false, msg}
+}
+
+func customHTTPErrorHandler(err error, c echo.Context) {
+	code := 400
+	msg := err.Error()
+	if he, ok := err.(*echo.HTTPError); ok {
+		code = he.Code
+		msg = he.Message.(string)
+	}
+	c.JSON(code, resErr(msg))
+}
+
+func signUpView(c echo.Context) error {
+	username := c.FormValue("username")
+	password := c.FormValue("password")
+	err := auth.Register(rc, username, password)
+	if err != nil {
+		return err
+	}
+	return c.JSON(200, resOK())
+}
+
+func signInView(c echo.Context) error {
+	username := c.FormValue("username")
+	password := c.FormValue("password")
+	token, err := auth.Login(rc, username, password)
+	if err != nil {
+		return err
+	}
+	return c.JSON(200, resToken{resOK(), token})
+}
+
+func signCheckView(c echo.Context) error {
+	token := c.FormValue("token")
+	data, err := auth.ParseToken(rc, token)
+	fmt.Println("sign view:", data, err)
+	if err != nil {
+		return err
+	}
+	return c.JSON(200, resOK())
+}
+
+func testView(c echo.Context) error {
+    return c.String(200, "ok")
+}

@@ -18,8 +18,63 @@ package main
 
 import (
 	"fairyla/api"
+	"flag"
+	"fmt"
+	"log"
+	"os"
+	"strconv"
 )
 
+// fairy server version
+const version = "0.1.0"
+
+var (
+	v bool
+
+	host   string
+	port   uint
+	rawurl string
+)
+
+func init() {
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
+
+	flag.BoolVar(&v, "v", false, "show version and exit")
+	flag.BoolVar(&v, "version", false, "show version and exit")
+
+	flag.StringVar(&host, "host", "0.0.0.0", "")
+	flag.UintVar(&port, "port", 10210, "")
+
+	flag.StringVar(&rawurl, "redis", "", "redis url, format: redis://:<password>@<host>:<port>/<db>")
+
+}
+
 func main() {
-	api.StartApi()
+	flag.Parse()
+	if v {
+		fmt.Println(version)
+	} else {
+		handle()
+	}
+}
+
+func handle() {
+	if rawurl == "" {
+		rawurl = os.Getenv("fairyla_redis_url")
+	}
+	envhost := os.Getenv("fairyla_host")
+	envport := os.Getenv("fairyla_port")
+	if envhost != "" {
+		host = envhost
+	}
+	if envport != "" {
+		envport, err := strconv.Atoi(envport)
+		if err != nil {
+			fmt.Println("Invalid environment fairyla_port")
+			return
+		}
+		port = uint(envport)
+	}
+
+	api.StartApi(rawurl, host, port)
 }

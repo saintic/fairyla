@@ -14,37 +14,19 @@
    limitations under the License.
 */
 
-package api
+package db
 
-import (
-	"fmt"
+import "github.com/staugur/go-ufc/redigo"
 
-	"fairyla/internal/db"
+type Conn struct {
+	*redigo.DB
+}
 
-	"github.com/labstack/echo/v4"
-)
-
-var rc *db.Conn
-
-func StartApi(redis_url, host string, port uint) {
-	c, err := db.New(redis_url)
+func New(redis_url string) (db *Conn, err error) {
+	c, err := redigo.New(redis_url)
 	if err != nil {
-		panic(err)
+		return
 	}
-	rc = c
-
-	e := echo.New()
-    e.Debug = true
-	e.HTTPErrorHandler = customHTTPErrorHandler
-    e.Use(serverHeader)
-
-
-	auth := e.Group("/auth")
-	auth.POST("/signup", signUpView)
-	auth.POST("/signin", signInView)
-
-	test := e.Group("/test", testMD)
-	test.POST("/check", signCheckView)
-
-	e.Logger.Fatal(e.Start(fmt.Sprintf("%s:%d", host, port)))
+	c.Prefix = "fairyla:"
+	return &Conn{c}, nil
 }
