@@ -19,6 +19,18 @@ package vars
 var (
 	UserIndex  = "users" // redis type set
 	GenUserKey = func(user string) string {
+		// :user:auth 密码
+		// :user:profile 资料
+		// :user:setting 配置
 		return "user:" + user
+	}
+
+	// :album:<User> Hash类型 Key是专辑ID Value是专辑属性，JSON格式
+	GenAlbumKey = func(user string) string {
+		return "album:" + user
+	}
+	// :fairy:<AlbumID> Hash类型 Key是照片ID Value是照片属性，JSON格式
+	GenFairyKey = func(albumID string) string {
+		return "fairy:" + albumID
 	}
 )

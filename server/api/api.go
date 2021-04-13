@@ -36,15 +36,13 @@ func StartApi(redis_url, host string, port uint) {
 	e := echo.New()
     e.Debug = true
 	e.HTTPErrorHandler = customHTTPErrorHandler
-    e.Use(serverHeader)
-
 
 	auth := e.Group("/auth")
 	auth.POST("/signup", signUpView)
 	auth.POST("/signin", signInView)
 
-	test := e.Group("/test", testMD)
-	test.POST("/check", signCheckView)
+	test := e.Group("/test", loginRequired)
+	test.POST("/check", testView)
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf("%s:%d", host, port)))
 }

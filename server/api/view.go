@@ -18,7 +18,6 @@ package api
 
 import (
 	"fairyla/internal/user/auth"
-	"fmt"
 
 	"github.com/labstack/echo/v4"
 )
@@ -71,16 +70,6 @@ func signInView(c echo.Context) error {
 	return c.JSON(200, resToken{resOK(), token})
 }
 
-func signCheckView(c echo.Context) error {
-	token := c.FormValue("token")
-	data, err := auth.ParseToken(rc, token)
-	fmt.Println("sign view:", data, err)
-	if err != nil {
-		return err
-	}
-	return c.JSON(200, resOK())
-}
-
 func testView(c echo.Context) error {
-    return c.String(200, "ok")
+	return c.JSON(200, resOK())
 }

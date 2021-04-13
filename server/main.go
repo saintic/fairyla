@@ -45,8 +45,7 @@ func init() {
 	flag.StringVar(&host, "host", "0.0.0.0", "")
 	flag.UintVar(&port, "port", 10210, "")
 
-	flag.StringVar(&rawurl, "redis", "", "redis url, format: redis://:<password>@<host>:<port>/<db>")
-
+	flag.StringVar(&rawurl, "redis", "", "redis url, format: redis://[:<password>@]<host>[:<port>/<db>]")
 }
 
 func main() {

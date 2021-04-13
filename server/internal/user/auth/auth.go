@@ -22,7 +22,6 @@ import (
 	"fairyla/internal/util"
 	"fairyla/internal/vars"
 	"fmt"
-	"log"
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
@@ -80,8 +79,7 @@ func Login(c *db.Conn, username, password string) (token string, err error) {
 	// generate jwt token
 	claims := jwt.MapClaims{
 		"name": username,
-		//"exp":  time.Now().Add(time.Hour * 24 * 30).Unix(),
-		"exp": time.Now().Add(time.Second * 60).Unix(),
+		"exp":  time.Now().Add(time.Hour * 24 * 7).Unix(),
 	}
 	jt := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
@@ -90,14 +88,16 @@ func Login(c *db.Conn, username, password string) (token string, err error) {
 
 // Verify jwt token
 func ParseToken(c *db.Conn, token string) (claims jwt.MapClaims, err error) {
-	log.Println(token)
+	if token == "" {
+		return
+	}
 
 	jt, err := jwt.Parse(token, func(jt *jwt.Token) (interface{}, error) {
 		// Don't forget to validate the alg is what you expect:
 		if _, ok := jt.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", jt.Header["alg"])
 		}
-        claims = jt.Claims.(jwt.MapClaims)
+		claims = jt.Claims.(jwt.MapClaims)
 		username := claims["name"].(string)
 		has, err := c.SIsMember(vars.UserIndex, username)
 		if err != nil {
@@ -110,12 +110,11 @@ func ParseToken(c *db.Conn, token string) (claims jwt.MapClaims, err error) {
 		if err != nil {
 			return nil, err
 		}
-        log.Println("hash", pwhash)
 
 		// hmacSampleSecret is a []byte containing your secret, e.g. []byte("my_secret_key")
 		return []byte(pwhash), nil
 	})
-    log.Println(claims)
+
 	if jt.Valid {
 		return claims, nil
 	} else {

@@ -16,3 +16,8 @@ jwt-go
 https://github.com/dgrijalva/jwt-go
 Copyright (c) 2012 Dave Grijalva
 Licensed under the MIT License
+
+redigo
+https://github.com/gomodule/redigo
+Copyright 2012 Gary Burd
+Licensed under the Apache License, Version 2.0

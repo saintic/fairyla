@@ -14,5 +14,5 @@
    limitations under the License.
 */
 
-package display
+package album
 

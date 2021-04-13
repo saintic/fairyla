@@ -21,6 +21,10 @@ type User struct {
 	Alias string
 	Bio   string
 }
+
 type UserSetting struct {
 	User
 }
+
+// 更新用户资料
+func (u *User) Update() {}
