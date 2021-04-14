@@ -17,12 +17,12 @@
 package main
 
 import (
-	"fairyla/api"
 	"flag"
 	"fmt"
 	"log"
-	"os"
-	"strconv"
+
+	"fairyla/api"
+	"fairyla/internal/sys"
 )
 
 // fairy server version
@@ -30,50 +30,39 @@ const version = "0.1.0"
 
 var (
 	v bool
+	s bool
 
-	host   string
-	port   uint
-	rawurl string
+	host        string
+	port        uint
+	rawurl      string
+	sapic_api   string
+	sapic_token string
 )
 
 func init() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
 	flag.BoolVar(&v, "v", false, "show version and exit")
-	flag.BoolVar(&v, "version", false, "show version and exit")
+	flag.BoolVar(&s, "print-config", false, "show config info and exit")
 
-	flag.StringVar(&host, "host", "0.0.0.0", "")
-	flag.UintVar(&port, "port", 10210, "")
+	flag.StringVar(&host, "host", "0.0.0.0", "http listen host")
+	flag.UintVar(&port, "port", 10210, "http listen port")
 
 	flag.StringVar(&rawurl, "redis", "", "redis url, format: redis://[:<password>@]<host>[:<port>/<db>]")
+
+	flag.StringVar(&sapic_api, "sapic-api", "", "Sapic Api URL")
+	flag.StringVar(&sapic_token, "sapic-token", "", "Sapic Api LinkToken")
 }
 
 func main() {
 	flag.Parse()
+	config := sys.New(rawurl, host, port, sapic_api, sapic_token)
 	if v {
 		fmt.Println(version)
+	} else if s {
+		fmt.Println(config)
 	} else {
-		handle()
+		config.Check()
+		api.StartApi(config)
 	}
-}
-
-func handle() {
-	if rawurl == "" {
-		rawurl = os.Getenv("fairyla_redis_url")
-	}
-	envhost := os.Getenv("fairyla_host")
-	envport := os.Getenv("fairyla_port")
-	if envhost != "" {
-		host = envhost
-	}
-	if envport != "" {
-		envport, err := strconv.Atoi(envport)
-		if err != nil {
-			fmt.Println("Invalid environment fairyla_port")
-			return
-		}
-		port = uint(envport)
-	}
-
-	api.StartApi(rawurl, host, port)
 }

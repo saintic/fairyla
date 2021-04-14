@@ -17,8 +17,8 @@
 package vars
 
 var (
-	UserIndex  = "users" // redis type set
-	GenUserKey = func(user string) string {
+	UserIndex  = "users"                    // redis type set
+	GenUserKey = func(user string) string { // redis type hash
 		// :user:auth 密码
 		// :user:profile 资料
 		// :user:setting 配置
@@ -34,3 +34,26 @@ var (
 		return "fairy:" + albumID
 	}
 )
+
+type (
+	Res struct {
+		Success bool   `json:"success"`
+		Message string `json:"message"`
+	}
+	ResToken struct {
+		Res
+		Token string `json:"token"`
+	}
+)
+
+func ResOK() Res {
+	return Res{true, "ok"}
+}
+
+func ResErr(msg string) Res {
+	return Res{false, msg}
+}
+
+func NewResToken(token string) ResToken {
+	return ResToken{Res{true, "ok"}, token}
+}

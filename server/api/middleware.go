@@ -39,10 +39,11 @@ func loginRequired(next echo.HandlerFunc) echo.HandlerFunc {
 		if !strings.HasPrefix(field, scheme) || token == "" {
 			return echo.NewHTTPError(400, "missing or malformed jwt")
 		}
-		_, err := auth.ParseToken(rc, token)
+		claims, err := auth.ParseToken(rc, token)
 		if err != nil {
 			return echo.NewHTTPError(401, "invalid or expired jwt")
 		}
+		c.Set("user", claims["name"])
 		return next(c)
 	}
 }

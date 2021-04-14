@@ -17,28 +17,12 @@
 package api
 
 import (
+	"fairyla/internal/album"
 	"fairyla/internal/user/auth"
+	"fairyla/vars"
 
 	"github.com/labstack/echo/v4"
 )
-
-type res struct {
-	Success bool   `json:"success"`
-	Message string `json:"message"`
-}
-
-type resToken struct {
-	res
-	Token string `json:"token"`
-}
-
-func resOK() res {
-	return res{true, "ok"}
-}
-
-func resErr(msg string) res {
-	return res{false, msg}
-}
 
 func customHTTPErrorHandler(err error, c echo.Context) {
 	code := 400
@@ -47,7 +31,7 @@ func customHTTPErrorHandler(err error, c echo.Context) {
 		code = he.Code
 		msg = he.Message.(string)
 	}
-	c.JSON(code, resErr(msg))
+	c.JSON(code, vars.ResErr(msg))
 }
 
 func signUpView(c echo.Context) error {
@@ -57,7 +41,7 @@ func signUpView(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return c.JSON(200, resOK())
+	return c.JSON(200, vars.ResOK())
 }
 
 func signInView(c echo.Context) error {
@@ -67,9 +51,39 @@ func signInView(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return c.JSON(200, resToken{resOK(), token})
+	return c.JSON(200, vars.NewResToken(token))
 }
 
 func testView(c echo.Context) error {
-	return c.JSON(200, resOK())
+	return c.JSON(200, vars.ResOK())
+}
+
+func createAlbumView(c echo.Context) error {
+	name := c.FormValue("name")
+	a, err := album.NewAlbum(c.Get("user").(string), name)
+	if err != nil {
+		return err
+	}
+	w := album.New(rc)
+	err = w.CreateAlbum(a)
+	if err != nil {
+		return err
+	}
+	return c.JSON(200, vars.ResOK())
+}
+
+func createFairyView(c echo.Context) error {
+	albumID := c.FormValue("album_id")
+	src := c.FormValue("src")
+	desc := c.FormValue("desc")
+	f, err := album.NewFairy(albumID, src, desc)
+	if err != nil {
+		return err
+	}
+	w := album.New(rc)
+	err = w.CreateFairy(f)
+	if err != nil {
+		return err
+	}
+	return c.JSON(200, vars.ResOK())
 }

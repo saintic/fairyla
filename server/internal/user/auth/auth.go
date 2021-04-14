@@ -18,9 +18,9 @@ package auth
 
 import (
 	"errors"
-	"fairyla/internal/db"
-	"fairyla/internal/util"
-	"fairyla/internal/vars"
+	"fairyla/pkg/db"
+	"fairyla/pkg/util"
+	"fairyla/vars"
 	"fmt"
 	"time"
 

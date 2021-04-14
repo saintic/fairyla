@@ -19,22 +19,23 @@ package api
 import (
 	"fmt"
 
-	"fairyla/internal/db"
+	"fairyla/internal/sys"
+	"fairyla/pkg/db"
 
 	"github.com/labstack/echo/v4"
 )
 
 var rc *db.Conn
 
-func StartApi(redis_url, host string, port uint) {
-	c, err := db.New(redis_url)
+func StartApi(config *sys.Setting) {
+	c, err := db.New(config.Redis)
 	if err != nil {
 		panic(err)
 	}
 	rc = c
 
 	e := echo.New()
-    e.Debug = true
+	e.Debug = true
 	e.HTTPErrorHandler = customHTTPErrorHandler
 
 	auth := e.Group("/auth")
@@ -44,5 +45,12 @@ func StartApi(redis_url, host string, port uint) {
 	test := e.Group("/test", loginRequired)
 	test.POST("/check", testView)
 
-	e.Logger.Fatal(e.Start(fmt.Sprintf("%s:%d", host, port)))
+	album := e.Group("/album", loginRequired)
+	album.POST("/", createAlbumView)
+	album.POST("/fairy", createFairyView)
+
+	for _, r := range e.Routes() {
+		fmt.Println(r)
+	}
+	e.Logger.Fatal(e.Start(fmt.Sprintf("%s:%d", config.Host, config.Port)))
 }

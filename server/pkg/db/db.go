@@ -14,17 +14,19 @@
    limitations under the License.
 */
 
-package util
+package db
 
-import "regexp"
+import "tcw.im/ufc/redigo"
 
-var (
-	namePat = regexp.MustCompile(`^[a-z][0-9a-z\_\-]{1,31}$`)
-)
+type Conn struct {
+	*redigo.DB
+}
 
-func IsName(name string) bool {
-	if name != "" && namePat.MatchString(name) {
-		return true
+func New(redis_url string) (db *Conn, err error) {
+	c, err := redigo.New(redis_url)
+	if err != nil {
+		return
 	}
-	return false
+	c.Prefix = "fairyla:"
+	return &Conn{c}, nil
 }

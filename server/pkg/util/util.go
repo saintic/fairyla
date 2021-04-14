@@ -14,19 +14,24 @@
    limitations under the License.
 */
 
-package db
+package util
 
-import "github.com/staugur/go-ufc/redigo"
+import (
+	"regexp"
+	"time"
+)
 
-type Conn struct {
-	*redigo.DB
+var (
+	namePat = regexp.MustCompile(`^[a-z][0-9a-z\_\-]{1,31}$`)
+)
+
+func IsName(name string) bool {
+	if name != "" && namePat.MatchString(name) {
+		return true
+	}
+	return false
 }
 
-func New(redis_url string) (db *Conn, err error) {
-	c, err := redigo.New(redis_url)
-	if err != nil {
-		return
-	}
-	c.Prefix = "fairyla:"
-	return &Conn{c}, nil
+func Now() int64 {
+	return time.Now().Unix()
 }
