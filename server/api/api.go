@@ -45,9 +45,11 @@ func StartApi(config *sys.Setting) {
 	test := e.Group("/test", loginRequired)
 	test.POST("/check", testView)
 
-	album := e.Group("/album", loginRequired)
-	album.POST("/", createAlbumView)
-	album.POST("/fairy", createFairyView)
+	user := e.Group("/user", loginRequired)
+	user.GET("/album", listAlbumView)
+	user.POST("/album", createAlbumView)
+	user.GET("/fairy", listFairyView)
+	user.POST("/fairy", createFairyView)
 
 	for _, r := range e.Routes() {
 		fmt.Println(r)

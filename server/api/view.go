@@ -51,7 +51,9 @@ func signInView(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return c.JSON(200, vars.NewResToken(token))
+	data := make(map[string]string)
+	data["token"] = token
+	return c.JSON(200, vars.NewResData(data))
 }
 
 func testView(c echo.Context) error {
@@ -69,7 +71,7 @@ func createAlbumView(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return c.JSON(200, vars.ResOK())
+	return c.JSON(200, vars.NewResData(a))
 }
 
 func createFairyView(c echo.Context) error {
@@ -85,5 +87,23 @@ func createFairyView(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return c.JSON(200, vars.ResOK())
+	return c.JSON(200, vars.NewResData(f))
+}
+
+func listAlbumView(c echo.Context) error {
+	w := album.New(rc)
+	data, err := w.ListAlbum(c.Get("user").(string))
+	if err != nil {
+		return err
+	}
+	return c.JSON(200, vars.NewResData(data))
+}
+
+func listFairyView(c echo.Context) error {
+	w := album.New(rc)
+	data, err := w.ListFairy(c.Get("user").(string))
+	if err != nil {
+		return err
+	}
+	return c.JSON(200, vars.NewResData(data))
 }

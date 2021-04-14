@@ -131,8 +131,51 @@ func (w wrap) CreateFairy(f *fairy) error {
 	return nil
 }
 
-func (w wrap) ShowAlbums(user string) error {
-	index := vars.GenAlbumKey(user)
-	w.HGetAll(index)
-	return nil
+func (w wrap) ListAlbum(user string) (albums []album, err error) {
+	data, err := w.HGetAll(vars.GenAlbumKey(user))
+	if err != nil {
+		return
+	}
+	albums = make([]album, 0, len(data))
+	for _, v := range data {
+		var a album
+		e := json.Unmarshal([]byte(v), &a)
+		if e == nil {
+			albums = append(albums, a)
+		}
+	}
+	return
+}
+
+func (w wrap) ListFairy(user string) (out map[string][]fairy, err error) {
+	data, err := w.HGetAll(vars.GenAlbumKey(user))
+	if err != nil {
+		return
+	}
+	out = make(map[string][]fairy)
+	for albumID := range data {
+		fs, e := w.GetFairy(albumID)
+		if e != nil {
+			err = e
+			return
+		}
+		out[albumID] = fs
+	}
+	return
+}
+
+func (w wrap) GetFairy(albumID string) (fairies []fairy, err error) {
+	data, err := w.HGetAll(vars.GenFairyKey(albumID))
+	if err != nil {
+		return
+	}
+	fairies = make([]fairy, 0, len(data))
+	for _, v := range data {
+		var f fairy
+		e := json.Unmarshal([]byte(v), &f)
+		if e == nil {
+			fairies = append(fairies, f)
+		}
+	}
+	return
 }

@@ -22,6 +22,7 @@ import (
 	"fairyla/pkg/util"
 	"fairyla/vars"
 	"fmt"
+	"strings"
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
@@ -88,7 +89,8 @@ func Login(c *db.Conn, username, password string) (token string, err error) {
 
 // Verify jwt token
 func ParseToken(c *db.Conn, token string) (claims jwt.MapClaims, err error) {
-	if token == "" {
+	if strings.Count(token, ".") != 2 {
+		err = errors.New("illegal token")
 		return
 	}
 
@@ -115,7 +117,7 @@ func ParseToken(c *db.Conn, token string) (claims jwt.MapClaims, err error) {
 		return []byte(pwhash), nil
 	})
 
-	if jt.Valid {
+	if jt.Valid { // if illegal token, maybe panic
 		return claims, nil
 	} else {
 		return nil, err

@@ -17,6 +17,7 @@
 package api
 
 import (
+	"log"
 	"strings"
 
 	"fairyla/internal/user/auth"
@@ -41,6 +42,7 @@ func loginRequired(next echo.HandlerFunc) echo.HandlerFunc {
 		}
 		claims, err := auth.ParseToken(rc, token)
 		if err != nil {
+			log.Println(err)
 			return echo.NewHTTPError(401, "invalid or expired jwt")
 		}
 		c.Set("user", claims["name"])

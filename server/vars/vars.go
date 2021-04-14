@@ -16,6 +16,11 @@
 
 package vars
 
+import (
+	"fmt"
+	"reflect"
+)
+
 var (
 	UserIndex  = "users"                    // redis type set
 	GenUserKey = func(user string) string { // redis type hash
@@ -40,9 +45,9 @@ type (
 		Success bool   `json:"success"`
 		Message string `json:"message"`
 	}
-	ResToken struct {
+	ResData struct {
 		Res
-		Token string `json:"token"`
+		Data interface{} `json:"data"`
 	}
 )
 
@@ -54,6 +59,30 @@ func ResErr(msg string) Res {
 	return Res{false, msg}
 }
 
-func NewResToken(token string) ResToken {
-	return ResToken{Res{true, "ok"}, token}
+func NewResData(data interface{}) ResData {
+	return ResData{Res{true, "ok"}, data}
+}
+
+func toMap(in interface{}) (map[string]interface{}, error) {
+	out := make(map[string]interface{})
+
+	v := reflect.ValueOf(in)
+	if v.Kind() == reflect.Ptr {
+		v = v.Elem()
+	}
+
+	if v.Kind() != reflect.Struct {
+		return nil, fmt.Errorf("only accepts struct or struct pointer; got %T", v)
+	}
+
+	t := v.Type()
+	// 遍历结构体字段
+	// 指定tagName值为map中key;字段值为map中value
+	for i := 0; i < v.NumField(); i++ {
+		fi := t.Field(i)
+		if tagValue := fi.Tag.Get("json"); tagValue != "" {
+			out[tagValue] = v.Field(i).Interface()
+		}
+	}
+	return out, nil
 }

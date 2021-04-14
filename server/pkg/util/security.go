@@ -29,7 +29,6 @@ func _gen_salt(length int) string {
 
 func _parse(data string) (method string, salt string, h string) {
 	r := strings.Split(data, "$")
-	fmt.Println(data, r[1], r[2])
 	if (len(r)) < 3 {
 		return "", "", ""
 	}
