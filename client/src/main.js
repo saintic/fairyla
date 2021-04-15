@@ -1,17 +1,16 @@
-import Vue from 'vue'
+import { createApp } from 'vue'
 import App from './App.vue'
-import ElementUI from 'element-ui'
-import router from './libs/router.js'
+import ElementPlus from 'element-plus'
+import 'element-plus/lib/theme-chalk/index.css'
+//import router from './libs/router.js'
 import store from './libs/store.js'
 import { http } from './libs/util.js'
 
-Vue.use(ElementUI)
-Vue.prototype.$http = http
-Vue.prototype.$store = store
-Vue.config.productionTip = false
+const app = createApp(App)
+    .use(ElementPlus)
+    .mount('#app')
 
-const vm = new Vue({
-    router,
-    render: (h) => h(App)
-}).$mount('#app')
-console.log(vm)
+app.config.globalProperties.$http = http
+app.config.globalProperties.$store = store
+
+console.log(app)

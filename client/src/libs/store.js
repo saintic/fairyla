@@ -1,5 +1,5 @@
-import Vue from 'vue'
-import { Message } from 'element-ui'
+import { reactive } from 'vue'
+import { Message } from 'element-plus'
 import { STORAGE_KEY } from './vars.js'
 import {
     http,
@@ -11,7 +11,7 @@ import {
 } from './util.js'
 
 console.log('init state')
-export const state = Vue.observable(
+export const state = reactive(
     Object.assign(
         {
             // app state

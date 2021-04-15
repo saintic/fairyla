@@ -4,14 +4,16 @@
             <img class="beian" :src="beian_url" />
             {{ beian }}
         </a>
-        <a href="http://beian.miit.gov.cn" target="_blank" v-if="icp">{{ icp }}</a>
-        Copyright &copy; {{ year }} All rights reserved.
-        Powered by
+        <a href="http://beian.miit.gov.cn" target="_blank" v-if="icp">{{
+            icp
+        }}</a>
+        Copyright &copy; {{ year }} All rights reserved. Powered by
         <a
             href="https://github.com/staugur/picbed"
             target="_blank"
             ref="nofollow"
-        >picbed</a>
+            >picbed</a
+        >
     </div>
 </template>
 
@@ -20,7 +22,7 @@ export default {
     name: 'Footer',
     data() {
         return {
-            beian_url: require('@/assets/img/beian.png')
+            beian_url: require('./assets/img/beian.png')
         }
     },
     computed: {

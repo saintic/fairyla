@@ -15,10 +15,10 @@
 </template>
 
 <script>
-import { STORAGE_KEY } from '@/libs/vars.js'
-import { setStorage } from '@/libs/util.js'
-import Navbar from '@/components/Navbar.vue'
-import Footer from '@/components/Footer.vue'
+import { STORAGE_KEY } from './libs/vars.js'
+import { setStorage } from './libs/util.js'
+import Navbar from './components/Navbar.vue'
+import Footer from './components/Footer.vue'
 console.log('init app.vue')
 
 export default {
