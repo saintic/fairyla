@@ -28,6 +28,11 @@ import (
 
 var rc *db.Conn
 
+type status struct {
+	Logged bool   `json:"logged"`
+	User   string `json:"user"`
+}
+
 func StartApi(config *sys.Setting) {
 	c, err := db.New(config.Redis)
 	if err != nil {
@@ -40,7 +45,15 @@ func StartApi(config *sys.Setting) {
 	e.HTTPErrorHandler = customHTTPErrorHandler
 
 	e.GET("/config", func(c echo.Context) error {
-		return c.JSON(200, vars.NewResData(config.SitePublic()))
+		data := config.SitePublic()
+		user, err := checkJWT(c)
+		userStatus := status{}
+		if err == nil {
+			userStatus.Logged = true
+			userStatus.User = user
+		}
+		data["status"] = userStatus
+		return c.JSON(200, vars.NewResData(data))
 	})
 
 	auth := e.Group("/auth")

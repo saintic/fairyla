@@ -17,7 +17,7 @@
 package api
 
 import (
-	"log"
+	"errors"
 	"strings"
 
 	"fairyla/internal/user/auth"
@@ -25,20 +25,38 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+func getJWT(c echo.Context) (token string, err error) {
+	scheme := "Bearer "
+	field := c.Request().Header.Get(echo.HeaderAuthorization)
+	token = strings.TrimPrefix(field, scheme)
+	if !strings.HasPrefix(field, scheme) || token == "" {
+		err = errors.New("missing or malformed token")
+		return
+	}
+	return
+}
+
+func checkJWT(c echo.Context) (user string, err error) {
+	token, err := getJWT(c)
+	if err != nil {
+		return
+	}
+	claims, err := auth.ParseToken(rc, token)
+	if err != nil {
+		err = errors.New("invalid or expired token")
+		return
+	}
+	user = claims["name"].(string)
+	return
+}
+
 func loginRequired(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		scheme := "Bearer "
-		field := c.Request().Header.Get(echo.HeaderAuthorization)
-		token := strings.TrimPrefix(field, scheme)
-		if !strings.HasPrefix(field, scheme) || token == "" {
-			return echo.NewHTTPError(400, "missing or malformed token")
-		}
-		claims, err := auth.ParseToken(rc, token)
+		user, err := checkJWT(c)
 		if err != nil {
-			log.Println(err)
-			return echo.NewHTTPError(401, "invalid or expired token")
+			return echo.NewHTTPError(400, err.Error())
 		}
-		c.Set("user", claims["name"])
+		c.Set("user", user)
 		return next(c)
 	}
 }
