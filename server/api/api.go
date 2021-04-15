@@ -21,6 +21,7 @@ import (
 
 	"fairyla/internal/sys"
 	"fairyla/pkg/db"
+	"fairyla/vars"
 
 	"github.com/labstack/echo/v4"
 )
@@ -38,6 +39,10 @@ func StartApi(config *sys.Setting) {
 	e.Debug = true
 	e.HTTPErrorHandler = customHTTPErrorHandler
 
+	e.GET("/config", func(c echo.Context) error {
+		return c.JSON(200, vars.NewResData(config.SitePublic()))
+	})
+
 	auth := e.Group("/auth")
 	auth.POST("/signup", signUpView)
 	auth.POST("/signin", signInView)
@@ -51,8 +56,5 @@ func StartApi(config *sys.Setting) {
 	user.GET("/fairy", listFairyView)
 	user.POST("/fairy", createFairyView)
 
-	for _, r := range e.Routes() {
-		fmt.Println(r)
-	}
 	e.Logger.Fatal(e.Start(fmt.Sprintf("%s:%d", config.Host, config.Port)))
 }

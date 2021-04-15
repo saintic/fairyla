@@ -25,25 +25,18 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func serverHeader(next echo.HandlerFunc) echo.HandlerFunc {
-	return func(c echo.Context) error {
-		c.Response().Header().Set(echo.HeaderServer, "Echo/v4")
-		return next(c)
-	}
-}
-
 func loginRequired(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		scheme := "Bearer "
 		field := c.Request().Header.Get(echo.HeaderAuthorization)
 		token := strings.TrimPrefix(field, scheme)
 		if !strings.HasPrefix(field, scheme) || token == "" {
-			return echo.NewHTTPError(400, "missing or malformed jwt")
+			return echo.NewHTTPError(400, "missing or malformed token")
 		}
 		claims, err := auth.ParseToken(rc, token)
 		if err != nil {
 			log.Println(err)
-			return echo.NewHTTPError(401, "invalid or expired jwt")
+			return echo.NewHTTPError(401, "invalid or expired token")
 		}
 		c.Set("user", claims["name"])
 		return next(c)

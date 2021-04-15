@@ -75,10 +75,11 @@ func createAlbumView(c echo.Context) error {
 }
 
 func createFairyView(c echo.Context) error {
+	user := c.Get("user").(string)
 	albumID := c.FormValue("album_id")
 	src := c.FormValue("src")
 	desc := c.FormValue("desc")
-	f, err := album.NewFairy(albumID, src, desc)
+	f, err := album.NewFairy(user, albumID, src, desc)
 	if err != nil {
 		return err
 	}

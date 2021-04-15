@@ -34,9 +34,9 @@ var (
 	GenAlbumKey = func(user string) string {
 		return "album:" + user
 	}
-	// :fairy:<AlbumID> Hash类型 Key是照片ID Value是照片属性，JSON格式
-	GenFairyKey = func(albumID string) string {
-		return "fairy:" + albumID
+	// :fairy:<User>:<AlbumID> Hash类型 Key是照片ID Value是照片属性，JSON格式
+	GenFairyKey = func(user, albumID string) string {
+		return fmt.Sprintf("fairy:%s:%s", user, albumID)
 	}
 )
 

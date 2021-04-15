@@ -48,6 +48,7 @@ type album struct {
 type fairy struct {
 	ID      string `json:"id"`       // 专辑ID，唯一性，索引，由Src而来
 	AlbumID string `json:"album_id"` // 所属专辑
+	Owner   string `json:"owner"`    // 所属用户
 	CTime   int64  `json:"ctime"`
 	Desc    string `json:"desc"`
 	Src     string `json:"src"` // 照片存储地址，理论上要求唯一
@@ -69,12 +70,17 @@ func (a *album) AddLabel(label string) {
 	a.Label = append(a.Label, label)
 }
 
-func NewFairy(albumID, src, desc string) (f *fairy, err error) {
-	if albumID == "" || src == "" {
+func NewFairy(owner, albumID, src, desc string) (f *fairy, err error) {
+	if albumID == "" || owner == "" {
 		err = errors.New("invalid fairy param")
 		return
 	}
-	f = &fairy{ufc.MD5(albumID + src), albumID, util.Now(), desc, src}
+	if !util.IsValidURL(src) {
+		err = errors.New("illegal fairyl url")
+		return
+	}
+	// 专辑内相册地址唯一（覆盖）
+	f = &fairy{ufc.MD5(albumID + src), albumID, owner, util.Now(), desc, src}
 	return
 }
 
@@ -115,11 +121,11 @@ func (w wrap) CreateAlbum(a *album) error {
 
 func (w wrap) CreateFairy(f *fairy) error {
 	// check param
-	if f.ID == "" || f.AlbumID == "" || f.Src == "" {
+	if f.ID == "" || f.Owner == "" || f.AlbumID == "" || f.Src == "" {
 		return errors.New("invalid fairy param")
 	}
 	// write db
-	index := vars.GenFairyKey(f.AlbumID)
+	index := vars.GenFairyKey(f.Owner, f.AlbumID)
 	val, err := json.Marshal(f)
 	if err != nil {
 		return err
@@ -154,7 +160,7 @@ func (w wrap) ListFairy(user string) (out map[string][]fairy, err error) {
 	}
 	out = make(map[string][]fairy)
 	for albumID := range data {
-		fs, e := w.GetFairy(albumID)
+		fs, e := w.GetFairy(user, albumID)
 		if e != nil {
 			err = e
 			return
@@ -164,8 +170,8 @@ func (w wrap) ListFairy(user string) (out map[string][]fairy, err error) {
 	return
 }
 
-func (w wrap) GetFairy(albumID string) (fairies []fairy, err error) {
-	data, err := w.HGetAll(vars.GenFairyKey(albumID))
+func (w wrap) GetFairy(user, albumID string) (fairies []fairy, err error) {
+	data, err := w.HGetAll(vars.GenFairyKey(user, albumID))
 	if err != nil {
 		return
 	}

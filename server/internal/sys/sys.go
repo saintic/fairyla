@@ -18,9 +18,11 @@ package sys
 
 import (
 	"errors"
+	"fairyla/pkg/util"
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 )
 
 type Setting struct {
@@ -31,62 +33,12 @@ type Setting struct {
 }
 
 type Sapic struct {
-	Api   string
-	Token string
+	Api   string `json:"api"`
+	SDK   string `json:"sdk"`
+	Token string `json:"token"`
 }
 
-// New from cli options first
-func New(redis, host string, port uint, api, token string) *Setting {
-	c := &Setting{
-		Redis: redis, Host: host, Port: port,
-		Sapic: Sapic{api, token},
-	}
-	c.parseEnv()
-	return c
-}
-
-// override option
-func (s *Setting) parseEnv() {
-	redis := os.Getenv("fairyla_redis_url")
-	host := os.Getenv("fairyla_host")
-	port := os.Getenv("fairyla_port")
-	api := os.Getenv("fairyla_sapic_api")
-	token := os.Getenv("fairyla_sapic_token")
-	if redis != "" {
-		s.Redis = redis
-	}
-	if host != "" {
-		s.Host = host
-	}
-	dport, err := parsePort(port)
-	if err == nil && dport > 1024 {
-		s.Port = dport
-	}
-	if api != "" {
-		s.Sapic.Api = api
-	}
-	if token != "" {
-		s.Sapic.Token = token
-	}
-}
-
-func (s *Setting) String() string {
-	token := "<No Token>"
-	if s.Sapic.Token != "" {
-		token = fmt.Sprintf("<%s>", s.Sapic.Token)
-	}
-	return fmt.Sprintf(
-		"Host: %s\nPort: %d\nRedis: %s\nSapic: %s %s",
-		s.Host, s.Port, s.Redis, s.Sapic.Api, token,
-	)
-}
-
-func (s *Setting) Check() {
-	sa := s.Sapic
-	if s.Redis == "" || sa.Api == "" || sa.Token == "" {
-		panic("miss required options")
-	}
-}
+var ep = "/api/upload"
 
 func parsePort(sport string) (dport uint, err error) {
 	if sport != "" {
@@ -99,4 +51,80 @@ func parsePort(sport string) (dport uint, err error) {
 	}
 	err = errors.New("empty port")
 	return
+}
+
+// New from cli options first
+func New(redis, host string, port uint, baseURL, token string) *Setting {
+	baseURL = strings.TrimSuffix(strings.TrimSuffix(baseURL, ep), "/")
+	c := &Setting{
+		Redis: redis, Host: host, Port: port,
+		Sapic: Sapic{
+			baseURL + ep, baseURL + "/static/sdk/uploader.min.js", token,
+		},
+	}
+	c.parseEnv()
+	return c
+}
+
+// 从环境变量读取配置，优先级高，会覆盖参数
+func (s *Setting) parseEnv() {
+	redis := os.Getenv("fairyla_redis_url")
+	host := os.Getenv("fairyla_host")
+	port := os.Getenv("fairyla_port")
+	api := os.Getenv("fairyla_sapic_api") // upload api url
+	sdk := os.Getenv("fairyla_sapic_sdk") // js sdk url
+	token := os.Getenv("fairyla_sapic_token")
+	if redis != "" {
+		s.Redis = redis
+	}
+	if host != "" {
+		s.Host = host
+	}
+	dport, err := parsePort(port)
+	if err == nil && dport > 1024 {
+		s.Port = dport
+	}
+	if util.IsValidURL(api) && strings.HasSuffix(api, ep) {
+		s.Sapic.Api = api
+	}
+	if util.IsValidURL(sdk) && strings.HasSuffix(sdk, "/uploader.min.js") {
+		s.Sapic.SDK = sdk
+	}
+	if token != "" {
+		s.Sapic.Token = token
+	}
+}
+
+func (s *Setting) String() string {
+	token := "<No Token>"
+	if s.Sapic.Token != "" {
+		token = fmt.Sprintf("<%s>", s.Sapic.Token)
+	}
+	return fmt.Sprintf(
+		"Host: %s\nPort: %d\nRedis: %s\nSapic:\n Api: %s\n SDK: %s\n LinkToken: %s",
+		s.Host, s.Port, s.Redis, s.Sapic.Api, s.Sapic.SDK, token,
+	)
+}
+
+// 检查是否缺少必须项
+func (s *Setting) Check() {
+	sa := s.Sapic
+	err := ""
+	if s.Redis == "" {
+		err = "redis"
+	} else if sa.Api == "" {
+		err = "sapic-url"
+	} else if sa.Token == "" {
+		err = "sapic-token"
+	}
+	if err != "" {
+		panic(fmt.Sprintf("miss required option: %s\n", err))
+	}
+}
+
+// 站点公共配置项
+func (s *Setting) SitePublic() map[string]interface{} {
+	cfg := make(map[string]interface{})
+	cfg["sapic"] = s.Sapic
+	return cfg
 }

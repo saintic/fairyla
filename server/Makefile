@@ -14,7 +14,7 @@ gotool:
 	go vet ./
 
 build:
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags "-s -w" -o bin/$(BINARY) && chmod +x bin/$(BINARY)
+	go build -ldflags "-s -w" -o bin/$(BINARY) && chmod +x bin/$(BINARY)
 
 docker:
 	docker build -t staugur/fairyla .
