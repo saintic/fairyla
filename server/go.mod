@@ -9,6 +9,6 @@ require (
 	golang.org/x/crypto v0.0.0-20210322153248-0c34fe9e7dc2
 	golang.org/x/net v0.0.0-20210414194228-064579744ee0 // indirect
 	golang.org/x/sys v0.0.0-20210415045647-66c3f260301c // indirect
-	tcw.im/ufc v0.2.2
-	tcw.im/ufc/redigo v0.3.0
+	tcw.im/gtc v1.0.0
+	tcw.im/gtc/redigo v0.4.1
 )

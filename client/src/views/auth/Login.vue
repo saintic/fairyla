@@ -28,16 +28,21 @@
                 ></el-input>
             </el-form-item>
             <el-form-item>
-                <el-checkbox v-model="checked" class="rememberme">记住我</el-checkbox>
-                <el-link type="info" class="forgot" href="https://picbed.pro">忘记密码？</el-link>
+                <el-checkbox v-model="checked" class="rememberme"
+                    >记住我</el-checkbox
+                >
+                <el-link type="info" class="forgot" href="https://picbed.pro"
+                    >忘记密码？</el-link
+                >
             </el-form-item>
-            <el-form-item style="width:100%;">
+            <el-form-item style="width: 100%">
                 <el-button
                     type="primary"
-                    style="width:100%;"
+                    style="width: 100%"
                     @click="handleSubmit"
                     :loading="logining"
-                >登录</el-button>
+                    >登录</el-button
+                >
             </el-form-item>
         </el-form>
     </div>
@@ -78,27 +83,23 @@ export default {
                 if (valid) {
                     this.logining = true
                     this.$http
-                        .post('/login', {
+                        .post('/auth/signin', {
                             username: this.loginForm.username,
                             password: this.loginForm.password,
                             remember: this.checked
                         })
                         .then((res) => {
                             this.logining = false
-                            if (res.data.code === 0) {
-                                this.$message.success('登录成功')
-                                this.$store.mutations.setLogin(
-                                    res.data.sid,
-                                    res.data.expire
-                                )
-                                this.$store.actions.fetchConfig()
-                                this.$router.push({ path: '/' })
-                            } else {
-                                this.$message.info(res.data.msg)
-                            }
+                            this.$message.success('登录成功')
+                            this.$store.mutations.setLogin(
+                                this.loginForm.username
+                            )
+                            this.$store.actions.fetchConfig()
+                            this.$router.push({ path: '/' })
                         })
                         .catch((e) => {
                             this.logining = false
+                            console.log(e)
                             this.$message.error(e)
                         })
                 } else {

@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	"tcw.im/ufc"
+	"tcw.im/gtc"
 )
 
 var c *Conn
@@ -47,7 +47,7 @@ func TestDBString(t *testing.T) {
 
 	ks, err := c.Keys("*")
 	raise(t, err)
-	if !ufc.StrInSlice(c.Prefix+k, ks) {
+	if !gtc.StrInSlice(c.Prefix+k, ks) {
 		t.Fatal("keys error")
 	}
 

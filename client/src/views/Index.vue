@@ -1,10 +1,9 @@
 <template>
-    <div class="home">Index</div>
+    <div>你好，INDEX</div>
 </template>
 
 <script>
 export default {
-    name: 'Index',
-    components: {}
+    name: 'Index'
 }
 </script>

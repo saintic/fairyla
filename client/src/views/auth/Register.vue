@@ -17,52 +17,41 @@
                     placeholder="请输入用户名"
                 ></el-input>
             </el-form-item>
-            <el-form-item v-if="visible" prop="password">
+            <el-form-item prop="password">
                 <el-input
                     type="password"
                     v-model="registerForm.password"
                     placeholder="请输入密码"
                     autocomplete="off"
+                    show-password
                 >
-                    <i
-                        slot="suffix"
-                        title="显示密码"
-                        @click="changePass"
-                        style="cursor:pointer;"
-                        class="saintic-icon saintic-icon-eye-open"
-                    ></i>
-                </el-input>
-            </el-form-item>
-            <el-form-item v-else prop="password">
-                <el-input
-                    type="text"
-                    v-model="registerForm.password"
-                    placeholder="请输入密码"
-                    autocomplete="off"
-                >
-                    <i
-                        slot="suffix"
-                        title="隐藏密码"
-                        @click="changePass"
-                        style="cursor:pointer;"
-                        class="saintic-icon saintic-icon-eye-close"
-                    ></i>
                 </el-input>
             </el-form-item>
             <el-form-item>
-                <el-checkbox v-model="checked" class="agree" prop="agree" required>
+                <el-checkbox
+                    v-model="checked"
+                    class="agree"
+                    prop="agree"
+                    required
+                >
                     我同意
-                    <el-link type="primary" @click="showTerms">服务条款</el-link>和
-                    <el-link type="primary" @click="showPrivacy">隐私政策</el-link>
+                    <el-button type="text" @click="showTerms" size="small">
+                        服务条款
+                    </el-button>
+                    和
+                    <el-button type="text" @click="showPrivacy" size="small">
+                        隐私政策
+                    </el-button>
                 </el-checkbox>
             </el-form-item>
-            <el-form-item style="width:100%;">
+            <el-form-item style="width: 100%">
                 <el-button
                     type="primary"
-                    style="width:100%;"
+                    style="width: 100%"
                     @click="handleSubmit"
                     :loading="registering"
-                >注册</el-button>
+                    >注册</el-button
+                >
             </el-form-item>
         </el-form>
     </div>
@@ -110,38 +99,30 @@ export default {
                     }
                 ]
             },
-            checked: false,
-            visible: true
+            checked: false
         }
     },
     methods: {
-        changePass() {
-            this.visible = !this.visible
-        },
         handleSubmit(event) {
-            this.$refs.registerForm.validate(valid => {
+            this.$refs.registerForm.validate((valid) => {
                 if (!this.checked) {
                     return this.$message.error('注册需同意服务条款与隐私政策')
                 }
                 if (valid) {
                     this.registering = true
                     this.$http
-                        .post('/register', {
+                        .post('/auth/signup', {
                             username: this.registerForm.username,
                             password: this.registerForm.password
                         })
-                        .then(res => {
+                        .then((res) => {
                             this.registering = false
-                            if (res.data.code === 0) {
-                                this.$message.success('注册成功')
-                                this.$router.push({ path: '/login' })
-                            } else {
-                                this.$message.warning(res.data.msg)
-                            }
+                            this.$message.success('注册成功')
+                            this.$router.push({ path: '/login' })
                         })
-                        .catch(e => {
+                        .catch((e) => {
                             this.registering = false
-                            this.$message.error(e)
+                            this.$message.warning(e)
                         })
                 } else {
                     console.log('error submit!')

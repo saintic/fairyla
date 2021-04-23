@@ -56,7 +56,7 @@ func Register(c *db.Conn, username, password string) error {
 }
 
 // Login Check username & password, if ok, generate a jwt token
-func Login(c *db.Conn, username, password string) (token string, err error) {
+func Login(c *db.Conn, username, password string, remember bool) (token string, err error) {
 	if !util.IsName(username) {
 		err = errors.New("invalid name")
 		return
@@ -78,9 +78,13 @@ func Login(c *db.Conn, username, password string) (token string, err error) {
 		return
 	}
 	// generate jwt token
+	hour := time.Hour * 2
+	if remember {
+		hour = time.Hour * 24 * 7
+	}
 	claims := jwt.MapClaims{
 		"name": username,
-		"exp":  time.Now().Add(time.Hour * 24 * 7).Unix(),
+		"exp":  time.Now().Add(hour).Unix(),
 	}
 	jt := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 

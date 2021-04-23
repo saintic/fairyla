@@ -24,14 +24,10 @@ import (
 	"fairyla/vars"
 
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 var rc *db.Conn
-
-type status struct {
-	Logged bool   `json:"logged"`
-	User   string `json:"user"`
-}
 
 func StartApi(config *sys.Setting) {
 	c, err := db.New(config.Redis)
@@ -43,27 +39,30 @@ func StartApi(config *sys.Setting) {
 	e := echo.New()
 	e.Debug = true
 	e.HTTPErrorHandler = customHTTPErrorHandler
+	e.Use(middleware.Logger())
 
-	e.GET("/config", func(c echo.Context) error {
+	api := e.Group("/api")
+
+	api.GET("/config", func(c echo.Context) error {
 		data := config.SitePublic()
+		data["isLogin"] = false
 		user, err := checkJWT(c)
-		userStatus := status{}
 		if err == nil {
-			userStatus.Logged = true
-			userStatus.User = user
+			data["isLogin"] = true
 		}
-		data["status"] = userStatus
+		data["user"] = user
+
 		return c.JSON(200, vars.NewResData(data))
 	})
 
-	auth := e.Group("/auth")
+	auth := api.Group("/auth")
 	auth.POST("/signup", signUpView)
 	auth.POST("/signin", signInView)
 
-	test := e.Group("/test", loginRequired)
+	test := api.Group("/test", loginRequired)
 	test.POST("/check", testView)
 
-	user := e.Group("/user", loginRequired)
+	user := api.Group("/user", loginRequired)
 	user.GET("/album", listAlbumView)
 	user.POST("/album", createAlbumView)
 	user.GET("/fairy", listFairyView)

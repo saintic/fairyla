@@ -16,7 +16,7 @@
 
 package db
 
-import "tcw.im/ufc/redigo"
+import "tcw.im/gtc/redigo"
 
 type Conn struct {
 	*redigo.DB

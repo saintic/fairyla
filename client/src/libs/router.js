@@ -1,11 +1,9 @@
-import Vue from 'vue'
-import VueRouter from 'vue-router'
-import Index from './views/Index.vue'
+import { createRouter, createWebHistory } from 'vue-router'
+import Index from '@/views/Index.vue'
+
 import { mutations } from './store.js'
 
 console.log('init router')
-
-Vue.use(VueRouter)
 
 const routes = [
     {
@@ -16,12 +14,12 @@ const routes = [
     {
         path: '/login',
         name: 'Login',
-        component: () => import('@/views/Login.vue')
+        component: () => import('@/views/auth/Login.vue')
     },
     {
         path: '/register',
         name: 'Register',
-        component: () => import('@/views/Register.vue')
+        component: () => import('@/views/auth/Register.vue')
     },
     {
         path: '/logout',
@@ -31,7 +29,8 @@ const routes = [
             return '/'
         },
         meta: { requiresAuth: true }
-    },
+    }
+    /*
     {
         path: '/control',
         name: 'Control',
@@ -70,29 +69,26 @@ const routes = [
             }
         ]
     }
+    */
 ]
 
-const router = new VueRouter({
-    mode: 'history',
+const router = createRouter({
+    history: createWebHistory(),
     routes
 })
 
-/*
-router.beforeEach((to, from, next) => {
-    if (to.matched.some(record => record.meta.requiresAuth)) {
-        // this route requires auth, check if logged in
-        // if not, redirect to login page.
-        if (!auth.loggedIn()) {
-            next({
-                path: '/login',
-                query: { redirect: to.fullPath }
-            })
-        } else {
-            next()
+router.beforeEach((to, from) => {
+    // 而不是去检查每条路由记录
+    // to.matched.some(record => record.meta.requiresAuth)
+    if (to.meta.requiresAuth && !mutations.isLogged()) {
+        // 此路由需要授权，请检查是否已登录
+        // 如果没有，则重定向到登录页面
+        return {
+            path: '/login',
+            // 保存我们所在的位置，以便以后再来
+            query: { redirect: to.fullPath }
         }
-    } else {
-        next() // 确保一定要调用 next()
     }
 })
-*/
+
 export default router

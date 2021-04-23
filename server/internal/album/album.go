@@ -24,7 +24,7 @@ import (
 	"fairyla/pkg/util"
 	"fairyla/vars"
 
-	"tcw.im/ufc"
+	"tcw.im/gtc"
 )
 
 var (
@@ -60,7 +60,7 @@ func NewAlbum(owner, name string) (a *album, err error) {
 		return
 	}
 	a = &album{
-		ID: ufc.MD5(owner + name), Owner: owner, Name: name, Public: true,
+		ID: gtc.MD5(owner + name), Owner: owner, Name: name, Public: true,
 		CTime: util.Now(),
 	}
 	return
@@ -80,7 +80,7 @@ func NewFairy(owner, albumID, src, desc string) (f *fairy, err error) {
 		return
 	}
 	// 专辑内相册地址唯一（覆盖）
-	f = &fairy{ufc.MD5(albumID + src), albumID, owner, util.Now(), desc, src}
+	f = &fairy{gtc.MD5(albumID + src), albumID, owner, util.Now(), desc, src}
 	return
 }
 

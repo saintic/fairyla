@@ -22,6 +22,7 @@ import (
 	"fairyla/vars"
 
 	"github.com/labstack/echo/v4"
+	"tcw.im/gtc"
 )
 
 func customHTTPErrorHandler(err error, c echo.Context) {
@@ -47,7 +48,8 @@ func signUpView(c echo.Context) error {
 func signInView(c echo.Context) error {
 	username := c.FormValue("username")
 	password := c.FormValue("password")
-	token, err := auth.Login(rc, username, password)
+	remember := gtc.IsTrue(c.FormValue("remember"))
+	token, err := auth.Login(rc, username, password, remember)
 	if err != nil {
 		return err
 	}

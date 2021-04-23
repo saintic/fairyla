@@ -1,28 +1,31 @@
 <template>
     <div class="footer">
         <a href="http://www.beian.gov.cn" target="_blank" v-if="beian">
-            <img class="beian" :src="beian_url" />
+            <img class="beian" :src="beianSrc" />
             {{ beian }}
         </a>
-        <a href="http://beian.miit.gov.cn" target="_blank" v-if="icp">{{
-            icp
-        }}</a>
+        <a href="http://beian.miit.gov.cn" target="_blank" v-if="icp">
+            {{ icp }}
+        </a>
         Copyright &copy; {{ year }} All rights reserved. Powered by
         <a
-            href="https://github.com/staugur/picbed"
+            href="https://github.com/staugur/fairyla"
             target="_blank"
             ref="nofollow"
-            >picbed</a
         >
+            fairyla
+        </a>
     </div>
 </template>
 
 <script>
+import beianSrc from '@/assets/img/beian.png'
+
 export default {
     name: 'Footer',
     data() {
         return {
-            beian_url: require('./assets/img/beian.png')
+            beianSrc: beianSrc
         }
     },
     computed: {
@@ -30,10 +33,10 @@ export default {
             return new Date().getFullYear()
         },
         icp() {
-            return this.$store.state.icp
+            return this.$store.state.icp || ''
         },
         beian() {
-            return this.$store.state.beian
+            return this.$store.state.beian || ''
         }
     }
 }

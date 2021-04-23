@@ -55,7 +55,7 @@
     "@vue/compiler-core" "3.0.11"
     "@vue/shared" "3.0.11"
 
-"@vue/compiler-sfc@^3.0.11":
+"@vue/compiler-sfc@^3.0.5":
   version "3.0.11"
   resolved "https://registry.npm.taobao.org/@vue/compiler-sfc/download/@vue/compiler-sfc-3.0.11.tgz#cd8ca2154b88967b521f5ad3b10f5f8b6b665679"
   integrity sha1-zYyiFUuIlntSH1rTsQ9fi2tmVnk=
@@ -160,10 +160,10 @@ csstype@^2.6.8:
 
 dayjs@1.x:
   version "1.10.4"
-  resolved "https://registry.npm.taobao.org/dayjs/download/dayjs-1.10.4.tgz#8e544a9b8683f61783f570980a8a80eaf54ab1e2"
+  resolved "https://registry.nlark.com/dayjs/download/dayjs-1.10.4.tgz#8e544a9b8683f61783f570980a8a80eaf54ab1e2"
   integrity sha1-jlRKm4aD9heD9XCYCoqA6vVKseI=
 
-element-plus@latest:
+element-plus@^1.0.2-beta.40:
   version "1.0.2-beta.40"
   resolved "https://registry.npm.taobao.org/element-plus/download/element-plus-1.0.2-beta.40.tgz#30fc9b161496ae587fab86235c80b728ea43d909"
   integrity sha1-MPybFhSWrlh/q4YjXIC3KOpD2Qk=
@@ -388,7 +388,7 @@ postcss@^8.1.10, postcss@^8.2.1:
 
 resize-observer-polyfill@^1.5.1:
   version "1.5.1"
-  resolved "https://registry.npm.taobao.org/resize-observer-polyfill/download/resize-observer-polyfill-1.5.1.tgz#0e9020dd3d21024458d4ebd27e23e40269810464"
+  resolved "https://registry.nlark.com/resize-observer-polyfill/download/resize-observer-polyfill-1.5.1.tgz?cache=0&sync_timestamp=1618847256390&other_urls=https%3A%2F%2Fregistry.nlark.com%2Fresize-observer-polyfill%2Fdownload%2Fresize-observer-polyfill-1.5.1.tgz#0e9020dd3d21024458d4ebd27e23e40269810464"
   integrity sha1-DpAg3T0hAkRY1OvSfiPkAmmBBGQ=
 
 resolve@^1.19.0:
@@ -438,7 +438,7 @@ util-deprecate@^1.0.2:
 
 vite@^2.1.5:
   version "2.1.5"
-  resolved "https://registry.npm.taobao.org/vite/download/vite-2.1.5.tgz#4857da441c62f7982c83cbd5f42a00330f20c9c1"
+  resolved "https://registry.npm.taobao.org/vite/download/vite-2.1.5.tgz?cache=0&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fvite%2Fdownload%2Fvite-2.1.5.tgz#4857da441c62f7982c83cbd5f42a00330f20c9c1"
   integrity sha1-SFfaRBxi95gsg8vV9CoAMw8gycE=
   dependencies:
     esbuild "^0.9.3"
@@ -448,7 +448,12 @@ vite@^2.1.5:
   optionalDependencies:
     fsevents "~2.3.1"
 
-vue@^3.0.11:
+vue-router@4:
+  version "4.0.6"
+  resolved "https://registry.npm.taobao.org/vue-router/download/vue-router-4.0.6.tgz?cache=0&sync_timestamp=1617697726574&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fvue-router%2Fdownload%2Fvue-router-4.0.6.tgz#91750db507d26642f225b0ec6064568e5fe448d6"
+  integrity sha1-kXUNtQfSZkLyJbDsYGRWjl/kSNY=
+
+vue@^3.0.5:
   version "3.0.11"
   resolved "https://registry.npm.taobao.org/vue/download/vue-3.0.11.tgz?cache=0&sync_timestamp=1617321643721&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fvue%2Fdownload%2Fvue-3.0.11.tgz#c82f9594cbf4dcc869241d4c8dd3e08d9a8f4b5f"
   integrity sha1-yC+VlMv03MhpJB1MjdPgjZqPS18=
