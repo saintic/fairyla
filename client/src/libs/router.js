@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Index from '@/views/Index.vue'
-
 import { mutations, actions } from './store.js'
+import { TitleSep, TitleSuffix } from './vars.js'
 
 console.log('init router')
 
@@ -15,13 +15,13 @@ const routes = [
         path: '/login',
         name: 'Login',
         component: () => import('@/views/auth/Login.vue'),
-        meta: { requiresAuth: false }
+        meta: { requiresAuth: false, title: '登录' }
     },
     {
         path: '/register',
         name: 'Register',
         component: () => import('@/views/auth/Register.vue'),
-        meta: { requiresAuth: false }
+        meta: { requiresAuth: false, title: '注册' }
     },
     {
         path: '/logout',
@@ -32,47 +32,27 @@ const routes = [
             return '/'
         },
         meta: { requiresAuth: true }
-    }
-    /*
-    {
-        path: '/control',
-        name: 'Control',
-        component: () => import('@/views/admin/Control.vue'),
-        children: [
-            {
-                path: 'setting',
-                component: () => import('@/views/admin/AdminSetting.vue')
-            },
-            {
-                path: 'hook',
-                component: () => import('@/views/admin/AdminHook.vue')
-            },
-            {
-                path: 'user',
-                component: () => import('@/views/admin/AdminUser.vue')
-            }
-        ]
     },
     {
-        path: '/user',
+        path: '/my',
         name: 'Home',
-        component: () => import('@/views/user/Home.vue'),
+        component: () => import('@/views/home/Home.vue'),
         children: [
             {
                 path: 'profile',
-                component: () => import('@/views/user/UserProfile.vue')
+                component: () => import('@/views/home/UserProfile.vue')
             },
             {
                 path: 'setting',
-                component: () => import('@/views/user/UserSetting.vue')
+                component: () => import('@/views/home/UserSetting.vue')
             },
             {
                 path: 'image',
-                component: () => import('@/views/user/UserImage.vue')
+                component: () => import('@/views/home/UserImage.vue')
             }
-        ]
+        ],
+        meta: { requiresAuth: true }
     }
-    */
 ]
 
 const router = createRouter({
@@ -81,9 +61,14 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from) => {
+    if (to.meta.title) {
+        document.title = to.meta.title + TitleSep + TitleSuffix
+    } else {
+        document.title = TitleSuffix
+    }
     // 而不是去检查每条路由记录
     // to.matched.some(record => record.meta.requiresAuth)
-    if (to.meta.requiresAuth === false && mutations.isLogged) {
+    if (to.meta.requiresAuth === false && mutations.isLogged()) {
         return { path: '/' }
     }
     if (to.meta.requiresAuth && !mutations.isLogged()) {

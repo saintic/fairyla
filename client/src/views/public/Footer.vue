@@ -2,9 +2,8 @@
     <div class="footer">
         <a href="http://www.beian.gov.cn" target="_blank" v-if="beian">
             <img class="beian" :src="beianSrc" />
-            {{ beian }}
-        </a>
-        <a href="http://beian.miit.gov.cn" target="_blank" v-if="icp">
+            {{ beian }} </a
+        >&nbsp;<a href="http://beian.miit.gov.cn" target="_blank" v-if="icp">
             {{ icp }}
         </a>
         Copyright &copy; {{ year }} All rights reserved. Powered by
@@ -19,26 +18,18 @@
 </template>
 
 <script>
+import { mapState } from '@/libs/store.js'
 import beianSrc from '@/assets/img/beian.png'
 
 export default {
     name: 'Footer',
     data() {
         return {
-            beianSrc: beianSrc
+            beianSrc: beianSrc,
+            year: new Date().getFullYear()
         }
     },
-    computed: {
-        year() {
-            return new Date().getFullYear()
-        },
-        icp() {
-            return this.$store.state.icp || ''
-        },
-        beian() {
-            return this.$store.state.beian || ''
-        }
-    }
+    computed: mapState(['icp', 'beian'])
 }
 </script>
 
