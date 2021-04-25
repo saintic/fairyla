@@ -35,13 +35,12 @@
                     required
                 >
                     我同意
-                    <el-button type="text" @click="showTerms" size="small">
-                        服务条款
-                    </el-button>
-                    和
-                    <el-button type="text" @click="showPrivacy" size="small">
-                        隐私政策
-                    </el-button>
+                    <el-button type="text" @click="showTerms" size="small"
+                        >服务条款</el-button
+                    >
+                    和<el-button type="text" @click="showPrivacy" size="small"
+                        >隐私政策</el-button
+                    >
                 </el-checkbox>
             </el-form-item>
             <el-form-item style="width: 100%">
@@ -50,8 +49,9 @@
                     style="width: 100%"
                     @click="handleSubmit"
                     :loading="registering"
-                    >注册</el-button
                 >
+                    注册
+                </el-button>
             </el-form-item>
         </el-form>
     </div>
@@ -81,8 +81,9 @@ export default {
                         trigger: 'blur'
                     },
                     {
-                        pattern: /^[a-zA-Z][0-9a-zA-Z\_]{3,31}$/,
-                        message: '用户名要求以字母开头加字母、数字或下划线',
+                        pattern: /^[a-z][0-9a-z\_\-]{1,31}$/,
+                        message:
+                            '用户名要求以小写字母开头加小写字母、数字、下划线、短横线',
                         trigger: 'blur'
                     }
                 ],
@@ -117,12 +118,12 @@ export default {
                         })
                         .then((res) => {
                             this.registering = false
-                            this.$message.success('注册成功')
+                            this.$message.success('注册成功，请登录！')
                             this.$router.push({ path: '/login' })
                         })
                         .catch((e) => {
+                            console.log(e)
                             this.registering = false
-                            this.$message.warning(e)
                         })
                 } else {
                     console.log('error submit!')

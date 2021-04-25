@@ -27,8 +27,8 @@ var (
 )
 
 func IsName(name string) bool {
-	if name != "" && namePat.MatchString(name) {
-		return true
+	if name != "" {
+		return namePat.MatchString(name)
 	}
 	return false
 }
@@ -38,15 +38,12 @@ func Now() int64 {
 }
 
 func IsValidURL(toTest string) bool {
-	_, err := url.ParseRequestURI(toTest)
+	u, err := url.ParseRequestURI(toTest)
 	if err != nil {
 		return false
 	}
-
-	u, err := url.Parse(toTest)
-	if err != nil || u.Scheme == "" || u.Host == "" {
+	if (u.Scheme != "http" && u.Scheme != "https") || u.Host == "" {
 		return false
 	}
-
 	return true
 }

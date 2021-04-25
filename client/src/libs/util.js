@@ -5,7 +5,22 @@ import { STORAGE_KEY, ErrMsgMap } from './vars.js'
 export const http = axios.create({
     baseURL: '/api',
     timeout: 5000,
-    withCredentials: false
+    withCredentials: false,
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    transformRequest: [
+        function (data) {
+            let ret = ''
+            for (let it in data) {
+                ret +=
+                    encodeURIComponent(it) +
+                    '=' +
+                    encodeURIComponent(data[it]) +
+                    '&'
+            }
+            ret = ret.substring(0, ret.lastIndexOf('&'))
+            return ret
+        }
+    ]
 })
 
 // request拦截器 ==> 对请求参数进行处理
@@ -13,6 +28,8 @@ http.interceptors.request.use(
     (config) => {
         // 可以在发送请求之前做些事情
         // 比如请求参数的处理、在headers中携带token等等
+        console.log('send ajax with config')
+        console.log(config)
         let s = getStorage()
         console.log(s)
         if (s) {
@@ -21,6 +38,7 @@ http.interceptors.request.use(
                 config.headers.Authorization = `Bearer ${token}`
             }
         }
+        console.log(config)
         return config
     },
     (error) => {
@@ -35,61 +53,60 @@ http.interceptors.response.use(
     (response) => {
         // 2xx 范围内的状态码都会触发该函数。
         // 接口返回success字段不为true表示请求错误
-        const res = response.data
-        if (!res.success) {
-            let msg = res.message || 'Error'
-            let err = new Error(msg)
-            err.text = msg
-            return Promise.reject(err)
+        console.log(response)
+        let data = response.data
+        if (!data.success) {
+            let prefix = ErrMsgMap[response.config.url],
+                text = data.message || 'Error'
+            ElMessage.error(prefix + text)
+            return Promise.reject(new Error(text))
         } else {
-            return res
+            return data
         }
     },
     (error) => {
-        let text = ''
+        let prefix = ErrMsgMap[error.config.url],
+            text = ''
 
         if (error.response) {
             // 请求成功发出且服务器也响应了状态码，但状态代码超出了 2xx 的范围
             console.log(error.response.data)
             console.log(error.response.status)
             console.log(error.response.headers)
-
             switch (error.response.status) {
                 case 400:
-                    text = '请求错误(400)，请重新申请'
+                    text = '参数错误'
                     break
                 case 401:
-                    text = '登录错误(401)，请重新登录'
+                    text = '未登录'
                     return this.$router.replace('/login')
                 case 403:
-                    text = '拒绝访问(403)'
+                    text = '拒绝访问'
                     break
                 case 404:
-                    text = '请求出错(404)'
-                    break
-                case 408:
-                    text = '请求超时(408)'
+                    text = '无效接口'
                     break
                 case 500:
-                    text = '服务器错误(500)'
+                    text = '服务器错误'
                     break
                 case 501:
-                    text = '服务未实现(501)'
+                    text = '服务未实现'
                     break
                 case 502:
-                    text = '网络错误(502)'
+                    text = '网关错误'
                     break
                 case 503:
-                    text = '服务不可用(503)'
+                    text = '服务不可用'
                     break
                 case 504:
-                    text = '网络超时(504)'
-                    break
-                case 505:
-                    text = 'HTTP版本不受支持(505)'
+                    text = '网关超时'
                     break
                 default:
                     text = '网络连接出错'
+            }
+            let data = error.response.data
+            if (isObject(data) && data.message !== '') {
+                text = text + `（ ${data.message} ）`
             }
         } else if (error.request) {
             // 请求已经成功发起，但没有收到响应
@@ -100,8 +117,7 @@ http.interceptors.response.use(
             // 请求已经成功发起，但没有收到响应
             text = error.message
         }
-        // TODO
-        let prefix = ErrMsgMap['xxx']
+        console.log(error.config)
         ElMessage.error(prefix + text)
         return Promise.reject(error)
     }

@@ -6,51 +6,47 @@
             </router-link>
         </div>
         <div class="nav-right">
-            <div v-if="isLogin">
-                <el-menu
-                    mode="horizontal"
-                    router
-                    :default-active="this.$route.path"
-                >
-                    <el-menu-item index>
-                        <el-avatar
-                            class="avatar"
-                            :src="avatar"
-                            :size="30"
-                        ></el-avatar>
+            <el-menu
+                mode="horizontal"
+                router
+                :default-active="this.$route.path"
+            >
+                <el-menu-item index="/ta">
+                    <i class="saintic-icon saintic-icon-goddess"></i> 她是
+                </el-menu-item>
+                <el-menu-item index="/user/index" v-if="isLogin">
+                    <i class="saintic-icon saintic-icon-home"></i> 个人中心
+                </el-menu-item>
+                <el-menu-item index v-if="isLogin">
+                    <el-avatar
+                        class="avatar"
+                        :src="avatar"
+                        :size="30"
+                    ></el-avatar>
+                </el-menu-item>
+                <el-submenu index="/user" v-if="isLogin">
+                    <template #title>{{ user }}</template>
+                    <el-menu-item index="/user/profile">
+                        <i class="saintic-icon saintic-icon-user"></i>
+                        个人资料
                     </el-menu-item>
-                    <el-submenu index="/user">
-                        <template slot="title">{{ user }}</template>
-                        <el-menu-item index="/user/profile">
-                            <i class="saintic-icon saintic-icon-user"></i>
-                            个人资料
-                        </el-menu-item>
-                        <el-menu-item index="/user/setting">
-                            <i class="saintic-icon saintic-icon-setting"></i>
-                            用户设置
-                        </el-menu-item>
-                        <el-menu-item>-------------</el-menu-item>
-                        <el-menu-item index="/logout">
-                            <i class="saintic-icon saintic-icon-logoff"></i>
-                            登出
-                        </el-menu-item>
-                    </el-submenu>
-                </el-menu>
-            </div>
-            <div v-else>
-                <el-menu
-                    mode="horizontal"
-                    router
-                    :default-active="this.$route.path"
-                >
-                    <el-menu-item index="/login">
-                        <i class="saintic-icon saintic-icon-login"></i> 登录
+                    <el-menu-item index="/user/setting">
+                        <i class="saintic-icon saintic-icon-setting"></i>
+                        用户设置
                     </el-menu-item>
-                    <el-menu-item index="/register">
-                        <i class="saintic-icon saintic-icon-register"></i> 注册
+                    <el-menu-item>-------------</el-menu-item>
+                    <el-menu-item index="/logout">
+                        <i class="saintic-icon saintic-icon-logoff"></i>
+                        登出
                     </el-menu-item>
-                </el-menu>
-            </div>
+                </el-submenu>
+                <el-menu-item index="/login" v-if="!isLogin">
+                    <i class="saintic-icon saintic-icon-login"></i> 登录
+                </el-menu-item>
+                <el-menu-item index="/register" v-if="!isLogin">
+                    <i class="saintic-icon saintic-icon-register"></i> 注册
+                </el-menu-item>
+            </el-menu>
         </div>
     </div>
 </template>
@@ -98,5 +94,9 @@ export default {
 }
 .nav .nav-right .avatar {
     background: #fff;
+}
+.el-menu--collapse .el-menu .el-submenu,
+.el-menu--popup {
+    min-width: 120px !important;
 }
 </style>

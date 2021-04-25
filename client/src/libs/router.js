@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Index from '@/views/Index.vue'
 
-import { mutations } from './store.js'
+import { mutations, actions } from './store.js'
 
 console.log('init router')
 
@@ -14,18 +14,21 @@ const routes = [
     {
         path: '/login',
         name: 'Login',
-        component: () => import('@/views/auth/Login.vue')
+        component: () => import('@/views/auth/Login.vue'),
+        meta: { requiresAuth: false }
     },
     {
         path: '/register',
         name: 'Register',
-        component: () => import('@/views/auth/Register.vue')
+        component: () => import('@/views/auth/Register.vue'),
+        meta: { requiresAuth: false }
     },
     {
         path: '/logout',
         name: 'Logout',
         redirect() {
             mutations.clearLogin()
+            actions.removeConfig()
             return '/'
         },
         meta: { requiresAuth: true }
@@ -80,6 +83,9 @@ const router = createRouter({
 router.beforeEach((to, from) => {
     // 而不是去检查每条路由记录
     // to.matched.some(record => record.meta.requiresAuth)
+    if (to.meta.requiresAuth === false && mutations.isLogged) {
+        return { path: '/' }
+    }
     if (to.meta.requiresAuth && !mutations.isLogged()) {
         // 此路由需要授权，请检查是否已登录
         // 如果没有，则重定向到登录页面

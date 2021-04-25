@@ -1,6 +1,12 @@
 import { reactive } from 'vue'
-import { ElMessage } from 'element-plus'
-import { http, getStorage, isValidMap, isObject } from './util.js'
+import {
+    http,
+    getStorage,
+    setStorage,
+    clearStorage,
+    isValidMap,
+    isObject
+} from './util.js'
 
 console.log('init state')
 
@@ -9,13 +15,13 @@ console.log({ ...state })
 
 export const mutations = {
     isLogged() {
-        return state.isLogin === true
+        return state.isLogin === true && state.token !== '' && state.user !== ''
     },
-    setLogin(user) {
-        this.commit('isLogin', true)
-        this.commit('user', user)
+    setToken(jwt) {
+        this.commit('token', jwt)
     },
     clearLogin() {
+        this.commit('token', '')
         this.commit('isLogin', false)
         this.commit('user', '')
     },
@@ -41,10 +47,18 @@ export const actions = {
                 for (let k in res.data) {
                     mutations.commit(k, res.data[k])
                 }
+                actions.saveConfig2Local()
             })
             .catch(function (e) {
                 console.log(e)
             })
+    },
+    saveConfig2Local() {
+        console.log('hit scl')
+        setStorage({ ...state })
+    },
+    removeConfig() {
+        clearStorage()
     }
 }
 
@@ -69,6 +83,8 @@ function normalizeMap(map) {
 
 /**
  * 获取需要的状态数据对象
+ * sts 可以是Array(String包装成Array)，获取其中的字段，适用于data
+ * sts 可以是Object，key是键，val是字段，可以是function(state)，适用于computed
  * @param {String | Array | Object} sts 状态字段
  * @returns {Object}
  */

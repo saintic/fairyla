@@ -15,7 +15,6 @@
 <script>
 import Navbar from './views/public/Navbar.vue'
 import Footer from './views/public/Footer.vue'
-import { setStorage } from './libs/util.js'
 
 export default {
     name: 'App',
@@ -25,7 +24,7 @@ export default {
         this.$store.actions.fetchConfig()
         //在页面刷新时持久化状态数据
         window.addEventListener('beforeunload', (e) => {
-            setStorage({ ...this.$store.state })
+            this.$store.actions.saveConfig2Local()
             e.returnValue = ''
         })
     }

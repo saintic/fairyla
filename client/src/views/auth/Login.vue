@@ -91,16 +91,14 @@ export default {
                         .then((res) => {
                             this.logining = false
                             this.$message.success('登录成功')
-                            this.$store.mutations.setLogin(
-                                this.loginForm.username
-                            )
+                            this.$store.mutations.setToken(res.data.token)
+                            this.$store.actions.saveConfig2Local()
                             this.$store.actions.fetchConfig()
                             this.$router.push({ path: '/' })
                         })
                         .catch((e) => {
                             this.logining = false
                             console.log(e)
-                            this.$message.error(e)
                         })
                 } else {
                     console.log('error submit!')
