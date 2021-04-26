@@ -17,6 +17,7 @@
 package api
 
 import (
+	"errors"
 	"fairyla/internal/album"
 	"fairyla/internal/user/auth"
 	"fairyla/vars"
@@ -50,7 +51,7 @@ func signInView(c echo.Context) error {
 	username := c.FormValue("username")
 	password := c.FormValue("password")
 	remember := gtc.IsTrue(c.FormValue("remember"))
-    fmt.Println(username, password, remember)
+	fmt.Println(username, password, remember)
 	expire := 60 * 60 * 2 // 2h
 	if remember {
 		expire = 60 * 60 * 24 * 7 // 7d
@@ -86,13 +87,35 @@ func createAlbumView(c echo.Context) error {
 func createFairyView(c echo.Context) error {
 	user := c.Get("user").(string)
 	albumID := c.FormValue("album_id")
+	albumName := c.FormValue("album_name")
 	src := c.FormValue("src")
 	desc := c.FormValue("desc")
+	w := album.New(rc)
+	if albumID == "" {
+		// auto create album
+		if albumName == "" {
+			return errors.New("invalid album_id or album_name")
+		}
+		a, err := album.NewAlbum(user, albumName)
+		if err != nil {
+			return err
+		}
+		has, err := a.Exist(rc)
+		if err != nil {
+			return err
+		}
+		if !has {
+			err := w.CreateAlbum(a)
+			if err != nil {
+				return err
+			}
+		}
+		albumID = a.ID
+	}
 	f, err := album.NewFairy(user, albumID, src, desc)
 	if err != nil {
 		return err
 	}
-	w := album.New(rc)
 	err = w.CreateFairy(f)
 	if err != nil {
 		return err

@@ -23,6 +23,8 @@ import (
 	"os"
 	"strconv"
 	"strings"
+
+	"tcw.im/gtc"
 )
 
 type Setting struct {
@@ -34,7 +36,7 @@ type Setting struct {
 
 type Sapic struct {
 	Api   string `json:"api"`
-	SDK   string `json:"sdk"`
+	Field string `json:"field"`
 	Token string `json:"token"`
 }
 
@@ -54,7 +56,7 @@ func parsePort(sport string) (dport uint, err error) {
 }
 
 // New from cli options first
-func New(redis, host string, port uint, baseURL, token string) *Setting {
+func New(host string, port uint, redis, baseURL, token, field string) *Setting {
 	if !util.IsValidURL(baseURL) {
 		panic("invalid sapic url")
 	}
@@ -62,7 +64,7 @@ func New(redis, host string, port uint, baseURL, token string) *Setting {
 	c := &Setting{
 		Redis: redis, Host: host, Port: port,
 		Sapic: Sapic{
-			baseURL + ep, baseURL + "/static/sdk/uploader.min.js", token,
+			baseURL + ep, field, token,
 		},
 	}
 	c.parseEnv()
@@ -74,8 +76,8 @@ func (s *Setting) parseEnv() {
 	redis := os.Getenv("fairyla_redis_url")
 	host := os.Getenv("fairyla_host")
 	port := os.Getenv("fairyla_port")
-	api := os.Getenv("fairyla_sapic_api") // upload api url
-	sdk := os.Getenv("fairyla_sapic_sdk") // js sdk url
+	api := os.Getenv("fairyla_sapic_api")     // upload api url
+	field := os.Getenv("fairyla_sapic_field") // upload file field name
 	token := os.Getenv("fairyla_sapic_token")
 	if redis != "" {
 		s.Redis = redis
@@ -90,12 +92,29 @@ func (s *Setting) parseEnv() {
 	if util.IsValidURL(api) && strings.HasSuffix(api, ep) {
 		s.Sapic.Api = api
 	}
-	if util.IsValidURL(sdk) && strings.HasSuffix(sdk, "/uploader.min.js") {
-		s.Sapic.SDK = sdk
+	if field != "" {
+		s.Sapic.Field = field
 	}
 	if token != "" {
 		s.Sapic.Token = token
 	}
+    // other options
+    sep := "fairyla_"
+    for _, e := rage os.Environ() {
+        env := e.split("=")
+        if strings.HasPrefix(env[0], sep) {
+            field := strings.TrimPrefix(env[0], sep)
+            switch field {
+            case "icp":
+                ...
+            case val2:
+                ...
+            default:
+                ...
+        }
+        }
+
+    }
 }
 
 func (s *Setting) String() string {
@@ -104,8 +123,8 @@ func (s *Setting) String() string {
 		token = fmt.Sprintf("<%s>", s.Sapic.Token)
 	}
 	return fmt.Sprintf(
-		"Host: %s\nPort: %d\nRedis: %s\nSapic:\n Api: %s\n SDK: %s\n LinkToken: %s",
-		s.Host, s.Port, s.Redis, s.Sapic.Api, s.Sapic.SDK, token,
+		"Host: %s\nPort: %d\nRedis: %s\nSapic:\n Api: %s\n Field: %s\n LinkToken: %s",
+		s.Host, s.Port, s.Redis, s.Sapic.Api, s.Sapic.Field, token,
 	)
 }
 

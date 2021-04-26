@@ -37,6 +37,7 @@ var (
 	rawurl      string
 	sapic_url   string
 	sapic_token string
+	sapic_field string
 )
 
 func init() {
@@ -50,13 +51,14 @@ func init() {
 
 	flag.StringVar(&rawurl, "redis", "", "redis url, format: redis://[:<password>@]<host>[:<port>/<db>]")
 
-	flag.StringVar(&sapic_url, "sapic-url", "", "Sapic Base URL (API & SDK)")
+	flag.StringVar(&sapic_url, "sapic-url", "", "Sapic Api URL")
 	flag.StringVar(&sapic_token, "sapic-token", "", "Sapic Api LinkToken")
+	flag.StringVar(&sapic_field, "sapic-field", "picbed", "Sapic Api Upload Field Name")
 }
 
 func main() {
 	flag.Parse()
-	config := sys.New(rawurl, host, port, sapic_url, sapic_token)
+	config := sys.New(host, port, rawurl, sapic_url, sapic_token, sapic_field)
 	if v {
 		fmt.Println(version)
 	} else if s {

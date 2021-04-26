@@ -29,9 +29,6 @@ import (
 
 var (
 	albumLimitNum uint64 = 5
-
-	// 专辑可选系统内置标签
-	SysLabels = []string{"亲人", "爱人", "暗恋", "偶像", "动漫"}
 )
 
 // 专辑属性
@@ -70,6 +67,10 @@ func (a *album) AddLabel(label string) {
 	a.Label = append(a.Label, label)
 }
 
+func (a *album) Exist(rc *db.Conn) (bool, error) {
+	return rc.HExists(vars.GenAlbumKey(a.Owner), a.ID)
+}
+
 func NewFairy(owner, albumID, src, desc string) (f *fairy, err error) {
 	if albumID == "" || owner == "" {
 		err = errors.New("invalid fairy param")
@@ -99,7 +100,7 @@ func (w wrap) CreateAlbum(a *album) error {
 		return errors.New("invalid album param")
 	}
 	// check db
-	index := vars.GenAlbumKey(a.Owner) // redis type hash
+	index := vars.GenAlbumKey(a.Owner)
 	length, err := w.HLen(index)
 	if err != nil {
 		return err
@@ -107,7 +108,7 @@ func (w wrap) CreateAlbum(a *album) error {
 	if length > albumLimitNum {
 		return errors.New("the number of albums exceeds the limit")
 	}
-	// write db
+	// write db, if exists(=update)
 	val, err := json.Marshal(a)
 	if err != nil {
 		return err

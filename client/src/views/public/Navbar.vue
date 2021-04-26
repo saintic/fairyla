@@ -14,7 +14,6 @@
                 <el-menu-item index="/ta">
                     <i class="saintic-icon saintic-icon-goddess"></i> 她是
                 </el-menu-item>
-
                 <el-menu-item index v-if="isLogin">
                     <el-avatar
                         class="avatar"
@@ -65,9 +64,7 @@ export default {
             avatar: defaultAvatar
         }
     },
-    computed: {
-        ...mapState(['isLogin', 'user'])
-    }
+    computed: mapState(['isLogin', 'user'])
 }
 </script>
 
