@@ -1,6 +1,6 @@
 <template>
-    <el-row type="flex" class="row-bg" justify="center">
-        <el-col :span="6">
+    <el-row type="flex" justify="center" align="middle">
+        <el-col :span="12">
             <div v-if="isLogin">
                 <div class="description">
                     <i
@@ -10,62 +10,33 @@
                     她是小仙女啦
                 </div>
 
-                <el-row :gutter="15">
-                    <el-form
-                        ref="fairy"
-                        :model="albumfairy"
-                        :rules="rules"
-                        size="medium"
-                        label-width="100px"
-                    >
-                        <el-col :span="24">
-                            <el-form-item label="专辑" prop="album">
-                                <el-select
-                                    v-model="albumfairy.album"
-                                    placeholder="请选择或新建专辑"
-                                    allow-create
-                                    filterable
-                                >
-                                    <el-option
-                                        v-for="(item, index) in albumOptions"
-                                        :key="index"
-                                        :label="item.label"
-                                        :value="item.value"
-                                        :disabled="item.disabled"
-                                    ></el-option>
-                                </el-select>
-                            </el-form-item>
-                        </el-col>
-                        <el-col :span="12">
-                            <el-form-item label="描述" prop="desc">
-                                <el-input
-                                    v-model="albumfairy.desc"
-                                    placeholder="请输入照片描述"
-                                    clearable
-                                >
-                                </el-input>
-                            </el-form-item>
-                        </el-col>
-                        <el-col :span="7">
-                            <el-form-item label-width="0" prop="">
-                                <el-upload
-                                    ref=""
-                                    :file-list="fileList"
-                                    :action="Action"
-                                    :before-upload="BeforeUpload"
-                                    accept="image/*"
-                                    name="picbed"
-                                >
-                                    <el-button
-                                        size="small"
-                                        type="primary"
-                                        icon="el-icon-upload"
-                                        >点击上传</el-button
-                                    >
-                                </el-upload>
-                            </el-form-item>
-                        </el-col>
-                        <el-col :span="24">
+                <el-form
+                    ref="fairy"
+                    :model="albumfairy"
+                    :rules="rules"
+                    size="small"
+                    label-width="100px"
+                >
+                    <el-row>
+                        <el-form-item label="专辑" prop="album">
+                            <el-select
+                                v-model="albumfairy.album"
+                                placeholder="请选择或新建专辑"
+                                allow-create
+                                filterable
+                            >
+                                <el-option
+                                    v-for="(item, index) in albumOptions"
+                                    :key="index"
+                                    :label="item.label"
+                                    :value="item.value"
+                                    :disabled="item.disabled"
+                                ></el-option>
+                            </el-select>
+                        </el-form-item>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="17">
                             <el-form-item label="照片" prop="src">
                                 <el-input
                                     v-model="albumfairy.src"
@@ -76,42 +47,58 @@
                                 ></el-input>
                             </el-form-item>
                         </el-col>
+                        <el-col :span="7">
+                            <el-form-item label-width="0" prop="">
+                                <el-tooltip
+                                    effect="dark"
+                                    content="可以上传 jpg/jpeg/png/webp
+                                        文件，且不超过 10MB"
+                                    placement="top"
+                                >
+                                    <el-upload
+                                        ref=""
+                                        :file-list="fileList"
+                                        :before-upload="BeforeUpload"
+                                        accept="image/*"
+                                        :action="api"
+                                        :headers="headers"
+                                        :data="data"
+                                        :name="field"
+                                    >
+                                        <el-button
+                                            size="small"
+                                            type="primary"
+                                            icon="el-icon-upload"
+                                            >点击上传</el-button
+                                        >
+                                    </el-upload>
+                                </el-tooltip>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
                         <el-col :span="24">
-                            <el-form-item size="large">
+                            <el-form-item label="描述" prop="desc">
+                                <el-input
+                                    v-model="albumfairy.desc"
+                                    placeholder="请输入照片描述"
+                                    clearable
+                                >
+                                </el-input>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="11">
+                            <el-form-item size="small">
                                 <el-button type="primary" @click="submitForm"
                                     >提交</el-button
                                 >
                                 <el-button @click="resetForm">重置</el-button>
                             </el-form-item>
                         </el-col>
-                    </el-form>
-                </el-row>
-
-                <div class="upload-area">
-                    <el-upload
-                        class="upload"
-                        drag
-                        :action="api"
-                        :headers="headers"
-                        :data="data"
-                        :name="field"
-                        accept="images"
-                        :limit="10"
-                        multiple
-                    >
-                        <i class="el-icon-upload"></i>
-                        <div class="el-upload__text">
-                            将文件拖到此处，或<em>点击上传</em>
-                        </div>
-                        <template #tip>
-                            <div class="el-upload__tip">
-                                可以上传 jpg/jpeg/png/webp 文件，且不超过 10MB
-                                <br />
-                                也可以在此处粘贴图片地址上传（不支持粘贴图片本身哦）
-                            </div>
-                        </template>
-                    </el-upload>
-                </div>
+                    </el-row>
+                </el-form>
             </div>
             <div v-else>你好，INDEX</div>
         </el-col>

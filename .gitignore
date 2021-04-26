@@ -121,3 +121,4 @@ dist
 # vendor/
 bin/
 .DS_Store
+nohup.out

@@ -23,14 +23,14 @@ import (
 	"os"
 	"strconv"
 	"strings"
-
-	"tcw.im/gtc"
 )
 
 type Setting struct {
 	Redis string
 	Host  string
 	Port  uint
+	ICP   string // beian.miit.gov.cn
+	Beian string // www.beian.gov.cn
 	Sapic Sapic
 }
 
@@ -98,23 +98,22 @@ func (s *Setting) parseEnv() {
 	if token != "" {
 		s.Sapic.Token = token
 	}
-    // other options
-    sep := "fairyla_"
-    for _, e := rage os.Environ() {
-        env := e.split("=")
-        if strings.HasPrefix(env[0], sep) {
-            field := strings.TrimPrefix(env[0], sep)
-            switch field {
-            case "icp":
-                ...
-            case val2:
-                ...
-            default:
-                ...
-        }
-        }
+	// other options
+	sep := "fairyla_"
+	for _, e := range os.Environ() {
+		env := strings.Split(e, "=")
+		if len(env) > 2 && strings.HasPrefix(env[0], sep) {
+			field := strings.TrimPrefix(env[0], sep)
+			v := env[1]
+			switch field {
+			case "icp":
+				s.ICP = v
+			case "beian":
+				s.Beian = v
+			}
+		}
 
-    }
+	}
 }
 
 func (s *Setting) String() string {
