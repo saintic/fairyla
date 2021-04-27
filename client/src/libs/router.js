@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 import Index from '@/views/Index.vue'
 import { mutations, actions } from './store.js'
 import { TitleSep, TitleSuffix } from './vars.js'
@@ -67,7 +67,7 @@ const routes = [
 ]
 
 const router = createRouter({
-    history: createWebHistory(),
+    history: createWebHashHistory(),
     routes
 })
 
@@ -86,8 +86,7 @@ router.beforeEach((to, from) => {
         // 此路由需要授权，请检查是否已登录
         // 如果没有，则重定向到登录页面
         return {
-            path: '/login',
-            // 保存我们所在的位置，以便以后再来
+            name: 'Login',
             query: { redirect: to.fullPath }
         }
     }

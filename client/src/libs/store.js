@@ -17,7 +17,9 @@ export const mutations = {
     isLogged() {
         return state.isLogin === true && state.token !== '' && state.user !== ''
     },
-    setToken(jwt) {
+    setLogin(user, jwt) {
+        this.commit('isLogin', true)
+        this.commit('user', user)
         this.commit('token', jwt)
     },
     clearLogin() {

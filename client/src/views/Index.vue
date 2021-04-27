@@ -12,7 +12,7 @@
 
                 <el-form
                     ref="fairy"
-                    :model="albumfairy"
+                    :model="af"
                     :rules="rules"
                     size="small"
                     label-width="100px"
@@ -20,17 +20,16 @@
                     <el-row>
                         <el-form-item label="专辑" prop="album">
                             <el-select
-                                v-model="albumfairy.album"
+                                v-model="af.album"
                                 placeholder="请选择或新建专辑"
                                 allow-create
                                 filterable
                             >
                                 <el-option
-                                    v-for="(item, index) in albumOptions"
+                                    v-for="(item, index) in albums"
                                     :key="index"
-                                    :label="item.label"
-                                    :value="item.value"
-                                    :disabled="item.disabled"
+                                    :label="item"
+                                    :value="item"
                                 ></el-option>
                             </el-select>
                         </el-form-item>
@@ -39,7 +38,7 @@
                         <el-col :span="17">
                             <el-form-item label="照片" prop="src">
                                 <el-input
-                                    v-model="albumfairy.src"
+                                    v-model="af.src"
                                     placeholder="请输入照片地址或上传"
                                     show-word-limit
                                     clearable
@@ -51,19 +50,15 @@
                             <el-form-item label-width="0" prop="">
                                 <el-tooltip
                                     effect="dark"
-                                    content="可以上传 jpg/jpeg/png/webp
-                                        文件，且不超过 10MB"
+                                    :content="upTip"
                                     placement="top"
                                 >
                                     <el-upload
-                                        ref=""
-                                        :file-list="fileList"
-                                        :before-upload="BeforeUpload"
-                                        accept="image/*"
-                                        :action="api"
-                                        :headers="headers"
-                                        :data="data"
-                                        :name="field"
+                                        accept="image/jpg, image/jpeg, image/webp, image/png"
+                                        :before-upload="upBefore"
+                                        :http-request="upload"
+                                        :show-file-list="false"
+                                        action=""
                                     >
                                         <el-button
                                             size="small"
@@ -80,7 +75,7 @@
                         <el-col :span="24">
                             <el-form-item label="描述" prop="desc">
                                 <el-input
-                                    v-model="albumfairy.desc"
+                                    v-model="af.desc"
                                     placeholder="请输入照片描述"
                                     clearable
                                 >
@@ -89,14 +84,12 @@
                         </el-col>
                     </el-row>
                     <el-row>
-                        <el-col :span="11">
-                            <el-form-item size="small">
-                                <el-button type="primary" @click="submitForm"
-                                    >提交</el-button
-                                >
-                                <el-button @click="resetForm">重置</el-button>
-                            </el-form-item>
-                        </el-col>
+                        <el-form-item size="small">
+                            <el-button type="primary" @click="submitForm"
+                                >提交</el-button
+                            >
+                            <el-button @click="resetForm">重置</el-button>
+                        </el-form-item>
                     </el-row>
                 </el-form>
             </div>
@@ -106,16 +99,16 @@
 </template>
 
 <script>
+import axios from 'axios'
 import { mapState } from '@/libs/store.js'
 
 export default {
     name: 'Index',
     data() {
         return {
-            data: { picbed: this.field, album: '' },
-            headers: { Authorization: 'LinkToken ' + this.linkToken },
-            albumfairy: {
-                album: 2,
+            upTip: '支持上传 jpg/jpeg/png/webp 类型图片（不超过10MB）',
+            af: {
+                album: '',
                 desc: '',
                 src: ''
             },
@@ -126,28 +119,9 @@ export default {
                         message: '请选择或新建专辑',
                         trigger: 'change'
                     }
-                ],
-                desc: [
-                    {
-                        required: true,
-                        message: '请输入照片描述',
-                        trigger: 'blur'
-                    }
-                ],
-                src: []
+                ]
             },
-            Action: 'https://jsonplaceholder.typicode.com/posts/',
-            fileList: [],
-            albumOptions: [
-                {
-                    label: '选项一',
-                    value: 1
-                },
-                {
-                    label: '选项二',
-                    value: 2
-                }
-            ]
+            albums: []
         }
     },
     computed: mapState({
@@ -173,7 +147,7 @@ export default {
         resetForm() {
             this.$refs['fairy'].resetFields()
         },
-        BeforeUpload(file) {
+        upBefore(file) {
             let isRightSize = file.size / 1024 / 1024 < 10
             if (!isRightSize) {
                 this.$message.error('文件大小超过 10MB')
@@ -183,6 +157,42 @@ export default {
                 this.$message.error('应该选择image/*类型的文件')
             }
             return isRightSize && isAccept
+        },
+        upload(opt) {
+            console.log(opt)
+            let data = new FormData()
+            data.append(this.field, opt.file)
+            data.append('album', this.af.album)
+            data.append('title', this.af.desc)
+            axios
+                .post(this.api, data, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                        Authorization: 'LinkToken ' + this.linkToken
+                    }
+                })
+                .then((res) => {
+                    console.log('上传图片接口-数据', res)
+                    let data = res.data
+                    if (data.code === 0) {
+                        this.af.src = data.src
+                    } else {
+                        this.$message.warning(data.msg)
+                    }
+                })
+                .catch((err) => {
+                    this.$message.error(err)
+                })
+        }
+    },
+    created() {
+        if (this.isLogin) {
+            this.$http.get('/user/album').then((res) => {
+                console.log(res)
+                res.data.map((a) => {
+                    this.albums.push(a.name)
+                })
+            })
         }
     }
 }

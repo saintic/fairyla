@@ -43,7 +43,7 @@ http.interceptors.request.use(
     },
     (error) => {
         // 处理请求错误
-        console.log(error) // for debug
+        console.error(error)
         return Promise.reject(error)
     }
 )

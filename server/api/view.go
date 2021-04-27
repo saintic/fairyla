@@ -22,6 +22,7 @@ import (
 	"fairyla/internal/user/auth"
 	"fairyla/vars"
 	"fmt"
+	"strings"
 
 	"github.com/labstack/echo/v4"
 	"tcw.im/gtc"
@@ -72,12 +73,25 @@ func testView(c echo.Context) error {
 
 func createAlbumView(c echo.Context) error {
 	name := c.FormValue("name")
+	labels := c.FormValue("labels")
 	a, err := album.NewAlbum(c.Get("user").(string), name)
 	if err != nil {
 		return err
 	}
+	has, err := a.Exist(rc)
+	if err != nil {
+		return err
+	}
+	if has {
+		return errors.New("album already exists")
+	}
+	if labels != "" {
+		for _, label := range strings.Split(labels, ",") {
+			a.AddLabel(strings.TrimSpace(label))
+		}
+	}
 	w := album.New(rc)
-	err = w.CreateAlbum(a)
+	err = w.WriteAlbum(a)
 	if err != nil {
 		return err
 	}
@@ -105,7 +119,7 @@ func createFairyView(c echo.Context) error {
 			return err
 		}
 		if !has {
-			err := w.CreateAlbum(a)
+			err := w.WriteAlbum(a)
 			if err != nil {
 				return err
 			}
@@ -116,7 +130,7 @@ func createFairyView(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	err = w.CreateFairy(f)
+	err = w.WriteFairy(f)
 	if err != nil {
 		return err
 	}

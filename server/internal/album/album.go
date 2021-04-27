@@ -56,9 +56,10 @@ func NewAlbum(owner, name string) (a *album, err error) {
 		err = errors.New("invalid fairy param")
 		return
 	}
+	// Name在用户中唯一，即ID唯一
+	ID := gtc.MD5(owner + name)
 	a = &album{
-		ID: gtc.MD5(owner + name), Owner: owner, Name: name, Public: true,
-		CTime: util.Now(),
+		ID: ID, Owner: owner, Name: name, Public: true, CTime: util.Now(),
 	}
 	return
 }
@@ -94,7 +95,7 @@ func New(c *db.Conn) wrap {
 	return wrap{c}
 }
 
-func (w wrap) CreateAlbum(a *album) error {
+func (w wrap) WriteAlbum(a *album) error {
 	// check param
 	if a.Owner == "" || a.ID == "" {
 		return errors.New("invalid album param")
@@ -120,7 +121,7 @@ func (w wrap) CreateAlbum(a *album) error {
 	return nil
 }
 
-func (w wrap) CreateFairy(f *fairy) error {
+func (w wrap) WriteFairy(f *fairy) error {
 	// check param
 	if f.ID == "" || f.Owner == "" || f.AlbumID == "" || f.Src == "" {
 		return errors.New("invalid fairy param")

@@ -91,10 +91,17 @@ export default {
                         .then((res) => {
                             this.logining = false
                             this.$message.success('登录成功')
-                            this.$store.mutations.setToken(res.data.token)
+                            this.$store.mutations.setLogin(
+                                this.loginForm.username,
+                                res.data.token
+                            )
                             this.$store.actions.saveConfig2Local()
                             this.$store.actions.fetchConfig()
-                            this.$router.push({ path: '/' })
+                            let rdt = this.$route.query.redirect || ''
+                            if (!rdt.startsWith('/')) {
+                                rdt = '/'
+                            }
+                            this.$router.push({ path: rdt })
                         })
                         .catch((e) => {
                             this.logining = false
