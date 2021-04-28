@@ -17,12 +17,18 @@
 package api
 
 import (
+	"encoding/base64"
+	"encoding/json"
 	"errors"
+	"fmt"
+	"io/ioutil"
+	"net/http"
+	"strings"
+	"time"
+
 	"fairyla/internal/album"
 	"fairyla/internal/user/auth"
 	"fairyla/vars"
-	"fmt"
-	"strings"
 
 	"github.com/labstack/echo/v4"
 	"tcw.im/gtc"
@@ -101,14 +107,14 @@ func createAlbumView(c echo.Context) error {
 func createFairyView(c echo.Context) error {
 	user := c.Get("user").(string)
 	albumID := c.FormValue("album_id")
-	albumName := c.FormValue("album_name")
+	albumName := c.FormValue("album")
 	src := c.FormValue("src")
 	desc := c.FormValue("desc")
 	w := album.New(rc)
 	if albumID == "" {
 		// auto create album
 		if albumName == "" {
-			return errors.New("invalid album_id or album_name")
+			return errors.New("invalid album_id or album")
 		}
 		a, err := album.NewAlbum(user, albumName)
 		if err != nil {
@@ -153,4 +159,78 @@ func listFairyView(c echo.Context) error {
 		return err
 	}
 	return c.JSON(200, vars.NewResData(data))
+}
+
+func configView(c echo.Context) error {
+	data := cfg.SitePublic()
+	data["isLogin"] = false
+	user, err := checkJWT(c)
+	if err == nil {
+		data["isLogin"] = true
+	}
+	data["user"] = user
+	return c.JSON(200, vars.NewResData(data))
+}
+
+func uploadView(c echo.Context) error {
+	album := c.FormValue("album")
+	title := c.FormValue("title")
+	file, err := c.FormFile("file")
+	if err != nil {
+		return err
+	}
+	fd, err := file.Open()
+	if err != nil {
+		return err
+	}
+	defer fd.Close()
+
+	content, err := ioutil.ReadAll(fd)
+	if err != nil {
+		return err
+	}
+	pic := base64.StdEncoding.EncodeToString(content)
+
+	var post http.Request
+	post.ParseForm()
+	post.Form.Add(cfg.Sapic.Field, pic)
+	post.Form.Add("album", album)
+	post.Form.Add("title", title)
+
+	client := &http.Client{Timeout: 30 * time.Second}
+	req, err := http.NewRequest(
+		"POST", cfg.Sapic.Api, strings.NewReader(post.Form.Encode()),
+	)
+	if err != nil {
+		return err
+	}
+
+	req.Header.Set("Content-Type", echo.MIMEApplicationForm)
+	req.Header.Set("User-Agent", "fairyla/v1")
+	req.Header.Set("Authorization", "LinkToken "+cfg.Sapic.Token)
+
+	res, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return err
+	}
+	ret := struct {
+		Code int    `json:"-"`
+		Msg  string `json:"-"`
+		Src  string `json:"src"`
+	}{}
+	err = json.Unmarshal(body, &ret)
+	if err != nil {
+		return err
+	}
+	if ret.Code == 0 {
+		return c.JSON(200, vars.NewResData(ret))
+	} else {
+		return errors.New(ret.Msg)
+	}
 }

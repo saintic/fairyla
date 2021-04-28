@@ -18,12 +18,13 @@ package auth
 
 import (
 	"errors"
-	"fairyla/pkg/db"
-	"fairyla/pkg/util"
-	"fairyla/vars"
 	"fmt"
 	"strings"
 	"time"
+
+	"fairyla/pkg/db"
+	"fairyla/pkg/util"
+	"fairyla/vars"
 
 	jwt "github.com/dgrijalva/jwt-go"
 )

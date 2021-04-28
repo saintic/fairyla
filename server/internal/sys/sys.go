@@ -146,6 +146,7 @@ func (s *Setting) Check() {
 // 站点公共配置项
 func (s *Setting) SitePublic() map[string]interface{} {
 	cfg := make(map[string]interface{})
-	cfg["sapic"] = s.Sapic
+	cfg["icp"] = s.ICP
+	cfg["beian"] = s.Beian
 	return cfg
 }

@@ -4,7 +4,7 @@
             <div v-if="isLogin">
                 <div class="description">
                     <i
-                        class="saintic-icon saintic-icon-goddess saintic-icon-2-5"
+                        class="saintic-icon saintic-icon-goddess saintic-icon-3"
                     ></i>
                     <br />
                     她是小仙女啦
@@ -56,9 +56,10 @@
                                     <el-upload
                                         accept="image/jpg, image/jpeg, image/webp, image/png"
                                         :before-upload="upBefore"
-                                        :http-request="upload"
                                         :show-file-list="false"
-                                        action=""
+                                        action="/api/upload"
+                                        :on-success="upSuccess"
+                                        :headers="headers"
                                     >
                                         <el-button
                                             size="small"
@@ -93,17 +94,18 @@
                     </el-row>
                 </el-form>
             </div>
-            <div v-else>你好，INDEX</div>
+            <div v-else><Welcome /></div>
         </el-col>
     </el-row>
 </template>
 
 <script>
-import axios from 'axios'
 import { mapState } from '@/libs/store.js'
+import Welcome from '@/components/Welcome.vue'
 
 export default {
     name: 'Index',
+    components: { Welcome },
     data() {
         return {
             upTip: '支持上传 jpg/jpeg/png/webp 类型图片（不超过10MB）',
@@ -127,21 +129,21 @@ export default {
     computed: mapState({
         isLogin: 'isLogin',
         user: 'user',
-        api: (state) => {
-            return state.sapic.api
-        },
-        field: (state) => {
-            return state.sapic.field || 'picbed'
-        },
-        linkToken: (state) => {
-            return state.sapic.token
-        }
+        headers: (state) => ({ Authorization: 'Bearer ' + state.token })
     }),
     methods: {
         submitForm() {
             this.$refs['fairy'].validate((valid) => {
                 if (!valid) return
-                // TODO 提交表单
+                this.$http
+                    .post('/user/fairy', this.af)
+                    .then((res) => {
+                        this.$message.success('已提交')
+                        this.resetForm()
+                    })
+                    .catch((err) => {
+                        console.error(err)
+                    })
             })
         },
         resetForm() {
@@ -158,31 +160,13 @@ export default {
             }
             return isRightSize && isAccept
         },
-        upload(opt) {
-            console.log(opt)
-            let data = new FormData()
-            data.append(this.field, opt.file)
-            data.append('album', this.af.album)
-            data.append('title', this.af.desc)
-            axios
-                .post(this.api, data, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                        Authorization: 'LinkToken ' + this.linkToken
-                    }
-                })
-                .then((res) => {
-                    console.log('上传图片接口-数据', res)
-                    let data = res.data
-                    if (data.code === 0) {
-                        this.af.src = data.src
-                    } else {
-                        this.$message.warning(data.msg)
-                    }
-                })
-                .catch((err) => {
-                    this.$message.error(err)
-                })
+        upSuccess(res) {
+            console.log(res)
+            if (res.success) {
+                this.af.src = res.data.src
+            } else {
+                this.$message.error(res.message)
+            }
         }
     },
     created() {

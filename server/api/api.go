@@ -21,13 +21,15 @@ import (
 
 	"fairyla/internal/sys"
 	"fairyla/pkg/db"
-	"fairyla/vars"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
 
-var rc *db.Conn
+var (
+	rc  *db.Conn
+	cfg *sys.Setting
+)
 
 func StartApi(config *sys.Setting) {
 	c, err := db.New(config.Redis)
@@ -35,6 +37,7 @@ func StartApi(config *sys.Setting) {
 		panic(err)
 	}
 	rc = c
+	cfg = config
 
 	e := echo.New()
 	e.Debug = true
@@ -42,18 +45,8 @@ func StartApi(config *sys.Setting) {
 	e.Use(middleware.Logger())
 
 	api := e.Group("/api")
-
-	api.GET("/config", func(c echo.Context) error {
-		data := config.SitePublic()
-		data["isLogin"] = false
-		user, err := checkJWT(c)
-		if err == nil {
-			data["isLogin"] = true
-		}
-		data["user"] = user
-
-		return c.JSON(200, vars.NewResData(data))
-	})
+	api.GET("/config", configView)
+	api.POST("/upload", uploadView, loginRequired)
 
 	auth := api.Group("/auth")
 	auth.POST("/signup", signUpView)
