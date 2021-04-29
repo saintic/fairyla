@@ -14,7 +14,7 @@
                 <el-menu-item index="/ta">
                     <i class="saintic-icon saintic-icon-goddess"></i> 她是
                 </el-menu-item>
-                <el-menu-item v-if="isLogin">
+                <el-menu-item index v-if="isLogin">
                     <el-avatar
                         class="avatar"
                         :src="avatar"
@@ -23,9 +23,6 @@
                 </el-menu-item>
                 <el-submenu v-if="isLogin">
                     <template #title>{{ user }}</template>
-                    <el-menu-item index="/my" v-if="isLogin">
-                        <i class="saintic-icon saintic-icon-home"></i> 个人中心
-                    </el-menu-item>
                     <el-menu-item index="/my/profile">
                         <i class="saintic-icon saintic-icon-user"></i>
                         个人资料
@@ -33,6 +30,10 @@
                     <el-menu-item index="/my/setting">
                         <i class="saintic-icon saintic-icon-setting"></i>
                         用户设置
+                    </el-menu-item>
+                    <el-menu-item index="/my/album">
+                        <i class="saintic-icon saintic-icon-user-album"></i>
+                        我的专辑
                     </el-menu-item>
                     <el-menu-item>-------------</el-menu-item>
                     <el-menu-item index="/logout">

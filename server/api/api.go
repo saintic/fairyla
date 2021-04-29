@@ -52,11 +52,10 @@ func StartApi(config *sys.Setting) {
 	auth.POST("/signup", signUpView)
 	auth.POST("/signin", signInView)
 
-	test := api.Group("/test", loginRequired)
-	test.POST("/check", testView)
-
 	user := api.Group("/user", loginRequired)
 	user.GET("/album", listAlbumView)
+	user.GET("/album/:id", getAlbumView)
+	user.GET("/album/:id/fairy", getAlbumFairyView)
 	user.POST("/album", createAlbumView)
 	user.GET("/fairy", listFairyView)
 	user.POST("/fairy", createFairyView)

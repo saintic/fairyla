@@ -53,8 +53,8 @@ const routes = [
                 component: () => import('@/views/home/UserSetting.vue')
             },
             {
-                path: 'image',
-                component: () => import('@/views/home/UserImage.vue')
+                path: 'album',
+                component: () => import('@/views/home/UserAlbum.vue')
             }
         ],
         meta: { requiresAuth: true }

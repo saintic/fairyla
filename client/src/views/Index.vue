@@ -139,6 +139,10 @@ export default {
                     .post('/user/fairy', this.af)
                     .then((res) => {
                         this.$message.success('已提交')
+                        // try update albums
+                        if (!this.albums.includes(this.af.album)) {
+                            this.albums.push(this.af.album)
+                        }
                         this.resetForm()
                     })
                     .catch((err) => {

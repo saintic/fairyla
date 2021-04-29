@@ -73,10 +73,6 @@ func signInView(c echo.Context) error {
 	return c.JSON(200, vars.NewResData(data))
 }
 
-func testView(c echo.Context) error {
-	return c.JSON(200, vars.ResOK())
-}
-
 func createAlbumView(c echo.Context) error {
 	name := c.FormValue("name")
 	labels := c.FormValue("labels")
@@ -140,12 +136,35 @@ func createFairyView(c echo.Context) error {
 	if err != nil {
 		return err
 	}
+	a, err := w.GetAlbum(user, f.AlbumID)
+	if err == nil {
+		(&a).SetLatest(f)
+		w.WriteAlbum(&a)
+	}
 	return c.JSON(200, vars.NewResData(f))
 }
 
 func listAlbumView(c echo.Context) error {
 	w := album.New(rc)
-	data, err := w.ListAlbum(c.Get("user").(string))
+	data, err := w.ListAlbums(c.Get("user").(string))
+	if err != nil {
+		return err
+	}
+	return c.JSON(200, vars.NewResData(data))
+}
+
+func getAlbumView(c echo.Context) error {
+	w := album.New(rc)
+	data, err := w.GetAlbum(c.Get("user").(string), c.Param("id"))
+	if err != nil {
+		return err
+	}
+	return c.JSON(200, vars.NewResData(data))
+}
+
+func getAlbumFairyView(c echo.Context) error {
+	w := album.New(rc)
+	data, err := w.GetFairies(c.Get("user").(string), c.Param("id"))
 	if err != nil {
 		return err
 	}
@@ -154,7 +173,7 @@ func listAlbumView(c echo.Context) error {
 
 func listFairyView(c echo.Context) error {
 	w := album.New(rc)
-	data, err := w.ListFairy(c.Get("user").(string))
+	data, err := w.ListFairies(c.Get("user").(string))
 	if err != nil {
 		return err
 	}

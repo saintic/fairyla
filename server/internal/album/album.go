@@ -19,6 +19,7 @@ package album
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 
 	"fairyla/pkg/db"
 	"fairyla/pkg/util"
@@ -33,12 +34,14 @@ var (
 
 // 专辑属性
 type album struct {
-	ID     string   `json:"id"`    // 专辑ID，唯一性，索引，由Name而来
-	Owner  string   `json:"owner"` // 所属用户
-	Name   string   `json:"name"`  // 专辑名称，不具备唯一性
-	CTime  int64    `json:"ctime"`
-	Public bool     `json:"public"`
-	Label  []string `json:"label"`
+	ID          string   `json:"id"`    // 专辑ID，唯一性，索引，由Name而来
+	Owner       string   `json:"owner"` // 所属用户
+	Name        string   `json:"name"`  // 专辑名称，不具备唯一性
+	CTime       int64    `json:"ctime"`
+	Public      bool     `json:"public"`
+	Label       []string `json:"label"`
+	LatestFairy *fairy   `json:"latest_fairy"` // 最近上传的fairy
+	SteadyFairy *fairy   `json:"steady_fairy"` // 固定设置的fairy
 }
 
 // 照片属性
@@ -49,6 +52,11 @@ type fairy struct {
 	CTime   int64  `json:"ctime"`
 	Desc    string `json:"desc"`
 	Src     string `json:"src"` // 照片存储地址，理论上要求唯一
+}
+
+type AlbumFairys struct {
+	album
+	Fairy []fairy
 }
 
 func NewAlbum(owner, name string) (a *album, err error) {
@@ -68,6 +76,14 @@ func (a *album) AddLabel(label string) {
 	a.Label = append(a.Label, label)
 }
 
+func (a *album) SetLatest(f *fairy) {
+	a.LatestFairy = f
+}
+
+func (a *album) SetSteady(f *fairy) {
+	a.SteadyFairy = f
+}
+
 func (a *album) Exist(rc *db.Conn) (bool, error) {
 	return rc.HExists(vars.GenAlbumKey(a.Owner), a.ID)
 }
@@ -81,8 +97,8 @@ func NewFairy(owner, albumID, src, desc string) (f *fairy, err error) {
 		err = errors.New("illegal fairyl url")
 		return
 	}
-	// 专辑内相册地址唯一（覆盖）
-	f = &fairy{gtc.MD5(albumID + src), albumID, owner, util.Now(), desc, src}
+	ID := fmt.Sprintf("%s-%s-%d", albumID, src, util.Now())
+	f = &fairy{gtc.MD5(ID), albumID, owner, util.Now(), desc, src}
 	return
 }
 
@@ -95,6 +111,7 @@ func New(c *db.Conn) wrap {
 	return wrap{c}
 }
 
+// Only check the basic parameters and (overwrite) write
 func (w wrap) WriteAlbum(a *album) error {
 	// check param
 	if a.Owner == "" || a.ID == "" {
@@ -121,6 +138,7 @@ func (w wrap) WriteAlbum(a *album) error {
 	return nil
 }
 
+// Only check the basic parameters and (overwrite) write
 func (w wrap) WriteFairy(f *fairy) error {
 	// check param
 	if f.ID == "" || f.Owner == "" || f.AlbumID == "" || f.Src == "" {
@@ -139,7 +157,7 @@ func (w wrap) WriteFairy(f *fairy) error {
 	return nil
 }
 
-func (w wrap) ListAlbum(user string) (albums []album, err error) {
+func (w wrap) ListAlbums(user string) (albums []album, err error) {
 	data, err := w.HGetAll(vars.GenAlbumKey(user))
 	if err != nil {
 		return
@@ -155,14 +173,26 @@ func (w wrap) ListAlbum(user string) (albums []album, err error) {
 	return
 }
 
-func (w wrap) ListFairy(user string) (out map[string][]fairy, err error) {
+func (w wrap) GetAlbum(user, albumID string) (a album, err error) {
+	val, err := w.HGet(vars.GenAlbumKey(user), albumID)
+	if err != nil {
+		return
+	}
+	err = json.Unmarshal([]byte(val), &a)
+	if err != nil {
+		return
+	}
+	return
+}
+
+func (w wrap) ListFairies(user string) (out map[string][]fairy, err error) {
 	data, err := w.HGetAll(vars.GenAlbumKey(user))
 	if err != nil {
 		return
 	}
 	out = make(map[string][]fairy)
 	for albumID := range data {
-		fs, e := w.GetFairy(user, albumID)
+		fs, e := w.GetFairies(user, albumID)
 		if e != nil {
 			err = e
 			return
@@ -172,7 +202,7 @@ func (w wrap) ListFairy(user string) (out map[string][]fairy, err error) {
 	return
 }
 
-func (w wrap) GetFairy(user, albumID string) (fairies []fairy, err error) {
+func (w wrap) GetFairies(user, albumID string) (fairies []fairy, err error) {
 	data, err := w.HGetAll(vars.GenFairyKey(user, albumID))
 	if err != nil {
 		return
@@ -184,6 +214,18 @@ func (w wrap) GetFairy(user, albumID string) (fairies []fairy, err error) {
 		if e == nil {
 			fairies = append(fairies, f)
 		}
+	}
+	return
+}
+
+func (w wrap) GetFairy(user, albumID, fairyID string) (f fairy, err error) {
+	val, err := w.HGet(vars.GenFairyKey(user, albumID), albumID)
+	if err != nil {
+		return
+	}
+	err = json.Unmarshal([]byte(val), &f)
+	if err != nil {
+		return
 	}
 	return
 }

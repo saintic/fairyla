@@ -25,7 +25,9 @@ export default {
         //在页面刷新时持久化状态数据
         window.addEventListener('beforeunload', (e) => {
             this.$store.actions.saveConfig2Local()
-            e.returnValue = ''
+            //e, preventDefault()
+            //e.returnValue = ''
+            //return ''
         })
     }
 }
@@ -45,5 +47,8 @@ body > .el-container {
 .el-header,
 .el-footer {
     line-height: 60px;
+}
+a {
+    color: #42b983;
 }
 </style>
