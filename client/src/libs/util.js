@@ -56,7 +56,7 @@ http.interceptors.response.use(
         console.log(response)
         let data = response.data
         if (!data.success) {
-            let prefix = ErrMsgMap[response.config.url],
+            let prefix = getErrMsgPrefix(response.config.url),
                 text = data.message || 'Error'
             ElMessage.error(prefix + text)
             return Promise.reject(new Error(text))
@@ -65,7 +65,7 @@ http.interceptors.response.use(
         }
     },
     (error) => {
-        let prefix = ErrMsgMap[error.config.url],
+        let prefix = getErrMsgPrefix(error.config.url),
             text = ''
 
         if (error.response) {
@@ -123,6 +123,15 @@ http.interceptors.response.use(
     }
 )
 
+function getErrMsgPrefix(url) {
+    for (let key of Object.keys(ErrMsgMap)) {
+        if (url.startsWith(key)) {
+            return ErrMsgMap[key]
+        }
+    }
+    return ''
+}
+
 /**
  * 设置过期存储
  * @param {*} data 数据
@@ -174,4 +183,25 @@ export function isObject(o) {
 
 export function isValidMap(map) {
     return Array.isArray(map) || isObject(map)
+}
+
+export function formatUnixTimestamp(unixtimestamp) {
+    var unixtimestamp = new Date(unixtimestamp * 1000)
+    var year = 1900 + unixtimestamp.getYear()
+    var month = '0' + (unixtimestamp.getMonth() + 1)
+    var date = '0' + unixtimestamp.getDate()
+    var hour = '0' + unixtimestamp.getHours()
+    var minute = '0' + unixtimestamp.getMinutes()
+    //var second = '0' + unixtimestamp.getSeconds()
+    return (
+        year +
+        '-' +
+        month.substring(month.length - 2, month.length) +
+        '-' +
+        date.substring(date.length - 2, date.length) +
+        ' ' +
+        hour.substring(hour.length - 2, hour.length) +
+        ':' +
+        minute.substring(minute.length - 2, minute.length)
+    )
 }

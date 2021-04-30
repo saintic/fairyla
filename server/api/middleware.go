@@ -17,7 +17,6 @@
 package api
 
 import (
-	"errors"
 	"strings"
 
 	"fairyla/internal/user/auth"
@@ -25,12 +24,17 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+var (
+	ErrJWTMissing = echo.NewHTTPError(400, "missing or malformed jwt")
+	ErrJWTInvalid = echo.NewHTTPError(401, "invalid or expired jwt")
+)
+
 func getJWT(c echo.Context) (token string, err error) {
 	scheme := "Bearer "
 	field := c.Request().Header.Get(echo.HeaderAuthorization)
 	token = strings.TrimPrefix(field, scheme)
 	if !strings.HasPrefix(field, scheme) || token == "" {
-		err = errors.New("missing or malformed token")
+		err = ErrJWTMissing
 		return
 	}
 	return
@@ -43,7 +47,7 @@ func checkJWT(c echo.Context) (user string, err error) {
 	}
 	claims, err := auth.ParseToken(rc, token)
 	if err != nil {
-		err = errors.New("invalid or expired token")
+		err = ErrJWTInvalid
 		return
 	}
 	user = claims["name"].(string)
@@ -54,6 +58,9 @@ func loginRequired(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		user, err := checkJWT(c)
 		if err != nil {
+			if err == ErrJWTMissing || err == ErrJWTInvalid {
+				return err
+			}
 			return echo.NewHTTPError(400, err.Error())
 		}
 		c.Set("user", user)

@@ -7,13 +7,22 @@
                     v-for="album in albums"
                     :key="album.id"
                 >
-                    <a href="" :title="album.label" class="post-main">
-                        <img :src="album.fairy.src" :alt="album.fairy.desc" />
+                    <router-link
+                        :to="{ name: 'Album', params: { name: album.name } }"
+                        :title="album.label"
+                        class="post-main"
+                    >
+                        <el-image
+                            :src="album.fairy.src"
+                            :title="album.fairy.desc"
+                            fit="cover"
+                        >
+                        </el-image>
                         <div class="post-content">
                             <h3>{{ album.name }}</h3>
                             <p>&nbsp;&nbsp; 所属：{{ album.owner }}</p>
                         </div>
-                    </a>
+                    </router-link>
                 </article>
             </section>
         </section>
@@ -33,7 +42,7 @@ defineProps({
             if (!Array.isArray(value)) return false
             for (let v of value) {
                 if (!isObject(v)) return false
-                if (!v.hasOwnProperty('name') || v.hasOwnProperty('fairy')) {
+                if (!v.hasOwnProperty('name') || !v.hasOwnProperty('fairy')) {
                     return false
                 }
             }

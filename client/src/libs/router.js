@@ -57,12 +57,19 @@ const routes = [
                 component: () => import('@/views/home/UserAlbum.vue')
             }
         ],
-        meta: { requiresAuth: true }
+        meta: { requiresAuth: true, title: '个人中心' }
+    },
+    {
+        path: '/album/:name',
+        name: 'Album',
+        component: () => import('@/views/album/AlbumFairy.vue'),
+        meta: { requiresAuth: true, title: '专辑' }
     },
     {
         path: '/:pathMatch(.*)*',
         name: 'NotFound',
-        component: () => import('@/views/public/NotFound.vue')
+        component: () => import('@/views/public/NotFound.vue'),
+        meta: { title: '页面未发现' }
     }
 ]
 

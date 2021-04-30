@@ -54,9 +54,13 @@ type fairy struct {
 	Src     string `json:"src"` // 照片存储地址，理论上要求唯一
 }
 
-type AlbumFairys struct {
+type AlbumFairy struct {
 	album
-	Fairy []fairy
+	Fairy []fairy `json:"fairy"`
+}
+
+func AlbumName2ID(owner, name string) string {
+	return gtc.MD5(owner + name)
 }
 
 func NewAlbum(owner, name string) (a *album, err error) {
@@ -65,9 +69,9 @@ func NewAlbum(owner, name string) (a *album, err error) {
 		return
 	}
 	// Name在用户中唯一，即ID唯一
-	ID := gtc.MD5(owner + name)
 	a = &album{
-		ID: ID, Owner: owner, Name: name, Public: true, CTime: util.Now(),
+		ID: AlbumName2ID(owner, name), Owner: owner, Name: name, Public: true,
+		CTime: util.Now(),
 	}
 	return
 }
@@ -182,6 +186,22 @@ func (w wrap) GetAlbum(user, albumID string) (a album, err error) {
 	if err != nil {
 		return
 	}
+	return
+}
+func (w wrap) GetAlbumFairies(user, albumID string) (a AlbumFairy, err error) {
+	val, err := w.HGet(vars.GenAlbumKey(user), albumID)
+	if err != nil {
+		return
+	}
+	err = json.Unmarshal([]byte(val), &a)
+	if err != nil {
+		return
+	}
+	f, err := w.GetFairies(user, albumID)
+	if err != nil {
+		return
+	}
+	a.Fairy = f
 	return
 }
 

@@ -1,4 +1,4 @@
-export const TitleSep = ' '
+export const TitleSep = ' | '
 export const TitleSuffix = 'Fairyla - 是小仙女啦'
 
 export const STORAGE_KEY = 'fairyla_storage'

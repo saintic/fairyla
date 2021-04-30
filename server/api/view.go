@@ -155,16 +155,34 @@ func listAlbumView(c echo.Context) error {
 
 func getAlbumView(c echo.Context) error {
 	w := album.New(rc)
-	data, err := w.GetAlbum(c.Get("user").(string), c.Param("id"))
-	if err != nil {
-		return err
+	user := c.Get("user").(string)
+	albumID := c.Param("id")
+	if gtc.IsTrue(c.QueryParam("is_name")) {
+		albumID = album.AlbumName2ID(user, c.Param("id"))
 	}
-	return c.JSON(200, vars.NewResData(data))
+	if gtc.IsTrue(c.QueryParam("fairy")) {
+		data, err := w.GetAlbumFairies(user, albumID)
+		if err != nil {
+			return err
+		}
+		return c.JSON(200, vars.NewResData(data))
+	} else {
+		data, err := w.GetAlbum(user, albumID)
+		if err != nil {
+			return err
+		}
+		return c.JSON(200, vars.NewResData(data))
+	}
 }
 
 func getAlbumFairyView(c echo.Context) error {
 	w := album.New(rc)
-	data, err := w.GetFairies(c.Get("user").(string), c.Param("id"))
+	user := c.Get("user").(string)
+	albumID := c.Param("id")
+	if gtc.IsTrue(c.QueryParam("is_name")) {
+		albumID = album.AlbumName2ID(user, c.Param("id"))
+	}
+	data, err := w.GetFairies(user, albumID)
 	if err != nil {
 		return err
 	}

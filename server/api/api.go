@@ -53,11 +53,11 @@ func StartApi(config *sys.Setting) {
 	auth.POST("/signin", signInView)
 
 	user := api.Group("/user", loginRequired)
-	user.GET("/album", listAlbumView)
-	user.GET("/album/:id", getAlbumView)
-	user.GET("/album/:id/fairy", getAlbumFairyView)
+	user.GET("/album", listAlbumView)               // 获取用户所有专辑信息
+	user.GET("/album/:id", getAlbumView)            // 获取用户某个专辑信息
+	user.GET("/album/:id/fairy", getAlbumFairyView) // 获取专辑下所有照片信息
 	user.POST("/album", createAlbumView)
-	user.GET("/fairy", listFairyView)
+	user.GET("/fairy", listFairyView) // 获取用户所有照片信息
 	user.POST("/fairy", createFairyView)
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf("%s:%d", config.Host, config.Port)))

@@ -13,18 +13,25 @@
                     v-for="f in fairies"
                     :key="f.id"
                 >
-                    <img :alt="f.desc" :src="f.src" />
+                    <el-image
+                        :title="f.desc"
+                        :src="f.src"
+                        :lazy="true"
+                        :preview-src-list="urls"
+                        :hide-on-click-modal="true"
+                    >
+                    </el-image>
                 </div>
                 <br />
                 <section class="bdshare">
                     <div class="info">
-                        <span class="category">
+                        <span class="category" v-if="album.label">
                             <i class="saintic-icon saintic-icon-tags"></i>
                             {{ album.label }}
                         </span>
                         <span class="date">
                             <i class="saintic-icon saintic-icon-time"></i>
-                            {{ album.ctime }}
+                            {{ album.cdate || album.ctime }}
                         </span>
                     </div>
                 </section>
@@ -42,20 +49,21 @@ defineProps({
         type: Object,
         required: true
     },
-    faries: {
+    fairies: {
         type: Array,
         required: true,
         validator: (value) => {
             if (!Array.isArray(value)) return false
             for (let v of value) {
                 if (!isObject(v)) return false
-                if (!v.hasOwnProperty('album_id') || v.hasOwnProperty('src')) {
+                if (!v.hasOwnProperty('src')) {
                     return false
                 }
             }
             return true
         }
-    }
+    },
+    urls: Array
 })
 </script>
 
@@ -109,6 +117,9 @@ defineProps({
 .info span {
     margin-right: 4px;
     display: inline-block;
+}
+.info span i {
+    font-size: 14px;
 }
 .entry .info a {
     color: #999;
