@@ -1,6 +1,6 @@
 <template>
     <div>
-        <p>欢迎~</p>
+        <p>欢迎内测~</p>
     </div>
 </template>
 

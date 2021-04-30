@@ -48,9 +48,9 @@ func signUpView(c echo.Context) error {
 	username := c.FormValue("username")
 	password := c.FormValue("password")
 	code := c.FormValue("code")
-    if code != "staugur" {
-        return errors.New("no open registration")
-    }
+	if code != "staugur" {
+		return errors.New("no open registration")
+	}
 	err := auth.Register(rc, username, password)
 	if err != nil {
 		return err
@@ -214,8 +214,6 @@ func configView(c echo.Context) error {
 }
 
 func uploadView(c echo.Context) error {
-	album := c.FormValue("album")
-	title := c.FormValue("title")
 	file, err := c.FormFile("file")
 	if err != nil {
 		return err
@@ -235,8 +233,7 @@ func uploadView(c echo.Context) error {
 	var post http.Request
 	post.ParseForm()
 	post.Form.Add(cfg.Sapic.Field, pic)
-	post.Form.Add("album", album)
-	post.Form.Add("title", title)
+	post.Form.Add("album", "fairyla")
 
 	client := &http.Client{Timeout: 30 * time.Second}
 	req, err := http.NewRequest(
