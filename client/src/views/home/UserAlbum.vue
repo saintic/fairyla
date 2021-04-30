@@ -12,9 +12,7 @@ export default {
     },
     created() {
         this.$http.get('/user/album').then((res) => {
-            console.log(res)
             for (let a of res.data) {
-                console.log(a)
                 if (a.steady_fairy) {
                     a['fairy'] = a.steady_fairy
                 } else {

@@ -28,5 +28,5 @@ app.use(ElementPlus)
 app.config.globalProperties.$http = http
 app.config.globalProperties.$store = store
 var vm = app.mount('#app')
-window.app = app
-window.vm = vm
+//window.app = app
+//window.vm = vm

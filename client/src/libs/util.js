@@ -1,3 +1,19 @@
+/*
+   Copyright 2021 Hiroshi.tao
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
+
 import axios from 'axios'
 import { ElMessage } from 'element-plus'
 import { STORAGE_KEY, ErrMsgMap } from './vars.js'
@@ -28,17 +44,13 @@ http.interceptors.request.use(
     (config) => {
         // 可以在发送请求之前做些事情
         // 比如请求参数的处理、在headers中携带token等等
-        console.log('send ajax with config')
-        console.log(config)
         let s = getStorage()
-        console.log(s)
         if (s) {
             let token = s.token
             if (token) {
                 config.headers.Authorization = `Bearer ${token}`
             }
         }
-        console.log(config)
         return config
     },
     (error) => {
@@ -53,7 +65,6 @@ http.interceptors.response.use(
     (response) => {
         // 2xx 范围内的状态码都会触发该函数。
         // 接口返回success字段不为true表示请求错误
-        console.log(response)
         let data = response.data
         if (!data.success) {
             let prefix = getErrMsgPrefix(response.config.url),
@@ -70,9 +81,6 @@ http.interceptors.response.use(
 
         if (error.response) {
             // 请求成功发出且服务器也响应了状态码，但状态代码超出了 2xx 的范围
-            console.log(error.response.data)
-            console.log(error.response.status)
-            console.log(error.response.headers)
             switch (error.response.status) {
                 case 400:
                     text = '参数错误'
@@ -117,7 +125,6 @@ http.interceptors.response.use(
             // 请求已经成功发起，但没有收到响应
             text = error.message
         }
-        console.log(error.config)
         ElMessage.error(prefix + text)
         return Promise.reject(error)
     }

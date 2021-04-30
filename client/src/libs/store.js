@@ -1,3 +1,19 @@
+/*
+   Copyright 2021 Hiroshi.tao
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
+
 import { reactive } from 'vue'
 import {
     http,
@@ -8,10 +24,7 @@ import {
     isObject
 } from './util.js'
 
-console.log('init state')
-
 export const state = reactive(getStorage() || {})
-console.log({ ...state })
 
 export const mutations = {
     isLogged() {
@@ -35,28 +48,14 @@ export const mutations = {
 export const actions = {
     fetchConfig() {
         //get public config
-        http.get('/config')
-            .then(function (res) {
-                console.log(res.data)
-                /*
-                let d = res.data
-                mutations.commit('isLogin', d.status.isLogin)
-                mutations.commit('username', d.status.user)
-                mutations.commit('sapicAPI', d.sapic.api)
-                mutations.commit('sapicSDK', d.sapic.sdk)
-                mutations.commit('sapicToken', d.sapic.token)
-                */
-                for (let k in res.data) {
-                    mutations.commit(k, res.data[k])
-                }
-                actions.saveConfig2Local()
-            })
-            .catch(function (e) {
-                console.log(e)
-            })
+        http.get('/config').then(function (res) {
+            for (let k in res.data) {
+                mutations.commit(k, res.data[k])
+            }
+            actions.saveConfig2Local()
+        })
     },
     saveConfig2Local() {
-        console.log('hit scl')
         setStorage({ ...state })
     },
     removeConfig() {

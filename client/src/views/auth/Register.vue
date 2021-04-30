@@ -122,11 +122,9 @@ export default {
                             this.$router.push({ path: '/login' })
                         })
                         .catch((e) => {
-                            console.log(e)
                             this.registering = false
                         })
                 } else {
-                    console.log('error submit!')
                     return false
                 }
             })

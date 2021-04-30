@@ -1,9 +1,23 @@
+/*
+   Copyright 2021 Hiroshi.tao
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
+
 import { createRouter, createWebHashHistory } from 'vue-router'
 import Index from '@/views/Index.vue'
 import { mutations, actions } from './store.js'
 import { TitleSep, TitleSuffix } from './vars.js'
-
-console.log('init router')
 
 const routes = [
     {
@@ -33,17 +47,20 @@ const routes = [
         },
         meta: { requiresAuth: true }
     },
+    /*
     {
         path: '/ta',
         name: 'Ta',
         component: () => import('@/views/ta/Ta.vue'),
         meta: { requiresAuth: true, title: '她是' }
     },
+    */
     {
         path: '/my',
         name: 'Home',
         component: () => import('@/views/home/Home.vue'),
         children: [
+            /*
             {
                 path: 'profile',
                 component: () => import('@/views/home/UserProfile.vue')
@@ -52,6 +69,7 @@ const routes = [
                 path: 'setting',
                 component: () => import('@/views/home/UserSetting.vue')
             },
+            */
             {
                 path: 'album',
                 component: () => import('@/views/home/UserAlbum.vue')

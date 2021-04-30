@@ -11,9 +11,11 @@
                 router
                 :default-active="this.$route.path"
             >
+                <!--
                 <el-menu-item index="/ta">
                     <i class="saintic-icon saintic-icon-goddess"></i> 她是
                 </el-menu-item>
+                -->
                 <el-menu-item index v-if="isLogin">
                     <el-avatar
                         class="avatar"
@@ -23,6 +25,7 @@
                 </el-menu-item>
                 <el-submenu v-if="isLogin">
                     <template #title>{{ user }}</template>
+                    <!--
                     <el-menu-item index="/my/profile">
                         <i class="saintic-icon saintic-icon-user"></i>
                         个人资料
@@ -31,11 +34,12 @@
                         <i class="saintic-icon saintic-icon-setting"></i>
                         用户设置
                     </el-menu-item>
+                    -->
                     <el-menu-item index="/my/album">
                         <i class="saintic-icon saintic-icon-user-album"></i>
                         我的专辑
                     </el-menu-item>
-                    <el-menu-item>-------------</el-menu-item>
+                    <el-menu-item>-----------------</el-menu-item>
                     <el-menu-item index="/logout">
                         <i class="saintic-icon saintic-icon-logoff"></i>
                         登出

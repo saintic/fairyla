@@ -47,6 +47,10 @@ func customHTTPErrorHandler(err error, c echo.Context) {
 func signUpView(c echo.Context) error {
 	username := c.FormValue("username")
 	password := c.FormValue("password")
+	code := c.FormValue("code")
+    if code != "staugur" {
+        return errors.New("no open registration")
+    }
 	err := auth.Register(rc, username, password)
 	if err != nil {
 		return err

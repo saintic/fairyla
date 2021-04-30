@@ -135,19 +135,14 @@ export default {
         submitForm() {
             this.$refs['fairy'].validate((valid) => {
                 if (!valid) return
-                this.$http
-                    .post('/user/fairy', this.af)
-                    .then((res) => {
-                        this.$message.success('已提交')
-                        // try update albums
-                        if (!this.albums.includes(this.af.album)) {
-                            this.albums.push(this.af.album)
-                        }
-                        this.resetForm()
-                    })
-                    .catch((err) => {
-                        console.error(err)
-                    })
+                this.$http.post('/user/fairy', this.af).then((res) => {
+                    this.$message.success('已提交')
+                    // try update albums
+                    if (!this.albums.includes(this.af.album)) {
+                        this.albums.push(this.af.album)
+                    }
+                    this.resetForm()
+                })
             })
         },
         resetForm() {
@@ -165,7 +160,6 @@ export default {
             return isRightSize && isAccept
         },
         upSuccess(res) {
-            console.log(res)
             if (res.success) {
                 this.af.src = res.data.src
             } else {
@@ -176,7 +170,6 @@ export default {
     created() {
         if (this.isLogin) {
             this.$http.get('/user/album').then((res) => {
-                console.log(res)
                 res.data.map((a) => {
                     this.albums.push(a.name)
                 })

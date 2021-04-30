@@ -106,10 +106,8 @@ export default {
                         })
                         .catch((e) => {
                             this.logining = false
-                            console.log(e)
                         })
                 } else {
-                    console.log('error submit!')
                     return false
                 }
             })
