@@ -40,7 +40,6 @@ func StartApi(config *sys.Setting) {
 	cfg = config
 
 	e := echo.New()
-	e.Debug = true
 	e.HTTPErrorHandler = customHTTPErrorHandler
 	e.Use(middleware.Logger())
 
@@ -57,8 +56,10 @@ func StartApi(config *sys.Setting) {
 	user.GET("/album/:id", getAlbumView)            // 获取用户某个专辑信息
 	user.GET("/album/:id/fairy", getAlbumFairyView) // 获取专辑下所有照片信息
 	user.POST("/album", createAlbumView)
+	user.DELETE("/album/:id", dropAlbumView)
 	user.GET("/fairy", listFairyView) // 获取用户所有照片信息
 	user.POST("/fairy", createFairyView)
+	user.DELETE("/fairy/:id", dropFairyView)
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf("%s:%d", config.Host, config.Port)))
 }

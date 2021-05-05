@@ -37,6 +37,9 @@ var (
 	GenFairyKey = func(user, albumID string) string {
 		return fmt.Sprintf("fairy:%s:%s", user, albumID)
 	}
+
+	AlbumPreID = "md.a."
+	FairyPreID = "md.f."
 )
 
 type (

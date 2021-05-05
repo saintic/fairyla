@@ -5,7 +5,7 @@
 <script>
 import Album from '@/components/Album.vue'
 export default {
-    Name: 'Home',
+    Name: 'UserAlbum',
     components: { Album },
     data() {
         return { albums: [] }

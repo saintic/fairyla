@@ -20,6 +20,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"sort"
 
 	"fairyla/pkg/db"
 	"fairyla/pkg/util"
@@ -60,7 +61,7 @@ type AlbumFairy struct {
 }
 
 func AlbumName2ID(owner, name string) string {
-	return gtc.MD5(owner + name)
+	return vars.AlbumPreID + gtc.MD5(owner+name)
 }
 
 func NewAlbum(owner, name string) (a *album, err error) {
@@ -101,8 +102,9 @@ func NewFairy(owner, albumID, src, desc string) (f *fairy, err error) {
 		err = errors.New("illegal fairyl url")
 		return
 	}
-	ID := fmt.Sprintf("%s-%s-%d", albumID, src, util.Now())
-	f = &fairy{gtc.MD5(ID), albumID, owner, util.Now(), desc, src}
+	now := util.Now()
+	ID := fmt.Sprintf("%s-%s-%d", albumID, src, now)
+	f = &fairy{vars.FairyPreID + gtc.MD5(ID), albumID, owner, now, desc, src}
 	return
 }
 
@@ -142,6 +144,32 @@ func (w wrap) WriteAlbum(a *album) error {
 	return nil
 }
 
+func (w wrap) DropAlbums(owner string) error {
+	index := vars.GenAlbumKey(owner)
+	albumIDs, err := w.HKeys(index)
+	if err != nil {
+		return err
+	}
+	pipe := w.Pipeline()
+	for _, aid := range albumIDs {
+		pipe.Del(vars.GenFairyKey(owner, aid))
+	}
+	_, err = pipe.Execute()
+	return err
+}
+
+func (w wrap) DropAlbum(owner, albumID string) error {
+	_, err := w.HDel(vars.GenAlbumKey(owner), albumID)
+	if err != nil {
+		return err
+	}
+	_, err = w.Del(vars.GenFairyKey(owner, albumID))
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // Only check the basic parameters and (overwrite) write
 func (w wrap) WriteFairy(f *fairy) error {
 	// check param
@@ -161,6 +189,12 @@ func (w wrap) WriteFairy(f *fairy) error {
 	return nil
 }
 
+func (w wrap) DropFairy(owner, albumID, fairyID string) error {
+	index := vars.GenFairyKey(owner, albumID)
+	_, err := w.HDel(index, fairyID)
+	return err
+}
+
 func (w wrap) ListAlbums(user string) (albums []album, err error) {
 	data, err := w.HGetAll(vars.GenAlbumKey(user))
 	if err != nil {
@@ -174,6 +208,9 @@ func (w wrap) ListAlbums(user string) (albums []album, err error) {
 			albums = append(albums, a)
 		}
 	}
+	sort.Slice(albums, func(i, j int) bool {
+		return albums[i].CTime > albums[j].CTime
+	})
 	return
 }
 
@@ -188,6 +225,7 @@ func (w wrap) GetAlbum(user, albumID string) (a album, err error) {
 	}
 	return
 }
+
 func (w wrap) GetAlbumFairies(user, albumID string) (a AlbumFairy, err error) {
 	val, err := w.HGet(vars.GenAlbumKey(user), albumID)
 	if err != nil {
@@ -235,6 +273,9 @@ func (w wrap) GetFairies(user, albumID string) (fairies []fairy, err error) {
 			fairies = append(fairies, f)
 		}
 	}
+	sort.Slice(fairies, func(i, j int) bool {
+		return fairies[i].CTime > fairies[j].CTime
+	})
 	return
 }
 

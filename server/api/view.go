@@ -20,7 +20,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -47,10 +46,6 @@ func customHTTPErrorHandler(err error, c echo.Context) {
 func signUpView(c echo.Context) error {
 	username := c.FormValue("username")
 	password := c.FormValue("password")
-	code := c.FormValue("code")
-	if code != "staugur" {
-		return errors.New("no open registration")
-	}
 	err := auth.Register(rc, username, password)
 	if err != nil {
 		return err
@@ -62,7 +57,6 @@ func signInView(c echo.Context) error {
 	username := c.FormValue("username")
 	password := c.FormValue("password")
 	remember := gtc.IsTrue(c.FormValue("remember"))
-	fmt.Println(username, password, remember)
 	expire := 60 * 60 * 2 // 2h
 	if remember {
 		expire = 60 * 60 * 24 * 7 // 7d
@@ -80,7 +74,7 @@ func signInView(c echo.Context) error {
 func createAlbumView(c echo.Context) error {
 	name := c.FormValue("name")
 	labels := c.FormValue("labels")
-	a, err := album.NewAlbum(c.Get("user").(string), name)
+	a, err := album.NewAlbum(getUser(c), name)
 	if err != nil {
 		return err
 	}
@@ -104,8 +98,19 @@ func createAlbumView(c echo.Context) error {
 	return c.JSON(200, vars.NewResData(a))
 }
 
+func dropAlbumView(c echo.Context) error {
+	user := getUser(c)
+	albumID := autoAlbumID(c)
+	w := album.New(rc)
+	err := w.DropAlbum(user, albumID)
+	if err != nil {
+		return err
+	}
+	return c.JSON(200, vars.ResOK())
+}
+
 func createFairyView(c echo.Context) error {
-	user := c.Get("user").(string)
+	user := getUser(c)
 	albumID := c.FormValue("album_id")
 	albumName := c.FormValue("album")
 	src := c.FormValue("src")
@@ -148,9 +153,24 @@ func createFairyView(c echo.Context) error {
 	return c.JSON(200, vars.NewResData(f))
 }
 
+func dropFairyView(c echo.Context) error {
+	user := getUser(c)
+	albumID := autoAlbumID(c)
+	fairyID := c.FormValue("fairy_id")
+	if fairyID == "" {
+		return errors.New("invalid param")
+	}
+	w := album.New(rc)
+	err := w.DropFairy(user, albumID, fairyID)
+	if err != nil {
+		return err
+	}
+	return c.JSON(200, vars.ResOK())
+}
+
 func listAlbumView(c echo.Context) error {
 	w := album.New(rc)
-	data, err := w.ListAlbums(c.Get("user").(string))
+	data, err := w.ListAlbums(getUser(c))
 	if err != nil {
 		return err
 	}
@@ -159,11 +179,8 @@ func listAlbumView(c echo.Context) error {
 
 func getAlbumView(c echo.Context) error {
 	w := album.New(rc)
-	user := c.Get("user").(string)
-	albumID := c.Param("id")
-	if gtc.IsTrue(c.QueryParam("is_name")) {
-		albumID = album.AlbumName2ID(user, c.Param("id"))
-	}
+	user := getUser(c)
+	albumID := autoAlbumID(c)
 	if gtc.IsTrue(c.QueryParam("fairy")) {
 		data, err := w.GetAlbumFairies(user, albumID)
 		if err != nil {
@@ -181,11 +198,8 @@ func getAlbumView(c echo.Context) error {
 
 func getAlbumFairyView(c echo.Context) error {
 	w := album.New(rc)
-	user := c.Get("user").(string)
-	albumID := c.Param("id")
-	if gtc.IsTrue(c.QueryParam("is_name")) {
-		albumID = album.AlbumName2ID(user, c.Param("id"))
-	}
+	user := getUser(c)
+	albumID := autoAlbumID(c)
 	data, err := w.GetFairies(user, albumID)
 	if err != nil {
 		return err
@@ -195,7 +209,7 @@ func getAlbumFairyView(c echo.Context) error {
 
 func listFairyView(c echo.Context) error {
 	w := album.New(rc)
-	data, err := w.ListFairies(c.Get("user").(string))
+	data, err := w.ListFairies(getUser(c))
 	if err != nil {
 		return err
 	}

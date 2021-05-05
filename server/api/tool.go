@@ -14,19 +14,28 @@
    limitations under the License.
 */
 
-import { createApp } from 'vue'
-import ElementPlus from 'element-plus'
-import 'element-plus/lib/theme-chalk/index.css'
-import App from './App.vue'
-import router from './libs/router.js'
-import store from './libs/store.js'
-import { http } from './libs/util.js'
+package api
 
-var app = createApp(App)
-app.use(router)
-app.use(ElementPlus)
-app.config.globalProperties.$http = http
-app.config.globalProperties.$store = store
-var vm = app.mount('#app')
-window.app = app
-window.vm = vm
+import (
+	"fairyla/internal/album"
+	"fairyla/vars"
+	"strings"
+
+	"github.com/labstack/echo/v4"
+)
+
+func getUser(c echo.Context) string {
+	return c.Get("user").(string)
+}
+
+func autoAlbumID(c echo.Context) string {
+	albumID := c.Param("id")
+	if albumID == "" {
+		return albumID
+	}
+	if !strings.HasPrefix(albumID, vars.AlbumPreID) {
+		// id is name
+		albumID = album.AlbumName2ID(getUser(c), albumID)
+	}
+	return albumID
+}

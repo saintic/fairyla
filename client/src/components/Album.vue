@@ -38,7 +38,6 @@ defineProps({
         type: Array,
         required: true,
         validator: (value) => {
-            console.log(value)
             if (!Array.isArray(value)) return false
             for (let v of value) {
                 if (!isObject(v)) return false

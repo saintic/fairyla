@@ -1,6 +1,6 @@
 module fairyla
 
-go 1.16
+go 1.15
 
 require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
@@ -10,5 +10,5 @@ require (
 	golang.org/x/net v0.0.0-20210414194228-064579744ee0 // indirect
 	golang.org/x/sys v0.0.0-20210415045647-66c3f260301c // indirect
 	tcw.im/gtc v1.0.0
-	tcw.im/gtc/redigo v0.4.1
+	tcw.im/gtc/redigo v0.4.3
 )

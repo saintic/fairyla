@@ -47,14 +47,12 @@ const routes = [
         },
         meta: { requiresAuth: true }
     },
-    /*
     {
         path: '/ta',
         name: 'Ta',
         component: () => import('@/views/ta/Ta.vue'),
         meta: { requiresAuth: true, title: '她是' }
     },
-    */
     {
         path: '/my',
         name: 'Home',

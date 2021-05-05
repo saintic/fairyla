@@ -64,3 +64,7 @@ tcw.im/gtc v1.0.0 h1:KmhCIkTKzitKm8jLVR9sez2Yh5Ya7kgNZcbrZSSyqgA=
 tcw.im/gtc v1.0.0/go.mod h1:3/MyT7EO9DBfuf1rlGNEpTrjXs0j0TM3GKt2Ql1x/mw=
 tcw.im/gtc/redigo v0.4.1 h1:z+pU4epPvVwtToAWVEzkwXIB+L/lP6qTMhYqHWPaXG4=
 tcw.im/gtc/redigo v0.4.1/go.mod h1:kP0dszeCj0aoVqpj8qQMptgIJaKVVEZ5DmkFMz2iTu0=
+tcw.im/gtc/redigo v0.4.2 h1:lY0wadWcGBg5OeqmTsjI91L/XgznX/R7pIvlqPAec8g=
+tcw.im/gtc/redigo v0.4.2/go.mod h1:kP0dszeCj0aoVqpj8qQMptgIJaKVVEZ5DmkFMz2iTu0=
+tcw.im/gtc/redigo v0.4.3 h1:u6JvZ2L5m09k6ZXeNqDmqUwWDdqbSHoGzpm1WI1avDw=
+tcw.im/gtc/redigo v0.4.3/go.mod h1:kP0dszeCj0aoVqpj8qQMptgIJaKVVEZ5DmkFMz2iTu0=

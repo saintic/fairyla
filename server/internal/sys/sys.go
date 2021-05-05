@@ -56,15 +56,12 @@ func parsePort(sport string) (dport uint, err error) {
 }
 
 // New from cli options first
-func New(host string, port uint, redis, baseURL, token, field string) *Setting {
-	if !util.IsValidURL(baseURL) {
-		panic("invalid sapic url")
-	}
-	baseURL = strings.TrimSuffix(strings.TrimSuffix(baseURL, ep), "/")
+func New(host string, port uint, redis, api, token, field string) *Setting {
+	api = strings.TrimSuffix(strings.TrimSuffix(api, ep), "/")
 	c := &Setting{
 		Redis: redis, Host: host, Port: port,
 		Sapic: Sapic{
-			baseURL + ep, field, token,
+			api + ep, field, token,
 		},
 	}
 	c.parseEnv()
