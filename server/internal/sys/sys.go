@@ -124,8 +124,8 @@ func (s *Setting) String() string {
 		token = fmt.Sprintf("<%s>", s.Sapic.Token)
 	}
 	return fmt.Sprintf(
-		"Host: %s\nPort: %d\nUI @ %s\nRedis: %s\nSapic:\n Api: %s\n Field: %s\n LinkToken: %s",
-		s.Host, s.Port, s.Dir, s.Redis, s.Sapic.Api, s.Sapic.Field, token,
+		"UI: %s\nHost: %s\nPort: %d\nRedis: %s\nSapic:\n Api: %s\n Field: %s\n LinkToken: %s",
+		s.Dir, s.Host, s.Port, s.Redis, s.Sapic.Api, s.Sapic.Field, token,
 	)
 }
 

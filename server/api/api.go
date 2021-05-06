@@ -40,7 +40,7 @@ func StartApi(config *sys.Setting) {
 
 	e := echo.New()
 	e.HTTPErrorHandler = customHTTPErrorHandler
-	e.File(cfg.Dir, "index.html")
+	e.Static("/", cfg.Dir)
 
 	api := e.Group("/api")
 	api.GET("/config", configView)
