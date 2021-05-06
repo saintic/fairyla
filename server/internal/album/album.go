@@ -29,24 +29,24 @@ import (
 	"tcw.im/gtc"
 )
 
-var (
+const (
 	albumLimitNum uint64 = 9 // 用户专辑数量限制
 )
 
 // 专辑属性
-type album struct {
+type Album struct {
 	ID          string   `json:"id"`    // 专辑ID，唯一性，索引，由Name而来
 	Owner       string   `json:"owner"` // 所属用户
 	Name        string   `json:"name"`  // 专辑名称，不具备唯一性
 	CTime       int64    `json:"ctime"`
 	Public      bool     `json:"public"`
 	Label       []string `json:"label"`
-	LatestFairy *fairy   `json:"latest_fairy"` // 最近上传的fairy
-	SteadyFairy *fairy   `json:"steady_fairy"` // 固定设置的fairy
+	LatestFairy *Fairy   `json:"latest_fairy"` // 最近上传的fairy
+	SteadyFairy *Fairy   `json:"steady_fairy"` // 固定设置的fairy
 }
 
 // 照片属性
-type fairy struct {
+type Fairy struct {
 	ID      string `json:"id"`       // 专辑ID，唯一性，索引，由Src而来
 	AlbumID string `json:"album_id"` // 所属专辑
 	Owner   string `json:"owner"`    // 所属用户
@@ -56,9 +56,9 @@ type fairy struct {
 }
 
 // 专辑及其包含的照片
-type albumFairy struct {
-	album
-	Fairy []fairy `json:"fairy"`
+type AlbumFairy struct {
+	Album
+	Fairy []Fairy `json:"fairy"`
 }
 
 // 专辑名转成ID
@@ -66,36 +66,36 @@ func AlbumName2ID(owner, name string) string {
 	return vars.AlbumPreID + gtc.MD5(owner+name)
 }
 
-func NewAlbum(owner, name string) (a *album, err error) {
+func NewAlbum(owner, name string) (a *Album, err error) {
 	if owner == "" || name == "" {
 		err = errors.New("invalid fairy param")
 		return
 	}
 	// Name在用户中唯一，即ID唯一
-	a = &album{
+	a = &Album{
 		ID: AlbumName2ID(owner, name), Owner: owner, Name: name, Public: true,
 		CTime: util.Now(),
 	}
 	return
 }
 
-func (a *album) AddLabel(label string) {
+func (a *Album) AddLabel(label string) {
 	a.Label = append(a.Label, label)
 }
 
-func (a *album) SetLatest(f *fairy) {
+func (a *Album) SetLatest(f *Fairy) {
 	a.LatestFairy = f
 }
 
-func (a *album) SetSteady(f *fairy) {
+func (a *Album) SetSteady(f *Fairy) {
 	a.SteadyFairy = f
 }
 
-func (a *album) Exist(rc *db.Conn) (bool, error) {
+func (a *Album) Exist(rc *db.Conn) (bool, error) {
 	return rc.HExists(vars.GenAlbumKey(a.Owner), a.ID)
 }
 
-func NewFairy(owner, albumID, src, desc string) (f *fairy, err error) {
+func NewFairy(owner, albumID, src, desc string) (f *Fairy, err error) {
 	if albumID == "" || owner == "" {
 		err = errors.New("invalid fairy param")
 		return
@@ -106,7 +106,7 @@ func NewFairy(owner, albumID, src, desc string) (f *fairy, err error) {
 	}
 	now := util.Now()
 	ID := fmt.Sprintf("%s-%s-%d", albumID, src, now)
-	f = &fairy{vars.FairyPreID + gtc.MD5(ID), albumID, owner, now, desc, src}
+	f = &Fairy{vars.FairyPreID + gtc.MD5(ID), albumID, owner, now, desc, src}
 	return
 }
 
@@ -120,7 +120,7 @@ func New(c *db.Conn) wrap {
 }
 
 // Only check the basic parameters and (overwrite) write
-func (w wrap) WriteAlbum(a *album) error {
+func (w wrap) WriteAlbum(a *Album) error {
 	// check param
 	if a.Owner == "" || a.ID == "" {
 		return errors.New("invalid album param")
@@ -131,7 +131,7 @@ func (w wrap) WriteAlbum(a *album) error {
 	if err != nil {
 		return err
 	}
-	if length > albumLimitNum {
+	if length >= albumLimitNum {
 		return errors.New("the number of albums exceeds the limit")
 	}
 	// write db, if exists(=update)
@@ -175,7 +175,7 @@ func (w wrap) DropAlbum(owner, albumID string) error {
 }
 
 // Only check the basic parameters and (overwrite) write
-func (w wrap) WriteFairy(f *fairy) error {
+func (w wrap) WriteFairy(f *Fairy) error {
 	// check param
 	if f.ID == "" || f.Owner == "" || f.AlbumID == "" || f.Src == "" {
 		return errors.New("invalid fairy param")
@@ -201,14 +201,14 @@ func (w wrap) DropFairy(owner, albumID, fairyID string) error {
 }
 
 // 列出用户所有专辑数据（不包含专辑下照片）
-func (w wrap) ListAlbums(user string) (albums []album, err error) {
+func (w wrap) ListAlbums(user string) (albums []Album, err error) {
 	data, err := w.HGetAll(vars.GenAlbumKey(user))
 	if err != nil {
 		return
 	}
-	albums = make([]album, 0, len(data))
+	albums = make([]Album, 0, len(data))
 	for _, v := range data {
-		var a album
+		var a Album
 		e := json.Unmarshal([]byte(v), &a)
 		if e == nil {
 			albums = append(albums, a)
@@ -221,7 +221,7 @@ func (w wrap) ListAlbums(user string) (albums []album, err error) {
 }
 
 // 获取用户某张专辑数据（不包含专辑下照片）
-func (w wrap) GetAlbum(user, albumID string) (a album, err error) {
+func (w wrap) GetAlbum(user, albumID string) (a Album, err error) {
 	val, err := w.HGet(vars.GenAlbumKey(user), albumID)
 	if err != nil {
 		return
@@ -234,7 +234,7 @@ func (w wrap) GetAlbum(user, albumID string) (a album, err error) {
 }
 
 // 获取用户某张专辑数据（包含专辑下照片）
-func (w wrap) GetAlbumFairies(user, albumID string) (af albumFairy, err error) {
+func (w wrap) GetAlbumFairies(user, albumID string) (af AlbumFairy, err error) {
 	a, err := w.GetAlbum(user, albumID)
 	if err != nil {
 		return
@@ -243,16 +243,16 @@ func (w wrap) GetAlbumFairies(user, albumID string) (af albumFairy, err error) {
 	if err != nil {
 		return
 	}
-	return albumFairy{a, f}, nil
+	return AlbumFairy{a, f}, nil
 }
 
 // 列出用户所有专辑ID及其下照片数据
-func (w wrap) ListFairies(user string) (out map[string][]fairy, err error) {
+func (w wrap) ListFairies(user string) (out map[string][]Fairy, err error) {
 	data, err := w.HGetAll(vars.GenAlbumKey(user))
 	if err != nil {
 		return
 	}
-	out = make(map[string][]fairy)
+	out = make(map[string][]Fairy)
 	for albumID := range data {
 		fs, e := w.GetFairies(user, albumID)
 		if e != nil {
@@ -265,14 +265,14 @@ func (w wrap) ListFairies(user string) (out map[string][]fairy, err error) {
 }
 
 // 获取用户某个专辑下所有照片数据（不包含专辑数据）
-func (w wrap) GetFairies(user, albumID string) (fairies []fairy, err error) {
+func (w wrap) GetFairies(user, albumID string) (fairies []Fairy, err error) {
 	data, err := w.HGetAll(vars.GenFairyKey(user, albumID))
 	if err != nil {
 		return
 	}
-	fairies = make([]fairy, 0, len(data))
+	fairies = make([]Fairy, 0, len(data))
 	for _, v := range data {
-		var f fairy
+		var f Fairy
 		e := json.Unmarshal([]byte(v), &f)
 		if e == nil {
 			fairies = append(fairies, f)
@@ -285,7 +285,7 @@ func (w wrap) GetFairies(user, albumID string) (fairies []fairy, err error) {
 }
 
 // 获取用户某个专辑某个照片数据
-func (w wrap) GetFairy(user, albumID, fairyID string) (f fairy, err error) {
+func (w wrap) GetFairy(user, albumID, fairyID string) (f Fairy, err error) {
 	val, err := w.HGet(vars.GenFairyKey(user, albumID), albumID)
 	if err != nil {
 		return

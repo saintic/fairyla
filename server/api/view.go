@@ -110,45 +110,38 @@ func dropAlbumView(c echo.Context) error {
 }
 
 func createFairyView(c echo.Context) error {
+	w := album.New(rc)
 	user := getUser(c)
 	albumID := c.FormValue("album_id")
 	albumName := c.FormValue("album")
 	src := c.FormValue("src")
 	desc := c.FormValue("desc")
-	w := album.New(rc)
+	var a *album.Album
 	if albumID == "" {
-		// auto create album
 		if albumName == "" {
 			return errors.New("invalid album_id or album")
 		}
-		a, err := album.NewAlbum(user, albumName)
-		if err != nil {
-			return err
-		}
-		has, err := a.Exist(rc)
-		if err != nil {
-			return err
-		}
-		if !has {
-			err := w.WriteAlbum(a)
-			if err != nil {
-				return err
-			}
-		}
+		a, _ = album.NewAlbum(user, albumName)
 		albumID = a.ID
+	} else {
+		ta, err := w.GetAlbum(user, albumID)
+		if err != nil {
+			return err
+		}
+		a = &ta
 	}
 	f, err := album.NewFairy(user, albumID, src, desc)
+	if err != nil {
+		return err
+	}
+	a.SetLatest(f)
+	err = w.WriteAlbum(a)
 	if err != nil {
 		return err
 	}
 	err = w.WriteFairy(f)
 	if err != nil {
 		return err
-	}
-	a, err := w.GetAlbum(user, f.AlbumID)
-	if err == nil {
-		(&a).SetLatest(f)
-		w.WriteAlbum(&a)
 	}
 	return c.JSON(200, vars.NewResData(f))
 }

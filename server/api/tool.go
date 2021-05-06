@@ -31,12 +31,16 @@ func getUser(c echo.Context) string {
 
 func autoAlbumID(c echo.Context) string {
 	albumID := c.Param("id")
+	return getAlbumID(getUser(c), albumID)
+}
+
+func getAlbumID(user, albumID string) string {
 	if albumID == "" {
 		return albumID
 	}
 	if !strings.HasPrefix(albumID, vars.AlbumPreID) {
 		// id is name
-		albumID = album.AlbumName2ID(getUser(c), albumID)
+		albumID = album.AlbumName2ID(user, albumID)
 	}
 	return albumID
 }

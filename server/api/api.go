@@ -60,5 +60,5 @@ func StartApi(config *sys.Setting) {
 	user.POST("/fairy", createFairyView)
 	user.DELETE("/fairy/:id", dropFairyView)
 
-	e.Logger.Fatal(e.Start(fmt.Sprintf("%s:%d", config.Host, config.Port)))
+	e.Logger.Fatal(e.Start(fmt.Sprintf("%s:%d", cfg.Host, cfg.Port)))
 }

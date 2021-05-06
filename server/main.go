@@ -32,10 +32,11 @@ var (
 	v bool
 	s bool
 
-	dir         string
-	host        string
-	port        uint
-	rawurl      string
+	dir    string
+	host   string
+	port   uint
+	rawurl string
+
 	sapic_url   string
 	sapic_token string
 	sapic_field string

@@ -43,7 +43,7 @@ func msgTranslator(locale, msg string) string {
 }
 
 var precise = map[string]map[string]string{
-	"zh": map[string]string{
+	"zh": {
 		"Hello world": "你好，世界",
 		// http status message
 		"Not Found":             "页面未发现",
@@ -74,7 +74,7 @@ var precise = map[string]map[string]string{
 }
 
 var fuzzy = map[string]map[*regexp.Regexp]string{
-	"zh": map[*regexp.Regexp]string{
+	"zh": {
 		regexp.MustCompile("hello world"): "你好，世界",
 	},
 }

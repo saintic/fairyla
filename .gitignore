@@ -119,6 +119,6 @@ dist
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
-bin/
+server/bin/
 .DS_Store
 nohup.out
