@@ -23,7 +23,8 @@ export const ErrMsgMap = {
     '/config': '请求配置失败：',
     '/auth/signin': '登录失败：',
     '/auth/signup': '注册失败：',
-    '/user/album': '用户专辑获取失败：'
+    '/user/album': '用户专辑获取失败：',
+    '/user/upload': '上传失败',
 }
 
 // 专辑可选系统内置标签

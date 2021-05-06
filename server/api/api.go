@@ -44,13 +44,13 @@ func StartApi(config *sys.Setting) {
 
 	api := e.Group("/api")
 	api.GET("/config", configView)
-	api.POST("/upload", uploadView, loginRequired)
 
 	auth := api.Group("/auth")
 	auth.POST("/signup", signUpView)
 	auth.POST("/signin", signInView)
 
 	user := api.Group("/user", loginRequired)
+	user.POST("/upload", uploadView)
 	user.GET("/album", listAlbumView)               // 获取用户所有专辑信息
 	user.GET("/album/:id", getAlbumView)            // 获取用户某个专辑信息
 	user.GET("/album/:id/fairy", getAlbumFairyView) // 获取专辑下所有照片信息

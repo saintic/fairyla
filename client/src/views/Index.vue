@@ -57,7 +57,7 @@
                                         accept="image/jpg, image/jpeg, image/webp, image/png"
                                         :before-upload="upBefore"
                                         :show-file-list="false"
-                                        action="/api/upload"
+                                        action="/api/user/upload"
                                         :on-success="upSuccess"
                                         :headers="headers"
                                     >

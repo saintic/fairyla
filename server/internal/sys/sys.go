@@ -26,13 +26,13 @@ import (
 )
 
 type Setting struct {
+	Dir   string // html & assets
 	Redis string
 	Host  string
 	Port  uint
+	Sapic Sapic
 	ICP   string // beian.miit.gov.cn
 	Beian string // www.beian.gov.cn
-	Sapic Sapic
-	Dir   string // html & assets
 }
 
 type Sapic struct {
@@ -114,7 +114,6 @@ func (s *Setting) parseEnv() {
 				s.Dir = v
 			}
 		}
-
 	}
 }
 

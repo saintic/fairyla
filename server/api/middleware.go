@@ -54,6 +54,7 @@ func checkJWT(c echo.Context) (user string, err error) {
 	return
 }
 
+// API登录拦截器
 func loginRequired(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		user, err := checkJWT(c)

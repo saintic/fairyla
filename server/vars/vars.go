@@ -43,24 +43,24 @@ var (
 )
 
 type (
-	Res struct {
+	res struct {
 		Success bool   `json:"success"`
 		Message string `json:"message"`
 	}
-	ResData struct {
-		Res
+	resData struct {
+		res
 		Data interface{} `json:"data"`
 	}
 )
 
-func ResOK() Res {
-	return Res{true, "ok"}
+func ResOK() res {
+	return res{true, "ok"}
 }
 
-func ResErr(msg string) Res {
-	return Res{false, msg}
+func ResErr(msg string) res {
+	return res{false, msgTranslator("zh", msg)}
 }
 
-func NewResData(data interface{}) ResData {
-	return ResData{Res{true, "ok"}, data}
+func NewResData(data interface{}) resData {
+	return resData{res{true, "ok"}, data}
 }

@@ -19,6 +19,7 @@ package api
 import (
 	"fairyla/internal/album"
 	"fairyla/vars"
+	"strconv"
 	"strings"
 
 	"github.com/labstack/echo/v4"
@@ -38,4 +39,31 @@ func autoAlbumID(c echo.Context) string {
 		albumID = album.AlbumName2ID(getUser(c), albumID)
 	}
 	return albumID
+}
+
+type LangQ struct {
+	Lang string
+	Q    float64
+}
+
+func parseAcceptLanguage(acptLang string) []LangQ {
+	var lqs []LangQ
+
+	langQStrs := strings.Split(acptLang, ",")
+	for _, langQStr := range langQStrs {
+		langQ := strings.Split(strings.Trim(langQStr, " "), ";")
+		if len(langQ) == 1 {
+			lq := LangQ{langQ[0], 1}
+			lqs = append(lqs, lq)
+		} else {
+			qp := strings.Split(langQ[1], "=")
+			q, err := strconv.ParseFloat(qp[1], 64)
+			if err != nil {
+				panic(err)
+			}
+			lq := LangQ{langQ[0], q}
+			lqs = append(lqs, lq)
+		}
+	}
+	return lqs
 }

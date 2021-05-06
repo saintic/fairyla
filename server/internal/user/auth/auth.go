@@ -33,7 +33,7 @@ const module = "auth"
 
 func Register(c *db.Conn, username, password string) error {
 	if !util.IsName(username) {
-		return errors.New("invalid name")
+		return errors.New("invalid username")
 	}
 	if len(password) < 6 {
 		return errors.New("password is too short")
@@ -59,7 +59,7 @@ func Register(c *db.Conn, username, password string) error {
 // Login Check username & password, if ok, generate a jwt token
 func Login(c *db.Conn, username, password string, remember bool) (token string, err error) {
 	if !util.IsName(username) {
-		err = errors.New("invalid name")
+		err = errors.New("invalid username")
 		return
 	}
 	has, err := c.SIsMember(vars.UserIndex, username)
