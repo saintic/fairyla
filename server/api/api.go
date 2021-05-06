@@ -23,7 +23,6 @@ import (
 	"fairyla/pkg/db"
 
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
 )
 
 var (
@@ -41,7 +40,7 @@ func StartApi(config *sys.Setting) {
 
 	e := echo.New()
 	e.HTTPErrorHandler = customHTTPErrorHandler
-	e.Use(middleware.Logger())
+	e.File(cfg.Dir, "index.html")
 
 	api := e.Group("/api")
 	api.GET("/config", configView)

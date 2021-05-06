@@ -32,6 +32,7 @@ type Setting struct {
 	ICP   string // beian.miit.gov.cn
 	Beian string // www.beian.gov.cn
 	Sapic Sapic
+	Dir   string // html & assets
 }
 
 type Sapic struct {
@@ -56,13 +57,14 @@ func parsePort(sport string) (dport uint, err error) {
 }
 
 // New from cli options first
-func New(host string, port uint, redis, api, token, field string) *Setting {
+func New(host string, port uint, redis, api, token, field, dir string) *Setting {
 	api = strings.TrimSuffix(strings.TrimSuffix(api, ep), "/")
 	c := &Setting{
 		Redis: redis, Host: host, Port: port,
 		Sapic: Sapic{
 			api + ep, field, token,
 		},
+		Dir: dir,
 	}
 	c.parseEnv()
 	return c
@@ -76,6 +78,7 @@ func (s *Setting) parseEnv() {
 	api := os.Getenv("fairyla_sapic_api")     // upload api url
 	field := os.Getenv("fairyla_sapic_field") // upload file field name
 	token := os.Getenv("fairyla_sapic_token")
+
 	if redis != "" {
 		s.Redis = redis
 	}
@@ -107,6 +110,8 @@ func (s *Setting) parseEnv() {
 				s.ICP = v
 			case "beian":
 				s.Beian = v
+			case "dir":
+				s.Dir = v
 			}
 		}
 
@@ -119,8 +124,8 @@ func (s *Setting) String() string {
 		token = fmt.Sprintf("<%s>", s.Sapic.Token)
 	}
 	return fmt.Sprintf(
-		"Host: %s\nPort: %d\nRedis: %s\nSapic:\n Api: %s\n Field: %s\n LinkToken: %s",
-		s.Host, s.Port, s.Redis, s.Sapic.Api, s.Sapic.Field, token,
+		"Host: %s\nPort: %d\nUI @ %s\nRedis: %s\nSapic:\n Api: %s\n Field: %s\n LinkToken: %s",
+		s.Host, s.Port, s.Dir, s.Redis, s.Sapic.Api, s.Sapic.Field, token,
 	)
 }
 

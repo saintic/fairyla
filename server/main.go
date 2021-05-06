@@ -32,6 +32,7 @@ var (
 	v bool
 	s bool
 
+	dir         string
 	host        string
 	port        uint
 	rawurl      string
@@ -46,6 +47,7 @@ func init() {
 	flag.BoolVar(&v, "v", false, "show version and exit")
 	flag.BoolVar(&s, "print-config", false, "show config info and exit")
 
+	flag.StringVar(&dir, "dir", "ui", "html and assets directory")
 	flag.StringVar(&host, "host", "0.0.0.0", "http listen host")
 	flag.UintVar(&port, "port", 10210, "http listen port")
 
@@ -58,7 +60,9 @@ func init() {
 
 func main() {
 	flag.Parse()
-	config := sys.New(host, port, rawurl, sapic_url, sapic_token, sapic_field)
+	config := sys.New(
+		host, port, rawurl, sapic_url, sapic_token, sapic_field, dir,
+	)
 	if v {
 		fmt.Println(version)
 	} else if s {

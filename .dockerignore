@@ -4,4 +4,5 @@ LICENSE
 Dockerfile
 Makefile
 README
-bin/
+server/bin/
+client/node_modules/
