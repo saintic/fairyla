@@ -31,7 +31,7 @@ func msgTranslator(locale, msg string) string {
 			return newMsg
 		}
 	}
-	fmt.Printf("msg translator into fuzzy: %s\n", msg)
+	fmt.Printf("msg translator into fuzzy(%s): %s\n", locale, msg)
 	if trans, has := fuzzy[locale]; has {
 		for pat, repl := range trans {
 			if pat.MatchString(msg) {
@@ -75,6 +75,6 @@ var precise = map[string]map[string]string{
 
 var fuzzy = map[string]map[*regexp.Regexp]string{
 	"zh": {
-		regexp.MustCompile("hello world"): "你好，世界",
+		regexp.MustCompile("(.*)connection refused"): "${1}连接拒绝",
 	},
 }

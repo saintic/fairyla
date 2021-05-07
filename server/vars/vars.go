@@ -57,8 +57,8 @@ func ResOK() res {
 	return res{true, "ok"}
 }
 
-func ResErr(msg string) res {
-	return res{false, msgTranslator("zh", msg)}
+func ResErr(lang, msg string) res {
+	return res{false, msgTranslator(lang, msg)}
 }
 
 func NewResData(data interface{}) resData {

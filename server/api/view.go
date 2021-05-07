@@ -40,7 +40,7 @@ func customHTTPErrorHandler(err error, c echo.Context) {
 		code = he.Code
 		msg = he.Message.(string)
 	}
-	c.JSON(code, vars.ResErr(msg))
+	c.JSON(code, vars.ResErr(getLocale(c), msg))
 }
 
 func signUpView(c echo.Context) error {

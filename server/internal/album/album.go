@@ -140,10 +140,7 @@ func (w wrap) WriteAlbum(a *Album) error {
 		return err
 	}
 	_, err = w.HSet(index, a.ID, string(val))
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 // 删除用户所有专辑及其下照片
@@ -168,10 +165,7 @@ func (w wrap) DropAlbum(owner, albumID string) error {
 		return err
 	}
 	_, err = w.Del(vars.GenFairyKey(owner, albumID))
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 // Only check the basic parameters and (overwrite) write
@@ -187,10 +181,7 @@ func (w wrap) WriteFairy(f *Fairy) error {
 		return err
 	}
 	_, err = w.HSet(index, f.ID, string(val))
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 // 删除用户某个专辑下某个照片
@@ -294,5 +285,32 @@ func (w wrap) GetFairy(user, albumID, fairyID string) (f Fairy, err error) {
 	if err != nil {
 		return
 	}
+	return
+}
+
+// 列出所有用户所有公开专辑数据（不包含专辑下照片）
+func (w wrap) ListPublicAlbums() (albums []Album, err error) {
+	users, err := w.SMembers(vars.UserIndex)
+	if err != nil {
+		return
+	}
+	for _, user := range users {
+		data, err := w.HGetAll(vars.GenAlbumKey(user))
+	}
+	data, err := w.HVals(vars.GenAlbumKey(user))
+	if err != nil {
+		return
+	}
+	albums = make([]Album, 0, len(data))
+	for _, v := range data {
+		var a Album
+		e := json.Unmarshal([]byte(v), &a)
+		if e == nil {
+			albums = append(albums, a)
+		}
+	}
+	sort.Slice(albums, func(i, j int) bool {
+		return albums[i].CTime > albums[j].CTime
+	})
 	return
 }

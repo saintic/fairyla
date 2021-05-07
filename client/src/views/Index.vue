@@ -28,7 +28,6 @@
                                 <el-option
                                     v-for="(item, index) in albums"
                                     :key="index"
-                                    :label="item"
                                     :value="item"
                                 ></el-option>
                             </el-select>

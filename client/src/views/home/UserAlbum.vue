@@ -4,6 +4,7 @@
 
 <script>
 import Album from '@/components/Album.vue'
+
 export default {
     Name: 'UserAlbum',
     components: { Album },

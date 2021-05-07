@@ -16,7 +16,10 @@
                             :src="album.fairy.src"
                             :title="album.fairy.desc"
                             fit="cover"
+                            v-if="album.fairy"
                         >
+                        </el-image>
+                        <el-image :src="dftCover" fit="cover" v-else>
                         </el-image>
                         <div class="post-content">
                             <h3>{{ album.name }}</h3>
@@ -24,6 +27,10 @@
                         </div>
                     </router-link>
                 </article>
+                <el-empty
+                    :image-size="200"
+                    v-if="albums.length === 0"
+                ></el-empty>
             </section>
         </section>
     </section>
@@ -32,6 +39,7 @@
 <script setup>
 import { defineProps } from 'vue'
 import { isObject } from '@/libs/util.js'
+import dftCover from '@/assets/img/fairy.png'
 
 defineProps({
     albums: {

@@ -19,6 +19,7 @@ package api
 import (
 	"fairyla/internal/album"
 	"fairyla/vars"
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -27,11 +28,6 @@ import (
 
 func getUser(c echo.Context) string {
 	return c.Get("user").(string)
-}
-
-func autoAlbumID(c echo.Context) string {
-	albumID := c.Param("id")
-	return getAlbumID(getUser(c), albumID)
 }
 
 func getAlbumID(user, albumID string) string {
@@ -45,19 +41,24 @@ func getAlbumID(user, albumID string) string {
 	return albumID
 }
 
-type LangQ struct {
+func autoAlbumID(c echo.Context) string {
+	albumID := c.Param("id")
+	return getAlbumID(getUser(c), albumID)
+}
+
+type alq struct {
 	Lang string
 	Q    float64
 }
 
-func parseAcceptLanguage(acptLang string) []LangQ {
-	var lqs []LangQ
+func parseAcceptLanguage(acptLang string) []alq {
+	var lqs []alq
 
 	langQStrs := strings.Split(acptLang, ",")
 	for _, langQStr := range langQStrs {
 		langQ := strings.Split(strings.Trim(langQStr, " "), ";")
 		if len(langQ) == 1 {
-			lq := LangQ{langQ[0], 1}
+			lq := alq{langQ[0], 1}
 			lqs = append(lqs, lq)
 		} else {
 			qp := strings.Split(langQ[1], "=")
@@ -65,9 +66,32 @@ func parseAcceptLanguage(acptLang string) []LangQ {
 			if err != nil {
 				panic(err)
 			}
-			lq := LangQ{langQ[0], q}
+			lq := alq{langQ[0], q}
 			lqs = append(lqs, lq)
 		}
 	}
 	return lqs
+}
+
+func getLocale(c echo.Context) string {
+	dft := "en"
+	lang := ""
+	cookie, err := c.Cookie("locale")
+	if err == nil {
+		lang = cookie.Value
+	}
+	if lang == "" {
+		alqs := parseAcceptLanguage(c.Request().Header.Get("Accept-Language"))
+		fmt.Printf("%+v\n", alqs)
+		if len(alqs) > 0 {
+			lang = alqs[0].Lang
+			if strings.HasPrefix(lang, "zh") {
+				lang = "zh"
+			}
+		}
+	}
+	if lang == "" {
+		lang = dft
+	}
+	return lang
 }
