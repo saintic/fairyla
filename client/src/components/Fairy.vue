@@ -74,7 +74,8 @@ defineProps({
     margin: 0 auto;
 }
 .container .wrapper {
-    overflow: hidden;
+    height: 100%;
+    overflow: scroll;
 }
 .post-head {
     margin-bottom: 24px;

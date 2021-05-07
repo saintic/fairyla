@@ -279,3 +279,12 @@ func uploadView(c echo.Context) error {
 		return errors.New(ret.Msg)
 	}
 }
+
+func pubAlbumView(c echo.Context) error {
+	w := album.New(rc)
+	data, err := w.ListPublicAlbums()
+	if err != nil {
+		return err
+	}
+	return c.JSON(200, vars.NewResData(data))
+}

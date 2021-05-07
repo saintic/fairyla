@@ -62,5 +62,5 @@ gopkg.in/yaml.v2 v2.2.2 h1:ZCJp+EgiOT7lHqUV2J862kp8Qj64Jo6az82+3Td9dZw=
 gopkg.in/yaml.v2 v2.2.2/go.mod h1:hI93XBmqTisBFMUTm0b8Fm+jr3Dg1NNxqwp+5A1VGuI=
 tcw.im/gtc v1.0.0 h1:KmhCIkTKzitKm8jLVR9sez2Yh5Ya7kgNZcbrZSSyqgA=
 tcw.im/gtc v1.0.0/go.mod h1:3/MyT7EO9DBfuf1rlGNEpTrjXs0j0TM3GKt2Ql1x/mw=
-tcw.im/gtc/redigo v0.4.3 h1:u6JvZ2L5m09k6ZXeNqDmqUwWDdqbSHoGzpm1WI1avDw=
-tcw.im/gtc/redigo v0.4.3/go.mod h1:kP0dszeCj0aoVqpj8qQMptgIJaKVVEZ5DmkFMz2iTu0=
+tcw.im/gtc/redigo v0.4.4 h1:l1pJ4GC1dzYHiSRf+3a+0OyjgzBp5n7KEhDhYoapeTU=
+tcw.im/gtc/redigo v0.4.4/go.mod h1:kP0dszeCj0aoVqpj8qQMptgIJaKVVEZ5DmkFMz2iTu0=

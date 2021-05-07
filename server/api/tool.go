@@ -19,7 +19,6 @@ package api
 import (
 	"fairyla/internal/album"
 	"fairyla/vars"
-	"fmt"
 	"strconv"
 	"strings"
 
@@ -82,7 +81,6 @@ func getLocale(c echo.Context) string {
 	}
 	if lang == "" {
 		alqs := parseAcceptLanguage(c.Request().Header.Get("Accept-Language"))
-		fmt.Printf("%+v\n", alqs)
 		if len(alqs) > 0 {
 			lang = alqs[0].Lang
 			if strings.HasPrefix(lang, "zh") {

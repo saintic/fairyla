@@ -160,11 +160,10 @@ func (w wrap) DropAlbums(owner string) error {
 
 // 删除用户某个专辑及其下照片
 func (w wrap) DropAlbum(owner, albumID string) error {
-	_, err := w.HDel(vars.GenAlbumKey(owner), albumID)
-	if err != nil {
-		return err
-	}
-	_, err = w.Del(vars.GenFairyKey(owner, albumID))
+	pipe := w.Pipeline()
+	pipe.HDel(vars.GenAlbumKey(owner), albumID)
+	pipe.Del(vars.GenFairyKey(owner, albumID))
+	_, err := pipe.Execute()
 	return err
 }
 
@@ -289,28 +288,25 @@ func (w wrap) GetFairy(user, albumID, fairyID string) (f Fairy, err error) {
 }
 
 // 列出所有用户所有公开专辑数据（不包含专辑下照片）
-func (w wrap) ListPublicAlbums() (albums []Album, err error) {
+func (w wrap) ListPublicAlbums() (data [][]Album, err error) {
 	users, err := w.SMembers(vars.UserIndex)
 	if err != nil {
 		return
 	}
 	for _, user := range users {
-		data, err := w.HGetAll(vars.GenAlbumKey(user))
-	}
-	data, err := w.HVals(vars.GenAlbumKey(user))
-	if err != nil {
-		return
-	}
-	albums = make([]Album, 0, len(data))
-	for _, v := range data {
-		var a Album
-		e := json.Unmarshal([]byte(v), &a)
-		if e == nil {
-			albums = append(albums, a)
+		uasd := make([]Album, 0)
+		uass, _ := w.HVals(vars.GenAlbumKey(user))
+		for _, d := range uass {
+			var a Album
+			err := json.Unmarshal([]byte(d), &a)
+			if err != nil {
+				fmt.Println(err)
+			}
+			if a.Public {
+				uasd = append(uasd, a)
+			}
 		}
+		data = append(data, uasd)
 	}
-	sort.Slice(albums, func(i, j int) bool {
-		return albums[i].CTime > albums[j].CTime
-	})
 	return
 }

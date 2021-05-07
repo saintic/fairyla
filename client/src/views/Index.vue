@@ -1,6 +1,6 @@
 <template>
     <el-row type="flex" justify="center" align="middle">
-        <el-col :span="12">
+        <el-col :md="12" :sm="16" :xs="20">
             <div v-if="isLogin">
                 <div class="description">
                     <i
@@ -9,13 +9,12 @@
                     <br />
                     她是小仙女啦
                 </div>
-
                 <el-form
                     ref="fairy"
                     :model="af"
                     :rules="rules"
                     size="small"
-                    label-width="100px"
+                    label-width="70px"
                 >
                     <el-row>
                         <el-form-item label="专辑" prop="album">
@@ -33,8 +32,8 @@
                             </el-select>
                         </el-form-item>
                     </el-row>
-                    <el-row>
-                        <el-col :span="17">
+                    <el-row :gutter="1">
+                        <el-col :sm="17" :xs="17">
                             <el-form-item label="照片" prop="src">
                                 <el-input
                                     v-model="af.src"
@@ -45,7 +44,7 @@
                                 ></el-input>
                             </el-form-item>
                         </el-col>
-                        <el-col :span="7">
+                        <el-col :sm="6" :xs="6">
                             <el-form-item label-width="0" prop="">
                                 <el-tooltip
                                     effect="dark"
@@ -61,10 +60,10 @@
                                         :headers="headers"
                                     >
                                         <el-button
-                                            size="small"
+                                            size="mini"
                                             type="primary"
                                             icon="el-icon-upload"
-                                            >点击上传</el-button
+                                            >上传</el-button
                                         >
                                     </el-upload>
                                 </el-tooltip>
@@ -72,7 +71,7 @@
                         </el-col>
                     </el-row>
                     <el-row>
-                        <el-col :span="24">
+                        <el-col :sm="24">
                             <el-form-item label="描述" prop="desc">
                                 <el-input
                                     v-model="af.desc"

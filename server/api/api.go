@@ -44,6 +44,7 @@ func StartApi(config *sys.Setting) {
 
 	api := e.Group("/api")
 	api.GET("/config", configView)
+	api.GET("/album", pubAlbumView)
 
 	auth := api.Group("/auth")
 	auth.POST("/signup", signUpView)
