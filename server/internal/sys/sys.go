@@ -52,8 +52,9 @@ func parsePort(sport string) (dport uint, err error) {
 			return
 		}
 		dport = uint(iport)
+	} else {
+		err = errors.New("empty port")
 	}
-	err = errors.New("empty port")
 	return
 }
 

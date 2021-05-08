@@ -11,7 +11,6 @@ help:
 	@echo "  make clean  - Remove binaries and vim swap files"
 	@echo "  make gotool - Run go tool 'fmt' and 'vet'"
 	@echo "  make build  - Compile go code and generate binary file"
-	@echo "  make release- Format go code and compile to generate binary release"
 
 gotool:
 	go fmt ./
@@ -28,9 +27,6 @@ build-macos:
 
 build-windows:
 	CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build ${LDFLAGS} -o bin/$(WIN) && chmod +x bin/$(WIN)
-
-docker:
-	docker build -t staugur/fairyla .
 
 clean:
 	find bin -name '*.tar.gz' -exec rm -f {} +

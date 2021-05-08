@@ -1,1 +1,0 @@
-import{X as s,V as e,c as t,q as a,a as r,$ as l}from"./vendor.884d25e1.js";const o={expose:[],setup:o=>(o,n)=>{const c=s("el-image"),u=s("el-result");return e(),t(u,{title:"404",subTitle:"页面未发现"},{icon:a((()=>[r(c,{src:l("/assets/404.17b05a9b.png")},null,8,["src"])])),_:1})}};export default o;

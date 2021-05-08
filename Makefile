@@ -18,3 +18,6 @@ release:
 	cd server && tar zcvf bin/$(BINARY).$(VERSION)-darwin-amd64.tar.gz bin/$(BINARY) ui && rm bin/$(BINARY)
 	cd server/bin && mv $(WIN) $(BINARY).exe
 	cd server && zip -r bin/$(BINARY).$(VERSION)-windows-amd64.zip bin/$(BINARY).exe ui && rm bin/$(BINARY).exe
+
+docker:
+	docker build -t staugur/fairyla .
