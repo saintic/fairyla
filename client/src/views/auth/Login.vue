@@ -32,9 +32,7 @@
                 <el-checkbox v-model="checked" class="rememberme"
                     >记住我</el-checkbox
                 >
-                <el-link type="info" class="forgot" href="https://picbed.pro"
-                    >忘记密码？</el-link
-                >
+                <el-link type="info" class="forgot">忘记密码？</el-link>
             </el-form-item>
             <el-form-item style="width: 100%">
                 <el-button

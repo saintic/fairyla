@@ -7,7 +7,7 @@
                         class="saintic-icon saintic-icon-goddess saintic-icon-3"
                     ></i>
                     <br />
-                    她是小仙女啦
+                    {{ slogan }}
                 </div>
                 <el-form
                     ref="fairy"
@@ -99,6 +99,7 @@
 
 <script>
 import { mapState } from '@/libs/store.js'
+import { IndexSlogan } from '@/libs/vars.js'
 import Welcome from '@/components/Welcome.vue'
 
 export default {
@@ -127,7 +128,10 @@ export default {
     computed: mapState({
         isLogin: 'isLogin',
         user: 'user',
-        headers: (state) => ({ Authorization: 'Bearer ' + state.token })
+        headers: (state) => ({ Authorization: 'Bearer ' + state.token }),
+        slogan: (state) => {
+            return state.slogan || IndexSlogan
+        }
     }),
     methods: {
         submitForm() {

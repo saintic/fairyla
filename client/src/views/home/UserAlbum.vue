@@ -19,6 +19,7 @@ export default {
                 } else {
                     a['fairy'] = a.latest_fairy
                 }
+                a.to = { name: 'UserAlbumFairy', params: { name: a.name } }
                 this.albums.push(a)
             }
         })

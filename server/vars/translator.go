@@ -17,13 +17,13 @@
 package vars
 
 import (
-	"fmt"
+	"log"
 	"regexp"
 )
 
 // API返回字段msg国际化翻译
 func msgTranslator(locale, msg string) string {
-	if locale == "" || msg == "" || msg == "ok" {
+	if locale == "" || locale == "en" || msg == "" || msg == "ok" {
 		return msg
 	}
 	if trans, has := precise[locale]; has {
@@ -31,7 +31,7 @@ func msgTranslator(locale, msg string) string {
 			return newMsg
 		}
 	}
-	fmt.Printf("msg translator into fuzzy(%s): %s\n", locale, msg)
+	log.Printf("msg translator into fuzzy(%s): %s\n", locale, msg)
 	if trans, has := fuzzy[locale]; has {
 		for pat, repl := range trans {
 			if pat.MatchString(msg) {

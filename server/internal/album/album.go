@@ -20,6 +20,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"sort"
 
 	"fairyla/pkg/db"
@@ -254,7 +255,7 @@ func (w wrap) ListFairies(user string) (out map[string][]Fairy, err error) {
 	return
 }
 
-// 获取用户某个专辑下所有照片数据（不包含专辑数据）
+// 仅获取用户某个专辑下所有照片数据（不包含专辑数据）
 func (w wrap) GetFairies(user, albumID string) (fairies []Fairy, err error) {
 	data, err := w.HGetAll(vars.GenFairyKey(user, albumID))
 	if err != nil {
@@ -288,25 +289,64 @@ func (w wrap) GetFairy(user, albumID, fairyID string) (f Fairy, err error) {
 }
 
 // 列出所有用户所有公开专辑数据（不包含专辑下照片）
-func (w wrap) ListPublicAlbums() (data [][]Album, err error) {
+func (w wrap) ListPublicAlbums() (data []Album, err error) {
 	users, err := w.SMembers(vars.UserIndex)
 	if err != nil {
 		return
 	}
+	pipe := w.Pipeline()
 	for _, user := range users {
-		uasd := make([]Album, 0)
-		uass, _ := w.HVals(vars.GenAlbumKey(user))
-		for _, d := range uass {
+		pipe.Send("HVALS", vars.GenAlbumKey(user))
+	}
+	rs, err := pipe.Execute()
+	if err != nil {
+		return
+	}
+	for _, r := range rs {
+		for _, d := range r.([]interface{}) {
 			var a Album
-			err := json.Unmarshal([]byte(d), &a)
-			if err != nil {
-				fmt.Println(err)
+			e := json.Unmarshal(d.([]byte), &a)
+			if e != nil {
+				log.Println(e)
+				continue
 			}
 			if a.Public {
-				uasd = append(uasd, a)
+				data = append(data, a)
 			}
 		}
-		data = append(data, uasd)
+	}
+	return
+}
+
+// 列出所有用户所有公开专辑数据（包含专辑下照片）
+// 当参数 albumIDs 不为空时，返回指定的专辑ID对应数据
+// 当参数 albumNames 不为空时，返回切指定的专辑名对应数据
+func (w wrap) ListPublicAlbumFaries(albumIDs, albumNames []string) (data []AlbumFairy, err error) {
+	albums, err := w.ListPublicAlbums()
+	if err != nil {
+		return
+	}
+	for _, a := range albums {
+		isUse := false
+		if len(albumIDs) > 0 || len(albumNames) > 0 {
+			// 说明仅返回两个参数指定的专辑即可
+			if gtc.StrInSlice(a.ID, albumIDs) {
+				isUse = true
+			}
+			if gtc.StrInSlice(a.Name, albumNames) {
+				isUse = true
+			}
+		} else {
+			isUse = true
+		}
+		if isUse {
+			f, e := w.GetFairies(a.Owner, a.ID)
+			if e != nil {
+				err = e
+				return
+			}
+			data = append(data, AlbumFairy{a, f})
+		}
 	}
 	return
 }

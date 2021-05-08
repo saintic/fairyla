@@ -49,14 +49,22 @@ const routes = [
     },
     {
         path: '/ta',
-        name: 'Ta',
+        name: 'TaAlbum',
         component: () => import('@/views/ta/Ta.vue'),
-        meta: { requiresAuth: true, title: '她是' }
+        meta: { title: '她是' }
+    },
+    {
+        path: '/ta/:name',
+        name: 'TaAlbumFairy',
+        component: () => import('@/views/album/AlbumFairy.vue'),
+        meta: { title: '专辑' },
+        props: { isPublic: true }
     },
     {
         path: '/my',
         name: 'Home',
         component: () => import('@/views/home/Home.vue'),
+        meta: { requiresAuth: true, title: '个人中心' },
         children: [
             /*
             {
@@ -70,16 +78,17 @@ const routes = [
             */
             {
                 path: 'album',
-                component: () => import('@/views/home/UserAlbum.vue')
+                name: 'UserAlbum',
+                component: () => import('@/views/home/UserAlbum.vue'),
+                meta: { title: '我的专辑' }
+            },
+            {
+                path: '/album/:name',
+                name: 'UserAlbumFairy',
+                component: () => import('@/views/album/AlbumFairy.vue'),
+                meta: { title: '专辑' }
             }
-        ],
-        meta: { requiresAuth: true, title: '个人中心' }
-    },
-    {
-        path: '/album/:name',
-        name: 'Album',
-        component: () => import('@/views/album/AlbumFairy.vue'),
-        meta: { requiresAuth: true, title: '专辑' }
+        ]
     },
     {
         path: '/:pathMatch(.*)*',

@@ -30,3 +30,5 @@ export const ErrMsgMap = {
 
 // 专辑可选系统内置标签
 export const SysLabels = ['亲人', '爱人', '暗恋', '偶像', '动漫']
+
+export const IndexSlogan = '她是小仙女啦'

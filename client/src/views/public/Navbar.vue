@@ -37,7 +37,6 @@
                         <i class="saintic-icon saintic-icon-user-album"></i>
                         我的专辑
                     </el-menu-item>
-                    <el-menu-item>-----------------</el-menu-item>
                     <el-menu-item index="/logout">
                         <i class="saintic-icon saintic-icon-logoff"></i>
                         登出

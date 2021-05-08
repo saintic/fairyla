@@ -26,13 +26,14 @@ import (
 )
 
 type Setting struct {
-	Dir   string // html & assets
-	Redis string
-	Host  string
-	Port  uint
-	Sapic Sapic
-	ICP   string // beian.miit.gov.cn
-	Beian string // www.beian.gov.cn
+	Dir    string // html & assets
+	Redis  string
+	Host   string
+	Port   uint
+	Sapic  Sapic
+	ICP    string // beian.miit.gov.cn
+	Beian  string // www.beian.gov.cn
+	Slogan string
 }
 
 type Sapic struct {
@@ -56,15 +57,16 @@ func parsePort(sport string) (dport uint, err error) {
 	return
 }
 
+func parseApiURL(url string) string {
+	url = strings.TrimSuffix(strings.TrimSuffix(url, ep), "/")
+	return url + ep
+}
+
 // New from cli options first
 func New(host string, port uint, redis, api, token, field, dir string) *Setting {
-	api = strings.TrimSuffix(strings.TrimSuffix(api, ep), "/")
 	c := &Setting{
-		Redis: redis, Host: host, Port: port,
-		Sapic: Sapic{
-			api + ep, field, token,
-		},
-		Dir: dir,
+		Redis: redis, Host: host, Port: port, Dir: dir,
+		Sapic: Sapic{parseApiURL(api), field, token},
 	}
 	c.parseEnv()
 	return c
@@ -89,8 +91,8 @@ func (s *Setting) parseEnv() {
 	if err == nil && dport > 1024 {
 		s.Port = dport
 	}
-	if util.IsValidURL(api) && strings.HasSuffix(api, ep) {
-		s.Sapic.Api = api
+	if util.IsValidURL(api) {
+		s.Sapic.Api = parseApiURL(api)
 	}
 	if field != "" {
 		s.Sapic.Field = field
@@ -102,7 +104,7 @@ func (s *Setting) parseEnv() {
 	sep := "fairyla_"
 	for _, e := range os.Environ() {
 		env := strings.Split(e, "=")
-		if len(env) > 2 && strings.HasPrefix(env[0], sep) {
+		if len(env) >= 2 && strings.HasPrefix(env[0], sep) {
 			field := strings.TrimPrefix(env[0], sep)
 			v := env[1]
 			switch field {
@@ -112,6 +114,8 @@ func (s *Setting) parseEnv() {
 				s.Beian = v
 			case "dir":
 				s.Dir = v
+			case "slogan":
+				s.Slogan = v
 			}
 		}
 	}
@@ -149,5 +153,6 @@ func (s *Setting) SitePublic() map[string]interface{} {
 	cfg := make(map[string]interface{})
 	cfg["icp"] = s.ICP
 	cfg["beian"] = s.Beian
+	cfg["slogan"] = s.Slogan
 	return cfg
 }

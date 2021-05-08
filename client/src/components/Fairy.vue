@@ -1,7 +1,7 @@
 <template>
     <section class="container">
         <section class="wrapper">
-            <article class="entry">
+            <article class="entry" v-if="album.id">
                 <header class="post-head">
                     <h2>{{ album.name }}</h2>
                 </header>
@@ -22,12 +22,18 @@
                     >
                     </el-image>
                 </div>
+                <el-empty
+                    :image-size="150"
+                    v-if="fairies.length === 0"
+                ></el-empty>
                 <br />
                 <section class="bdshare">
                     <div class="info">
                         <span class="category" v-if="album.label">
-                            <i class="saintic-icon saintic-icon-tags"></i>
-                            {{ album.label }}
+                            <i class="saintic-icon saintic-icon-tags"></i>&nbsp;
+                            <span v-for="l in album.label" :key="l"
+                                >{{ l }}
+                            </span>
                         </span>
                         <span class="date">
                             <i class="saintic-icon saintic-icon-time"></i>
@@ -36,7 +42,6 @@
                     </div>
                 </section>
             </article>
-            <el-backtop target=".container .wrapper"></el-backtop>
         </section>
     </section>
 </template>
@@ -74,8 +79,7 @@ defineProps({
     margin: 0 auto;
 }
 .container .wrapper {
-    height: 100%;
-    overflow: scroll;
+    overflow: hidden;
 }
 .post-head {
     margin-bottom: 24px;

@@ -282,9 +282,20 @@ func uploadView(c echo.Context) error {
 
 func pubAlbumView(c echo.Context) error {
 	w := album.New(rc)
-	data, err := w.ListPublicAlbums()
-	if err != nil {
-		return err
+	if gtc.IsTrue(c.QueryParam("fairy")) {
+		q := c.Request().URL.Query()
+		ids := q["album_id"]
+		names := q["album_name"]
+		data, err := w.ListPublicAlbumFaries(ids, names)
+		if err != nil {
+			return err
+		}
+		return c.JSON(200, vars.NewResData(data))
+	} else {
+		data, err := w.ListPublicAlbums()
+		if err != nil {
+			return err
+		}
+		return c.JSON(200, vars.NewResData(data))
 	}
-	return c.JSON(200, vars.NewResData(data))
 }

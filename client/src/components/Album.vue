@@ -8,7 +8,7 @@
                     :key="album.id"
                 >
                     <router-link
-                        :to="{ name: 'Album', params: { name: album.name } }"
+                        :to="album.to"
                         :title="album.label"
                         class="post-main"
                     >
@@ -28,7 +28,7 @@
                     </router-link>
                 </article>
                 <el-empty
-                    :image-size="200"
+                    :image-size="150"
                     v-if="albums.length === 0"
                 ></el-empty>
             </section>
