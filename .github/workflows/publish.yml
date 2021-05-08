@@ -20,3 +20,4 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
           repository: staugur/fairyla
           tag_with_ref: true
+          build_args: alpine=dl-cdn.alpinelinux.org,registry=https://registry.npmjs.org,goproxy=https://proxy.golang.org
