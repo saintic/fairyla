@@ -18,8 +18,13 @@ package util
 
 import (
 	"net/url"
+	"path/filepath"
 	"regexp"
 	"time"
+
+	"fairyla/vars"
+
+	"tcw.im/gtc"
 )
 
 var (
@@ -46,4 +51,14 @@ func IsValidURL(toTest string) bool {
 		return false
 	}
 	return true
+}
+
+func IsImage(filename string) bool {
+	ext := filepath.Ext(filepath.Base(filename))
+	return gtc.StrInSlice(ext, vars.AllowImage)
+}
+
+func IsVideo(filename string) bool {
+	ext := filepath.Ext(filepath.Base(filename))
+	return gtc.StrInSlice(ext, vars.AllowVideo)
 }

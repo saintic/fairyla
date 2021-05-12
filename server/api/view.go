@@ -20,6 +20,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -225,6 +226,7 @@ func uploadView(c echo.Context) error {
 	if err != nil {
 		return err
 	}
+	fmt.Printf("name: %s, size: %d\n", file.Filename, file.Size)
 	fd, err := file.Open()
 	if err != nil {
 		return err
@@ -264,6 +266,7 @@ func uploadView(c echo.Context) error {
 	if err != nil {
 		return err
 	}
+	fmt.Println(string(body))
 	ret := struct {
 		Code int    `json:"-"`
 		Msg  string `json:"-"`
@@ -273,7 +276,8 @@ func uploadView(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	if ret.Code == 0 {
+	fmt.Printf("%+v\n", ret)
+	if ret.Src != "" {
 		return c.JSON(200, vars.NewResData(ret))
 	} else {
 		return errors.New(ret.Msg)

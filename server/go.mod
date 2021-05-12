@@ -4,11 +4,10 @@ go 1.15
 
 require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
-	github.com/labstack/echo/v4 v4.2.2
-	github.com/mattn/go-colorable v0.1.8 // indirect
-	golang.org/x/crypto v0.0.0-20210505212654-3497b51f5e64
-	golang.org/x/net v0.0.0-20210505214959-0714010a04ed // indirect
-	golang.org/x/sys v0.0.0-20210503173754-0981d6026fa6 // indirect
+	github.com/labstack/echo/v4 v4.3.0
+	golang.org/x/crypto v0.0.0-20210506145944-38f3c27a63bf
+	golang.org/x/net v0.0.0-20210510120150-4163338589ed // indirect
+	golang.org/x/sys v0.0.0-20210511113859-b0526f3d8744 // indirect
 	tcw.im/gtc v1.0.0
 	tcw.im/gtc/redigo v0.4.4
 )

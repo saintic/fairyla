@@ -21,6 +21,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"net/url"
 	"sort"
 
 	"fairyla/pkg/db"
@@ -30,15 +31,12 @@ import (
 	"tcw.im/gtc"
 )
 
-const (
-	albumLimitNum uint64 = 9 // 用户专辑数量限制
-)
-
 // 专辑属性
 type Album struct {
 	ID          string   `json:"id"`    // 专辑ID，唯一性，索引，由Name而来
-	Owner       string   `json:"owner"` // 所属用户
 	Name        string   `json:"name"`  // 专辑名称，不具备唯一性
+	Owner       string   `json:"owner"` // 所属用户
+	Ta          string   `json:"ta"`    // 认领用户
 	CTime       int64    `json:"ctime"`
 	Public      bool     `json:"public"`
 	Label       []string `json:"label"`
@@ -50,10 +48,11 @@ type Album struct {
 type Fairy struct {
 	ID      string `json:"id"`       // 专辑ID，唯一性，索引，由Src而来
 	AlbumID string `json:"album_id"` // 所属专辑
-	Owner   string `json:"owner"`    // 所属用户
+	Owner   string `json:"owner"`    // 所属用户（上传者，专辑属主或认领者）
 	CTime   int64  `json:"ctime"`
 	Desc    string `json:"desc"`
-	Src     string `json:"src"` // 照片存储地址，理论上要求唯一
+	Src     string `json:"src"`      // 照片存储地址，理论上要求唯一
+	IsVideo bool   `json:"is_video"` // 是否为视频
 }
 
 // 专辑及其包含的照片
@@ -105,9 +104,18 @@ func NewFairy(owner, albumID, src, desc string) (f *Fairy, err error) {
 		err = errors.New("illegal fairyl src url")
 		return
 	}
+	u, _ := url.ParseRequestURI(src)
+	isVideo := util.IsVideo(u.Path)
+	isImage := util.IsImage(u.Path)
+	if !isVideo && !isImage {
+		err = errors.New("nsupported file type")
+		return
+	}
 	now := util.Now()
 	ID := fmt.Sprintf("%s-%s-%d", albumID, src, now)
-	f = &Fairy{vars.FairyPreID + gtc.MD5(ID), albumID, owner, now, desc, src}
+	f = &Fairy{
+		vars.FairyPreID + gtc.MD5(ID), albumID, owner, now, desc, src, isVideo,
+	}
 	return
 }
 
@@ -128,11 +136,11 @@ func (w wrap) WriteAlbum(a *Album) error {
 	}
 	// check db
 	index := vars.GenAlbumKey(a.Owner)
-	length, err := w.HLen(index)
+	aIDs, err := w.HKeys(index)
 	if err != nil {
 		return err
 	}
-	if length >= albumLimitNum {
+	if len(aIDs) >= vars.AlbumLimitNum && !gtc.StrInSlice(a.ID, aIDs) {
 		return errors.New("the number of albums exceeds the limit")
 	}
 	// write db, if exists(=update)

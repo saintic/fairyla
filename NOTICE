@@ -23,16 +23,21 @@ Copyright 2012 Gary Burd
 Licensed under the Apache License, Version 2.0
 
 Vue.js
-https://github.com/vuejs/vue-next/
+https://github.com/vuejs/vue-next
 Copyright (c) 2018-present, Yuxi (Evan) You
 Licensed under the MIT License
 
 Vue-Router
-https://github.com/vuejs/vue-router/
+https://github.com/vuejs/vue-router
 Copyright (c) 2013-present Evan You
 Licensed under the MIT License
 
 Element-Plus
 https://github.com/element-plus/element-plus
 Copyright (c) 2020 Element Plus
+Licensed under the MIT License
+
+Axios
+https://github.com/axios/axios
+Copyright (c) 2014-present Matt Zabriskie
 Licensed under the MIT License

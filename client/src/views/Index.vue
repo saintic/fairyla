@@ -37,7 +37,7 @@
                             <el-form-item label="照片" prop="src">
                                 <el-input
                                     v-model="af.src"
-                                    placeholder="请输入照片地址或上传"
+                                    placeholder="请输入照片（视频）地址或上传"
                                     show-word-limit
                                     clearable
                                     prefix-icon="el-icon-link"
@@ -52,11 +52,12 @@
                                     placement="top"
                                 >
                                     <el-upload
-                                        accept="image/jpg, image/jpeg, image/webp, image/png"
+                                        :accept="acceptMimes"
                                         :before-upload="upBefore"
                                         :show-file-list="false"
                                         action="/api/user/upload"
                                         :on-success="upSuccess"
+                                        :on-error="upErr"
                                         :headers="headers"
                                     >
                                         <el-button
@@ -75,7 +76,7 @@
                             <el-form-item label="描述" prop="desc">
                                 <el-input
                                     v-model="af.desc"
-                                    placeholder="请输入照片描述"
+                                    placeholder="请输入照片（视频）描述"
                                     clearable
                                 >
                                 </el-input>
@@ -131,7 +132,13 @@ export default {
         headers: (state) => ({ Authorization: 'Bearer ' + state.token }),
         slogan: (state) => {
             return state.slogan || IndexSlogan
-        }
+        },
+        acceptMimes: (state) => {
+            let mimes = 'image/jpg, image/jpeg, image/webp, image/png',
+                ext = (state.extra_mimes || []).join(',')
+            return ext ? `${mimes},${ext}` : mimes
+        },
+        upLimit: 'upload_limit'
     }),
     methods: {
         submitForm() {
@@ -151,15 +158,17 @@ export default {
             this.$refs['fairy'].resetFields()
         },
         upBefore(file) {
-            let isRightSize = file.size / 1024 / 1024 < 10
+            let isRightSize = file.size / 1024 / 1024 < this.upLimit
             if (!isRightSize) {
-                this.$message.error('文件大小超过 10MB')
+                this.$message.error('文件大小超过限制')
+                return
             }
-            let isAccept = new RegExp('image/*').test(file.type)
-            if (!isAccept) {
-                this.$message.error('应该选择image/*类型的文件')
+            let isImage = new RegExp('image/*').test(file.type)
+            let isVideo = new RegExp('video/*').test(file.type)
+            if (!isImage && !isVideo) {
+                this.$message.error('不支持上传的文件类型')
             }
-            return isRightSize && isAccept
+            return isRightSize && (isImage || isVideo)
         },
         upSuccess(res) {
             if (res.success) {
@@ -167,6 +176,9 @@ export default {
             } else {
                 this.$message.error(res.message)
             }
+        },
+        upErr(err) {
+            console.log(err)
         }
     },
     created() {

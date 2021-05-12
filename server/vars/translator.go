@@ -68,6 +68,7 @@ var precise = map[string]map[string]string{
 		"not found username":        "未发现用户",
 		"wrong password":            "密码错误",
 		"illegal token":             "非法Token",
+		"unsupported file type":     "不支持的文件类型",
 
 		// project message(too long)
 		"the number of albums exceeds the limit": "专辑数量限制",

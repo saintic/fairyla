@@ -38,8 +38,22 @@ var (
 		return fmt.Sprintf("fairy:%s:%s", user, albumID)
 	}
 
+	AllowImage = []string{".png", ".jpg", ".jpeg", ".gif"}
+	AllowVideo = []string{".mp4", ".ogg", ".ogv", ".webm", ".3gp", ".mov"}
+	// 额外允许上传的类型
+	ExtraMimes = []string{
+		"video/mp4", "video/ogg", "video/webm", "video/3gpp", "video/quicktime",
+	}
+)
+
+const (
 	AlbumPreID = "md.a."
 	FairyPreID = "md.f."
+
+	// 上传限制，单位MB
+	UploadLimitSize = 10
+	// 用户专辑数量限制
+	AlbumLimitNum = 9
 )
 
 type (
