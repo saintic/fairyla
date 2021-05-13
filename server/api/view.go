@@ -226,7 +226,12 @@ func uploadView(c echo.Context) error {
 	if err != nil {
 		return err
 	}
+	// Size(bytes) limit
 	fmt.Printf("name: %s, size: %d\n", file.Filename, file.Size)
+	limit := vars.UploadLimitSize * 1024 * 1024
+	if file.Size > limit {
+		return errors.New("the uploaded file exceeds the limit")
+	}
 	fd, err := file.Open()
 	if err != nil {
 		return err
@@ -237,12 +242,13 @@ func uploadView(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	pic := base64.StdEncoding.EncodeToString(content)
+	stream := base64.StdEncoding.EncodeToString(content)
 
 	var post http.Request
 	post.ParseForm()
-	post.Form.Add(cfg.Sapic.Field, pic)
+	post.Form.Add(cfg.Sapic.Field, stream)
 	post.Form.Add("album", "fairyla")
+	post.Form.Add("filename", file.Filename)
 
 	client := &http.Client{Timeout: 30 * time.Second}
 	req, err := http.NewRequest(

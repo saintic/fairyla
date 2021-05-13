@@ -25,8 +25,8 @@
                                 filterable
                             >
                                 <el-option
-                                    v-for="(item, index) in albums"
-                                    :key="index"
+                                    v-for="item in albums"
+                                    :key="item"
                                     :value="item"
                                 ></el-option>
                             </el-select>
@@ -138,7 +138,9 @@ export default {
                 ext = (state.extra_mimes || []).join(',')
             return ext ? `${mimes},${ext}` : mimes
         },
-        upLimit: 'upload_limit'
+        upLimit: (state) => {
+            return state.upload_limit || 10
+        }
     }),
     methods: {
         submitForm() {
@@ -178,7 +180,8 @@ export default {
             }
         },
         upErr(err) {
-            console.log(err)
+            let msg = JSON.parse(err.message)
+            this.$message.error(msg)
         }
     },
     created() {

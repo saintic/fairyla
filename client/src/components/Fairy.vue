@@ -8,17 +8,35 @@
                 <div class="post-info">
                     &nbsp;&nbsp; 所属：{{ album.owner }}
                 </div>
-                <div
-                    style="text-align: center"
-                    v-for="f in fairies"
-                    :key="f.id"
-                >
+                <div class="post-info" v-if="btns.length > 0">
+                    <el-button
+                        v-for="(btn, index) in btns"
+                        :key="index"
+                        size="mini"
+                        :type="btn.type || 'primary'"
+                        :plain="btn.plain"
+                        :round="btn.round"
+                        :circle="btn.circle"
+                        :loading="btn.loading"
+                        :disabled="btn.disabled"
+                        :icon="btn.icon"
+                        @click="btn.click"
+                    ></el-button>
+                </div>
+                <div class="post-main" v-for="f in fairies" :key="f.id">
+                    <vue3-video-player
+                        :title="f.desc"
+                        :src="f.src"
+                        preload="metadata"
+                        v-if="f.is_video"
+                    ></vue3-video-player>
                     <el-image
                         :title="f.desc"
                         :src="f.src"
                         :lazy="true"
                         :preview-src-list="urls"
                         :hide-on-click-modal="true"
+                        v-else
                     >
                     </el-image>
                 </div>
@@ -69,7 +87,17 @@ defineProps({
             return true
         }
     },
-    urls: Array
+    urls: Array,
+    btns: {
+        type: Array,
+        validator: (value) => {
+            if (!Array.isArray(value)) return false
+            for (let v of value) {
+                if (!isObject(v)) return false
+            }
+            return true
+        }
+    }
 })
 </script>
 
@@ -98,6 +126,10 @@ defineProps({
 }
 .post-info {
     margin-bottom: 32px;
+}
+.post-main {
+    text-align: center;
+    margin: 5px auto;
 }
 
 .entry {

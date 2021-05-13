@@ -108,7 +108,7 @@ func NewFairy(owner, albumID, src, desc string) (f *Fairy, err error) {
 	isVideo := util.IsVideo(u.Path)
 	isImage := util.IsImage(u.Path)
 	if !isVideo && !isImage {
-		err = errors.New("nsupported file type")
+		err = errors.New("unsupported file type")
 		return
 	}
 	now := util.Now()

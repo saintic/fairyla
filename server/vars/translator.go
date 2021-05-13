@@ -72,6 +72,7 @@ var precise = map[string]map[string]string{
 
 		// project message(too long)
 		"the number of albums exceeds the limit": "专辑数量限制",
+		"the uploaded file exceeds the limit":    "上传文件超出限制",
 	},
 }
 

@@ -16,7 +16,7 @@
                             :src="album.fairy.src"
                             :title="album.fairy.desc"
                             fit="cover"
-                            v-if="album.fairy"
+                            v-if="album.fairy && !album.fairy.is_video"
                         >
                         </el-image>
                         <el-image :src="dftCover" fit="cover" v-else>
