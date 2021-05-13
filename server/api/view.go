@@ -20,7 +20,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -124,7 +123,12 @@ func createFairyView(c echo.Context) error {
 		}
 		a, _ = album.NewAlbum(user, albumName)
 		albumID = a.ID
-	} else {
+	}
+	exist, err := a.Exist(rc)
+	if err != nil {
+		return err
+	}
+	if exist {
 		ta, err := w.GetAlbum(user, albumID)
 		if err != nil {
 			return err
@@ -135,7 +139,9 @@ func createFairyView(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	a.SetLatest(f)
+	if !f.IsVideo {
+		a.SetLatest(f)
+	}
 	err = w.WriteAlbum(a)
 	if err != nil {
 		return err
@@ -227,7 +233,6 @@ func uploadView(c echo.Context) error {
 		return err
 	}
 	// Size(bytes) limit
-	fmt.Printf("name: %s, size: %d\n", file.Filename, file.Size)
 	limit := vars.UploadLimitSize * 1024 * 1024
 	if file.Size > limit {
 		return errors.New("the uploaded file exceeds the limit")
@@ -272,7 +277,6 @@ func uploadView(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(body))
 	ret := struct {
 		Code int    `json:"-"`
 		Msg  string `json:"-"`
@@ -282,7 +286,6 @@ func uploadView(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("%+v\n", ret)
 	if ret.Src != "" {
 		return c.JSON(200, vars.NewResData(ret))
 	} else {

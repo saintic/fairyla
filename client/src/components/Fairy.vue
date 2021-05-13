@@ -24,12 +24,16 @@
                     ></el-button>
                 </div>
                 <div class="post-main" v-for="f in fairies" :key="f.id">
-                    <vue3-video-player
+                    <video
                         :title="f.desc"
                         :src="f.src"
                         preload="metadata"
+                        controls
+                        style="top: 0; left: 0; max-width: 90%"
                         v-if="f.is_video"
-                    ></vue3-video-player>
+                    >
+                        抱歉，您的浏览器不支持内嵌视频！
+                    </video>
                     <el-image
                         :title="f.desc"
                         :src="f.src"

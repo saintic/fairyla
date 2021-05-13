@@ -21,15 +21,10 @@ import App from './App.vue'
 import router from './libs/router.js'
 import store from './libs/store.js'
 import { http } from './libs/util.js'
-import Vue3VideoPlayer from '@cloudgeek/vue3-video-player'
-import '@cloudgeek/vue3-video-player/dist/vue3-video-player.css'
 
 var app = createApp(App)
 app.use(router)
 app.use(ElementPlus)
-app.use(Vue3VideoPlayer, {
-    lang: 'zh-CN'
-})
 app.config.globalProperties.$http = http
 app.config.globalProperties.$store = store
 var vm = app.mount('#app')
