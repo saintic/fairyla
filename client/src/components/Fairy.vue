@@ -21,7 +21,8 @@
                         :disabled="btn.disabled"
                         :icon="btn.icon"
                         @click="btn.click"
-                    ></el-button>
+                        >{{ btn.name }}</el-button
+                    >
                 </div>
                 <div class="post-main" v-for="f in fairies" :key="f.id">
                     <video

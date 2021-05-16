@@ -20,6 +20,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"os"
 
 	"fairyla/api"
 	"fairyla/internal/sys"
@@ -69,7 +70,11 @@ func main() {
 	} else if s {
 		fmt.Println(config)
 	} else {
-		config.Check()
+		err := config.Check()
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
 		api.StartApi(config)
 	}
 }

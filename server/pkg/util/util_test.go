@@ -36,4 +36,11 @@ func TestUtil(t *testing.T) {
 			t.Fatalf("IsValidURL should be false: %s\n", v)
 		}
 	}
+
+	if IsImage("a.jpg") != true || IsImage("a.xx") == true {
+		t.Fatal("IsImage error")
+	}
+	if IsVideo("a.mp4") != true || IsVideo("a.xx") == true {
+		t.Fatal("IsVideo error")
+	}
 }

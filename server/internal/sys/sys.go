@@ -18,12 +18,12 @@ package sys
 
 import (
 	"errors"
-	"fairyla/pkg/util"
 	"fmt"
 	"os"
 	"strconv"
 	"strings"
 
+	"fairyla/pkg/util"
 	"fairyla/vars"
 )
 
@@ -61,6 +61,12 @@ func parsePort(sport string) (dport uint, err error) {
 }
 
 func parseApiURL(url string) string {
+	if !strings.HasPrefix(url, "http://") && !strings.HasPrefix(url, "https://") {
+		url = "http://" + url
+	}
+	if !util.IsValidURL(url) {
+		return ""
+	}
 	url = strings.TrimSuffix(strings.TrimSuffix(url, ep), "/")
 	return url + ep
 }
@@ -94,7 +100,7 @@ func (s *Setting) parseEnv() {
 	if err == nil && dport > 1024 {
 		s.Port = dport
 	}
-	if util.IsValidURL(api) {
+	if api != "" {
 		s.Sapic.Api = parseApiURL(api)
 	}
 	if field != "" {
@@ -130,13 +136,13 @@ func (s *Setting) String() string {
 		token = fmt.Sprintf("<%s>", s.Sapic.Token)
 	}
 	return fmt.Sprintf(
-		"UI: %s\nHost: %s\nPort: %d\nRedis: %s\nSapic:\n Api: %s\n Field: %s\n LinkToken: %s",
+		"UI @ %s\nHost: %s\nPort: %d\nRedis: %s\nSapic:\n Api: %s\n Field: %s\n LinkToken: %s",
 		s.Dir, s.Host, s.Port, s.Redis, s.Sapic.Api, s.Sapic.Field, token,
 	)
 }
 
 // 检查是否缺少必须项
-func (s *Setting) Check() {
+func (s *Setting) Check() error {
 	sa := s.Sapic
 	err := ""
 	if s.Redis == "" {
@@ -147,8 +153,9 @@ func (s *Setting) Check() {
 		err = "sapic-token"
 	}
 	if err != "" {
-		panic(fmt.Sprintf("miss required option: %s\n", err))
+		return fmt.Errorf("miss required option: %s", err)
 	}
+	return nil
 }
 
 // 站点公共配置项

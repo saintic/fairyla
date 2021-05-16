@@ -58,7 +58,7 @@ const routes = [
         name: 'TaAlbumFairy',
         component: () => import('@/views/album/AlbumFairy.vue'),
         meta: { title: '专辑' },
-        props: { isPublic: true }
+        props: { fromTa: true }
     },
     {
         path: '/my',

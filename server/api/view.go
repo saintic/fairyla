@@ -254,6 +254,7 @@ func uploadView(c echo.Context) error {
 	post.Form.Add(cfg.Sapic.Field, stream)
 	post.Form.Add("album", "fairyla")
 	post.Form.Add("filename", file.Filename)
+	post.Form.Add("_upload_field", cfg.Sapic.Field)
 
 	client := &http.Client{Timeout: 30 * time.Second}
 	req, err := http.NewRequest(
@@ -296,6 +297,7 @@ func uploadView(c echo.Context) error {
 func pubAlbumView(c echo.Context) error {
 	w := album.New(rc)
 	if gtc.IsTrue(c.QueryParam("fairy")) {
+		// TODO 多个用户专辑名重复时，考虑 <Ta>/:user/:name
 		q := c.Request().URL.Query()
 		ids := q["album_id"]
 		names := q["album_name"]
