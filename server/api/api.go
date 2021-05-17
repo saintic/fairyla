@@ -45,6 +45,7 @@ func StartApi(config *sys.Setting) {
 	api := e.Group("/api")
 	api.GET("/config", configView)
 	api.GET("/album", pubAlbumView)
+	api.POST("/album/claim", claimPubAlbumView, loginRequired) // 认领其他用户专辑
 
 	auth := api.Group("/auth")
 	auth.POST("/signup", signUpView)
@@ -56,6 +57,7 @@ func StartApi(config *sys.Setting) {
 	user.GET("/album/:id", getAlbumView)            // 获取用户某个专辑信息
 	user.GET("/album/:id/fairy", getAlbumFairyView) // 仅获取专辑下所有照片信息
 	user.POST("/album", createAlbumView)
+	user.PUT("/album/:id", updateAlbumView)
 	user.DELETE("/album/:id", dropAlbumView)
 	user.GET("/fairy", listFairyView) // 获取用户所有照片信息
 	user.POST("/fairy", createFairyView)

@@ -49,6 +49,7 @@ var precise = map[string]map[string]string{
 		"Not Found":             "页面未发现",
 		"Internal Server Error": "服务器错误",
 		"Method Not Allowed":    "方法不允许",
+		"no data":               "没有数据",
 
 		// common message
 		"invalid param":            "无效参数",
@@ -69,6 +70,7 @@ var precise = map[string]map[string]string{
 		"wrong password":            "密码错误",
 		"illegal token":             "非法Token",
 		"unsupported file type":     "不支持的文件类型",
+		"invalid action param":      "无效的action参数",
 
 		// project message(too long)
 		"the number of albums exceeds the limit": "专辑数量限制",

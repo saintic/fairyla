@@ -19,7 +19,10 @@ export default {
                 } else {
                     a['fairy'] = a.latest_fairy
                 }
-                a.to = { name: 'TaAlbumFairy', params: { name: a.name } }
+                a.to = {
+                    name: 'TaAlbumFairy',
+                    params: { user: a.owner, name: a.name }
+                }
                 this.albums.push(a)
             }
         })

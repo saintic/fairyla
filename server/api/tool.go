@@ -73,7 +73,6 @@ func parseAcceptLanguage(acptLang string) []alq {
 }
 
 func getLocale(c echo.Context) string {
-	dft := "en"
 	lang := ""
 	cookie, err := c.Cookie("locale")
 	if err == nil {
@@ -89,7 +88,7 @@ func getLocale(c echo.Context) string {
 		}
 	}
 	if lang == "" {
-		lang = dft
+		lang = "en"
 	}
 	return lang
 }

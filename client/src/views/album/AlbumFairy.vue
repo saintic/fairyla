@@ -5,27 +5,34 @@
 <script>
 import Fairy from '@/components/Fairy.vue'
 import { formatUnixTimestamp } from '@/libs/util.js'
+import { TaLabel } from '@/libs/vars.js'
 
 export default {
     Name: 'AlbumFairy',
     components: { Fairy },
     props: {
-        fromTa: Boolean // 来源于Ta为True，来源于Home为False
+        source: String // 来源于：Ta、Home(default)
     },
     data() {
         return { album: {}, fairies: [], urls: [], btns: [] }
     },
     computed: {
         statusText() {
-            return this.album.public ? '公开' : '私有'
+            // 当前专辑反向状态
+            return this.album.public ? '私有' : '公开'
+        },
+        fromTa() {
+            // 来源于Ta为True，其他来源为False
+            return this.source === TaLabel
         }
     },
     created() {
-        let name = this.$route.params.name,
+        let user = this.$route.params.user,
+            name = this.$route.params.name,
             url = this.fromTa
-                ? `/album?fairy=true&album_name=${name}`
+                ? `/album?fairy=true&user=${user}&album_name=${name}`
                 : `/user/album/${name}?fairy=true`
-        if (!name) {
+        if (!name || (this.fromTa === true && !user)) {
             this.$router.go(-1)
         }
         this.$http.get(url).then((res) => {
@@ -40,7 +47,7 @@ export default {
                 }
             }
             // Add function buttons
-            if (this.fromTa) {
+            if (this.source === TaLabel) {
                 this.btns = [
                     {
                         name: '认领',
@@ -64,10 +71,18 @@ export default {
                         name: this.statusText,
                         type: 'warning',
                         click: () => {
-                            this.album.public = !this.album.public
-                            this.btns[1].name = this.statusText
-                            this.btns[1].disabled = true
                             console.log('click status')
+                            this.$http
+                                .put(`/user/album/${name}?action=status`)
+                                .then((res) => {
+                                    this.$message.success({
+                                        message: `已 <b>${this.statusText}</b> 状态`,
+                                        dangerouslyUseHTMLString: true,
+                                        customClass: 'el-message--slim'
+                                    })
+                                    this.album.public = !this.album.public
+                                    this.btns[1].name = this.statusText
+                                })
                         }
                     }
                 ]

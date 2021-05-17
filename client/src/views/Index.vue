@@ -123,7 +123,8 @@ export default {
                     }
                 ]
             },
-            albums: []
+            albums: [],
+            acceptMimes: 'image/*,video/*'
         }
     },
     computed: mapState({
@@ -132,11 +133,6 @@ export default {
         headers: (state) => ({ Authorization: 'Bearer ' + state.token }),
         slogan: (state) => {
             return state.slogan || IndexSlogan
-        },
-        acceptMimes: (state) => {
-            let mimes = 'image/jpg, image/jpeg, image/webp, image/png',
-                ext = (state.extra_mimes || []).join(',')
-            return ext ? `${mimes},${ext}` : mimes
         },
         upLimit: (state) => {
             return state.upload_limit || 10

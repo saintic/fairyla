@@ -37,13 +37,13 @@ var (
 	GenFairyKey = func(user, albumID string) string {
 		return fmt.Sprintf("fairy:%s:%s", user, albumID)
 	}
+	// :claim:<User> Set类型 Key格式是 owner:album_id
+	GenClaimKey = func(user string) string {
+		return fmt.Sprintf("claim:%s", user)
+	}
 
 	AllowImage = []string{".png", ".jpg", ".jpeg", ".gif", ".webp"}
 	AllowVideo = []string{".mp4", ".ogg", ".ogv", ".webm", ".3gp", ".mov"}
-	// 额外允许上传的类型
-	ExtraMimes = []string{
-		"video/mp4", "video/ogg", "video/webm", "video/3gpp", "video/quicktime",
-	}
 )
 
 const (
@@ -54,6 +54,10 @@ const (
 	UploadLimitSize int64 = 20
 	// 用户专辑数量限制
 	AlbumLimitNum = 9
+
+	RedigoNil = "redigo: nil returned"
+	// 允许多种方式获取JWT认证值
+	AllowExtraJWT = true
 )
 
 type (

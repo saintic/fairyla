@@ -17,7 +17,7 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import Index from '@/views/Index.vue'
 import { mutations, actions } from './store.js'
-import { TitleSep, TitleSuffix } from './vars.js'
+import { TitleSep, TitleSuffix, TaLabel } from './vars.js'
 
 const routes = [
     {
@@ -54,11 +54,11 @@ const routes = [
         meta: { title: '她是' }
     },
     {
-        path: '/ta/:name',
+        path: '/ta/:user/:name',
         name: 'TaAlbumFairy',
         component: () => import('@/views/album/AlbumFairy.vue'),
         meta: { title: '专辑' },
-        props: { fromTa: true }
+        props: { source: TaLabel }
     },
     {
         path: '/my',

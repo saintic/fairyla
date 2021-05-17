@@ -43,4 +43,7 @@ body > .el-container {
 .el-footer {
     line-height: 60px;
 }
+.el-message--slim {
+    min-width: 150px;
+}
 </style>

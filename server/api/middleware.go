@@ -20,6 +20,7 @@ import (
 	"strings"
 
 	"fairyla/internal/user/auth"
+	"fairyla/vars"
 
 	"github.com/labstack/echo/v4"
 )
@@ -31,9 +32,19 @@ var (
 
 func getJWT(c echo.Context) (token string, err error) {
 	scheme := "Bearer "
-	field := c.Request().Header.Get(echo.HeaderAuthorization)
-	token = strings.TrimPrefix(field, scheme)
-	if !strings.HasPrefix(field, scheme) || token == "" {
+	header := c.Request().Header.Get(echo.HeaderAuthorization)
+	if strings.HasPrefix(header, scheme) {
+		token = strings.TrimPrefix(header, scheme)
+	}
+	if vars.AllowExtraJWT {
+		if token == "" {
+			token = c.FormValue("jwt")
+		}
+		if token == "" {
+			token = c.QueryParam("jwt")
+		}
+	}
+	if token == "" {
 		err = ErrJWTMissing
 		return
 	}

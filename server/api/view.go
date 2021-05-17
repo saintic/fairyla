@@ -40,6 +40,9 @@ func customHTTPErrorHandler(err error, c echo.Context) {
 		code = he.Code
 		msg = he.Message.(string)
 	}
+	if msg == vars.RedigoNil {
+		msg = "no data"
+	}
 	c.JSON(code, vars.ResErr(getLocale(c), msg))
 }
 
@@ -96,6 +99,42 @@ func createAlbumView(c echo.Context) error {
 		return err
 	}
 	return c.JSON(200, vars.NewResData(a))
+}
+
+func updateAlbumView(c echo.Context) error {
+	user := getUser(c)
+	albumID := autoAlbumID(c)
+	w := album.New(rc)
+	a, err := w.GetAlbum(user, albumID)
+	if err != nil {
+		return err
+	}
+	switch c.QueryParam("action") {
+	case "status":
+		pub := c.QueryParam("public")
+		if pub == "" {
+			a.Public = !a.Public
+		} else {
+			a.Public = gtc.IsTrue(pub)
+		}
+	case "share":
+		ta := c.QueryParam("ta")
+		has, err := w.HasUser(ta)
+		if err != nil {
+			return err
+		}
+		if !has {
+			return errors.New("not found username")
+		}
+		a.Ta = ta
+	default:
+		return errors.New("invalid action param")
+	}
+	err = w.WriteAlbum(&a)
+	if err != nil {
+		return err
+	}
+	return c.JSON(200, vars.ResOK())
 }
 
 func dropAlbumView(c echo.Context) error {
@@ -297,11 +336,11 @@ func uploadView(c echo.Context) error {
 func pubAlbumView(c echo.Context) error {
 	w := album.New(rc)
 	if gtc.IsTrue(c.QueryParam("fairy")) {
-		// TODO 多个用户专辑名重复时，考虑 <Ta>/:user/:name
 		q := c.Request().URL.Query()
 		ids := q["album_id"]
 		names := q["album_name"]
-		data, err := w.ListPublicAlbumFaries(ids, names)
+		users := q["user"]
+		data, err := w.ListPublicAlbumFaries(users, ids, names)
 		if err != nil {
 			return err
 		}
@@ -313,4 +352,9 @@ func pubAlbumView(c echo.Context) error {
 		}
 		return c.JSON(200, vars.NewResData(data))
 	}
+}
+
+// 认领其他用户专辑需由所属者确认方可领取成功
+func claimPubAlbumView(c echo.Context) error {
+	return nil
 }

@@ -164,7 +164,6 @@ func (s *Setting) SitePublic() map[string]interface{} {
 	cfg["icp"] = s.ICP
 	cfg["beian"] = s.Beian
 	cfg["slogan"] = s.Slogan
-	cfg["extra_mimes"] = vars.ExtraMimes
 	cfg["upload_limit"] = vars.UploadLimitSize
 	return cfg
 }
