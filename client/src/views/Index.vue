@@ -17,9 +17,9 @@
                     label-width="70px"
                 >
                     <el-row>
-                        <el-form-item label="专辑" prop="album">
+                        <el-form-item label="专辑" prop="album_name">
                             <el-select
-                                v-model="af.album"
+                                v-model="af.album_name"
                                 placeholder="请选择或新建专辑"
                                 allow-create
                                 filterable
@@ -110,12 +110,12 @@ export default {
         return {
             upTip: '支持上传 jpg/jpeg/png/webp 类型图片（不超过10MB）',
             af: {
-                album: '',
+                album_name: '',
                 desc: '',
                 src: ''
             },
             rules: {
-                album: [
+                album_name: [
                     {
                         required: true,
                         message: '请选择或新建专辑',
@@ -145,8 +145,8 @@ export default {
                 this.$http.post('/user/fairy', this.af).then((res) => {
                     this.$message.success('已提交')
                     // try update albums
-                    if (!this.albums.includes(this.af.album)) {
-                        this.albums.push(this.af.album)
+                    if (!this.albums.includes(this.af.album_name)) {
+                        this.albums.push(this.af.album_name)
                     }
                     this.resetForm()
                 })

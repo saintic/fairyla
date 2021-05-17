@@ -17,6 +17,7 @@
 import { createApp } from 'vue'
 import ElementPlus from 'element-plus'
 import 'element-plus/lib/theme-chalk/index.css'
+import locale from 'element-plus/lib/locale/lang/zh-cn'
 import App from './App.vue'
 import router from './libs/router.js'
 import store from './libs/store.js'
@@ -24,7 +25,7 @@ import { http } from './libs/util.js'
 
 var app = createApp(App)
 app.use(router)
-app.use(ElementPlus)
+app.use(ElementPlus, { locale })
 app.config.globalProperties.$http = http
 app.config.globalProperties.$store = store
 var vm = app.mount('#app')

@@ -23,6 +23,7 @@ import (
 	"log"
 	"net/url"
 	"sort"
+	"strings"
 
 	"fairyla/pkg/db"
 	"fairyla/pkg/util"
@@ -93,6 +94,16 @@ func (a *Album) SetSteady(f *Fairy) {
 
 func (a *Album) Exist(rc *db.Conn) (bool, error) {
 	return rc.HExists(vars.GenAlbumKey(a.Owner), a.ID)
+}
+
+// 专辑认领入库
+func (a *Album) Claim(rc *db.Conn) error {
+	if a.Ta != "" {
+		key := vars.GenClaimKey(a.Ta)
+		_, err := rc.SAdd(key, fmt.Sprintf("%s:%s", a.Owner, a.ID))
+		return err
+	}
+	return nil
 }
 
 func NewFairy(owner, albumID, src, desc string) (f *Fairy, err error) {
@@ -245,24 +256,6 @@ func (w wrap) GetAlbumFairies(user, albumID string) (af AlbumFairy, err error) {
 	return AlbumFairy{a, f}, nil
 }
 
-// 列出用户所有专辑ID及其下照片数据
-func (w wrap) ListFairies(user string) (out map[string][]Fairy, err error) {
-	data, err := w.HGetAll(vars.GenAlbumKey(user))
-	if err != nil {
-		return
-	}
-	out = make(map[string][]Fairy)
-	for albumID := range data {
-		fs, e := w.GetFairies(user, albumID)
-		if e != nil {
-			err = e
-			return
-		}
-		out[albumID] = fs
-	}
-	return
-}
-
 // 仅获取用户某个专辑下所有照片数据（不包含专辑数据）
 func (w wrap) GetFairies(user, albumID string) (fairies []Fairy, err error) {
 	data, err := w.HGetAll(vars.GenFairyKey(user, albumID))
@@ -280,6 +273,24 @@ func (w wrap) GetFairies(user, albumID string) (fairies []Fairy, err error) {
 	sort.Slice(fairies, func(i, j int) bool {
 		return fairies[i].CTime > fairies[j].CTime
 	})
+	return
+}
+
+// 列出用户所有专辑ID及其下照片数据
+func (w wrap) ListFairies(user string) (out map[string][]Fairy, err error) {
+	data, err := w.HGetAll(vars.GenAlbumKey(user))
+	if err != nil {
+		return
+	}
+	out = make(map[string][]Fairy)
+	for albumID := range data {
+		fs, e := w.GetFairies(user, albumID)
+		if e != nil {
+			err = e
+			return
+		}
+		out[albumID] = fs
+	}
 	return
 }
 
@@ -326,43 +337,6 @@ func (w wrap) ListPublicAlbums() (data []Album, err error) {
 	return
 }
 
-// 列出所有用户所有公开专辑数据（包含专辑下照片）
-// 当参数 users 不为空时，返回指定的用户对应数据
-// 当参数 albumIDs 不为空时，返回指定的专辑ID对应数据
-// 当参数 albumNames 不为空时，返回切指定的专辑名对应数据
-func (w wrap) ListPublicAlbumFaries(users, albumIDs, albumNames []string) (data []AlbumFairy, err error) {
-	albums, err := w.ListPublicAlbums()
-	if err != nil {
-		return
-	}
-	for _, a := range albums {
-		isUse := false
-		if len(users) > 0 || len(albumIDs) > 0 || len(albumNames) > 0 {
-			// 说明仅返回参数指定的专辑即可
-			if gtc.StrInSlice(a.Owner, users) {
-				isUse = true
-			}
-			if gtc.StrInSlice(a.ID, albumIDs) {
-				isUse = true
-			}
-			if gtc.StrInSlice(a.Name, albumNames) {
-				isUse = true
-			}
-		} else {
-			isUse = true
-		}
-		if isUse {
-			f, e := w.GetFairies(a.Owner, a.ID)
-			if e != nil {
-				err = e
-				return
-			}
-			data = append(data, AlbumFairy{a, f})
-		}
-	}
-	return
-}
-
 // 是否有此用户
 func (w wrap) HasUser(user string) (bool, error) {
 	return w.SIsMember(vars.UserIndex, user)
@@ -370,30 +344,21 @@ func (w wrap) HasUser(user string) (bool, error) {
 
 // 列出用户下所有认领的专辑数据（不包含专辑下照片）
 func (w wrap) ListClaimAlbums(user string) (data []Album, err error) {
-	users, err := w.SMembers(vars.UserIndex)
+	claims, err := w.SMembers(vars.GenClaimKey(user))
 	if err != nil {
 		return
 	}
-	pipe := w.Pipeline()
-	for _, user := range users {
-		pipe.Send("HVALS", vars.GenAlbumKey(user))
-	}
-	rs, err := pipe.Execute()
-	if err != nil {
-		return
-	}
-	for _, r := range rs {
-		for _, d := range r.([]interface{}) {
-			var a Album
-			e := json.Unmarshal(d.([]byte), &a)
-			if e != nil {
-				log.Println(e)
-				continue
-			}
-			if a.Public {
-				data = append(data, a)
-			}
+	for _, claim := range claims {
+		kv := strings.Split(claim, ":")
+		if len(kv) != 2 {
+			continue
 		}
+		a, e := w.GetAlbum(kv[0], kv[1])
+		if e != nil {
+			err = e
+			return
+		}
+		data = append(data, a)
 	}
 	return
 }

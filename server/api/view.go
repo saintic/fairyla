@@ -109,16 +109,17 @@ func updateAlbumView(c echo.Context) error {
 	if err != nil {
 		return err
 	}
+	hookWriteShare := false
 	switch c.QueryParam("action") {
 	case "status":
-		pub := c.QueryParam("public")
+		pub := c.FormValue("public")
 		if pub == "" {
 			a.Public = !a.Public
 		} else {
 			a.Public = gtc.IsTrue(pub)
 		}
 	case "share":
-		ta := c.QueryParam("ta")
+		ta := c.FormValue("ta")
 		has, err := w.HasUser(ta)
 		if err != nil {
 			return err
@@ -127,12 +128,19 @@ func updateAlbumView(c echo.Context) error {
 			return errors.New("not found username")
 		}
 		a.Ta = ta
+		hookWriteShare = true
 	default:
 		return errors.New("invalid action param")
 	}
 	err = w.WriteAlbum(&a)
 	if err != nil {
 		return err
+	}
+	if hookWriteShare {
+		err = (&a).Claim(rc)
+		if err != nil {
+			return err
+		}
 	}
 	return c.JSON(200, vars.ResOK())
 }
@@ -152,7 +160,7 @@ func createFairyView(c echo.Context) error {
 	w := album.New(rc)
 	user := getUser(c)
 	albumID := c.FormValue("album_id")
-	albumName := c.FormValue("album")
+	albumName := c.FormValue("album_name")
 	src := c.FormValue("src")
 	desc := c.FormValue("desc")
 	var a *album.Album
@@ -336,11 +344,12 @@ func uploadView(c echo.Context) error {
 func pubAlbumView(c echo.Context) error {
 	w := album.New(rc)
 	if gtc.IsTrue(c.QueryParam("fairy")) {
-		q := c.Request().URL.Query()
-		ids := q["album_id"]
-		names := q["album_name"]
-		users := q["user"]
-		data, err := w.ListPublicAlbumFaries(users, ids, names)
+		user := c.QueryParam("user")
+		albumID := getAlbumID(user, c.QueryParam("album"))
+		if user == "" || albumID == "" {
+			return errors.New("invalid param")
+		}
+		data, err := w.GetAlbumFairies(user, albumID)
 		if err != nil {
 			return err
 		}
@@ -356,5 +365,9 @@ func pubAlbumView(c echo.Context) error {
 
 // 认领其他用户专辑需由所属者确认方可领取成功
 func claimPubAlbumView(c echo.Context) error {
+	return nil
+}
+
+func listUserClaimView(c echo.Context) error {
 	return nil
 }

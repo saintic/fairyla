@@ -62,6 +62,7 @@ func StartApi(config *sys.Setting) {
 	user.GET("/fairy", listFairyView) // 获取用户所有照片信息
 	user.POST("/fairy", createFairyView)
 	user.DELETE("/fairy/:id", dropFairyView)
+	user.GET("/claim", listUserClaimView)
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf("%s:%d", cfg.Host, cfg.Port)))
 }

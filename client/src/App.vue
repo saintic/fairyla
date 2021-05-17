@@ -46,4 +46,7 @@ body > .el-container {
 .el-message--slim {
     min-width: 150px;
 }
+.el-message-box--slim {
+    width: 300px;
+}
 </style>
