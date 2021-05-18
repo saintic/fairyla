@@ -164,12 +164,32 @@ func createFairyView(c echo.Context) error {
 	albumName := c.FormValue("album_name")
 	src := c.FormValue("src")
 	desc := c.FormValue("desc")
+	albumOwner := user
 	var a *album.Album
 	if albumID == "" {
 		if albumName == "" {
 			return errors.New("invalid album_id or album")
 		}
-		a, _ = album.NewAlbum(user, albumName)
+		// support claim album
+		if strings.Contains(albumName, "/") {
+			an := strings.Split(albumName, "/")
+			owner := an[0]
+			da, err := album.NewAlbum(owner, an[1])
+			if err != nil {
+				return err
+			}
+			has, err := w.HasClaim(user, fmt.Sprintf("%s:%s", owner, da.ID))
+			if err != nil {
+				return err
+			}
+			if !has {
+				return errors.New("not found claim")
+			}
+			a = da
+			albumOwner = owner
+		} else {
+			a, _ = album.NewAlbum(user, albumName)
+		}
 		albumID = a.ID
 	}
 	exist, err := a.Exist(rc)
@@ -177,12 +197,14 @@ func createFairyView(c echo.Context) error {
 		return err
 	}
 	if exist {
-		ta, err := w.GetAlbum(user, albumID)
+		da, err := w.GetAlbum(albumOwner, albumID)
 		if err != nil {
 			return err
 		}
-		a = &ta
+		a = &da
 	}
+	a.Owner = albumOwner
+	// 上传到专属专辑属主是本人，上传到认领专辑属主也是本人，但在他人专辑下
 	f, err := album.NewFairy(user, albumID, src, desc)
 	if err != nil {
 		return err
@@ -223,6 +245,27 @@ func listAlbumView(c echo.Context) error {
 		return err
 	}
 	return c.JSON(200, vars.NewResData(data))
+}
+
+func listAlbumNamesView(c echo.Context) error {
+	w := album.New(rc)
+	user := getUser(c)
+	names := []string{}
+	albums, err := w.ListAlbums(user)
+	if err != nil {
+		return err
+	}
+	for _, a := range albums {
+		names = append(names, a.Name)
+	}
+	claims, err := w.ListClaimAlbums(user)
+	if err != nil {
+		return err
+	}
+	for _, a := range claims {
+		names = append(names, fmt.Sprintf("%s/%s", a.Owner, a.Name))
+	}
+	return c.JSON(200, vars.NewResData(names))
 }
 
 func getAlbumView(c echo.Context) error {

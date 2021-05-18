@@ -55,6 +55,7 @@ func StartApi(config *sys.Setting) {
 
 	user.POST("/album", createAlbumView)            // 创建专辑
 	user.GET("/album", listAlbumView)               // 获取用户所有专辑信息
+	user.GET("/album/names", listAlbumNamesView)    // 获取用户所有专辑名（包含认领）
 	user.GET("/album/:id", getAlbumView)            // 获取用户某个专辑信息
 	user.GET("/album/:id/fairy", getAlbumFairyView) // 仅获取专辑下所有照片信息
 	user.PUT("/album/:id", updateAlbumView)         // 更新专辑属性

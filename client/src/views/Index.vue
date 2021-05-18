@@ -25,7 +25,7 @@
                                 filterable
                             >
                                 <el-option
-                                    v-for="item in albums"
+                                    v-for="item in album_names"
                                     :key="item"
                                     :value="item"
                                 ></el-option>
@@ -109,9 +109,9 @@ export default {
     data() {
         return {
             af: {
-                album_name: '',
-                desc: '',
-                src: ''
+                album_name: '', // 可由斜线分隔认领的专辑属主和专辑Name
+                desc: '', // 描述
+                src: '' // 照片或视频URL地址
             },
             rules: {
                 album_name: [
@@ -122,7 +122,7 @@ export default {
                     }
                 ]
             },
-            albums: [],
+            album_names: [],
             acceptMimes: 'image/*,video/*'
         }
     },
@@ -147,9 +147,8 @@ export default {
                 if (!valid) return
                 this.$http.post('/user/fairy', this.af).then((res) => {
                     this.$message.success('已提交')
-                    // try update albums
-                    if (!this.albums.includes(this.af.album_name)) {
-                        this.albums.push(this.af.album_name)
+                    if (!this.album_names.includes(this.af.album_name)) {
+                        this.album_names.push(this.af.album_name)
                     }
                     this.resetForm()
                 })
@@ -185,9 +184,9 @@ export default {
     },
     created() {
         if (this.isLogin) {
-            this.$http.get('/user/album').then((res) => {
-                res.data.map((a) => {
-                    this.albums.push(a.name)
+            this.$http.get('/user/album/names').then((res) => {
+                res.data.map((name) => {
+                    this.album_names.push(name)
                 })
             })
         }
