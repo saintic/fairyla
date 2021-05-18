@@ -29,6 +29,7 @@ func getUser(c echo.Context) string {
 	return c.Get("user").(string)
 }
 
+// 从 album(name or id) 解析专辑ID
 func getAlbumID(user, albumID string) string {
 	if albumID == "" {
 		return albumID
@@ -43,6 +44,15 @@ func getAlbumID(user, albumID string) string {
 func autoAlbumID(c echo.Context) string {
 	albumID := c.Param("id")
 	return getAlbumID(getUser(c), albumID)
+}
+
+// 从 query 或 form 中查找参数
+func getParam(c echo.Context, key string) string {
+	val := c.QueryParam(key)
+	if val == "" {
+		val = c.FormValue(key)
+	}
+	return val
 }
 
 type alq struct {

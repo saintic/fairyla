@@ -15,9 +15,6 @@
                         size="mini"
                         :type="btn.type || 'primary'"
                         :plain="btn.plain"
-                        :round="btn.round"
-                        :circle="btn.circle"
-                        :loading="btn.loading"
                         :disabled="btn.disabled"
                         :icon="btn.icon"
                         @click="btn.click"
@@ -52,7 +49,15 @@
                 <br />
                 <section class="bdshare">
                     <div class="info">
-                        <span class="category" v-if="album.label">
+                        <span class="category">
+                            <i class="saintic-icon saintic-icon-catalog"></i>
+                            <span v-if="album.source === 'Ta'">公开</span>
+                            <span v-else-if="album.source === 'Claim'"
+                                >共享</span
+                            >
+                            <span v-else>专属</span>
+                        </span>
+                        <span class="label" v-if="album.label">
                             <i class="saintic-icon saintic-icon-tags"></i>&nbsp;
                             <span v-for="l in album.label" :key="l"
                                 >{{ l }}
@@ -175,11 +180,11 @@ defineProps({
     color: #f46;
 }
 .info .category:hover i,
-.info .comment:hover i,
-.info .more:hover i,
+.info .label:hover i,
+.info .date:hover i,
 .info .category:hover a,
-.info .comment:hover a,
-.info .more:hover a {
+.info .label:hover a,
+.info .date:hover a {
     color: #e02b57;
 }
 

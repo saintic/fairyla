@@ -23,9 +23,9 @@ export const ErrMsgMap = {
     '/config': '请求配置失败：',
     '/auth/signin': '登录失败：',
     '/auth/signup': '注册失败：',
-    '/user/album': '用户专辑获取失败：',
     '/user/upload': '上传失败：',
-    '/album': '公开专辑获取失败：'
+    '/user/album': '专辑接口错误：',
+    '/album': '专辑接口错误：'
 }
 
 // 专辑可选系统内置标签
@@ -34,3 +34,4 @@ export const SysLabels = ['亲人', '爱人', '暗恋', '偶像', '动漫']
 export const IndexSlogan = '她是小仙女啦'
 
 export const TaLabel = 'Ta'
+export const ClaimLabel = 'Claim'

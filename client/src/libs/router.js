@@ -17,7 +17,7 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import Index from '@/views/Index.vue'
 import { mutations, actions } from './store.js'
-import { TitleSep, TitleSuffix, TaLabel } from './vars.js'
+import { TitleSep, TitleSuffix, TaLabel, ClaimLabel } from './vars.js'
 
 const routes = [
     {
@@ -54,7 +54,7 @@ const routes = [
         meta: { title: '她是' }
     },
     {
-        path: '/ta/:user/:name',
+        path: '/ta/:owner/:name',
         name: 'TaAlbumFairy',
         component: () => import('@/views/album/AlbumFairy.vue'),
         meta: { title: '专辑' },
@@ -80,13 +80,26 @@ const routes = [
                 path: 'album',
                 name: 'UserAlbum',
                 component: () => import('@/views/home/UserAlbum.vue'),
-                meta: { title: '我的专辑' }
+                meta: { title: '我的专属个人专辑' }
             },
             {
                 path: '/album/:name',
                 name: 'UserAlbumFairy',
                 component: () => import('@/views/album/AlbumFairy.vue'),
                 meta: { title: '专辑' }
+            },
+            {
+                path: 'claim',
+                name: 'UserClaimAlbum',
+                component: () => import('@/views/home/UserClaim.vue'),
+                meta: { title: '我的认领与共享专辑' }
+            },
+            {
+                path: '/claim/:owner/:name',
+                name: 'UserClaimAlbumFairy',
+                component: () => import('@/views/album/AlbumFairy.vue'),
+                meta: { title: '专辑' },
+                props: { source: ClaimLabel }
             }
         ]
     },

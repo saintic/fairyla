@@ -342,6 +342,11 @@ func (w wrap) HasUser(user string) (bool, error) {
 	return w.SIsMember(vars.UserIndex, user)
 }
 
+// 用户是否有此认领的专辑（claimkey格式是 owner:album_id）
+func (w wrap) HasClaim(user, claimKey string) (bool, error) {
+	return w.SIsMember(vars.GenClaimKey(user), claimKey)
+}
+
 // 列出用户下所有认领的专辑数据（不包含专辑下照片）
 func (w wrap) ListClaimAlbums(user string) (data []Album, err error) {
 	claims, err := w.SMembers(vars.GenClaimKey(user))

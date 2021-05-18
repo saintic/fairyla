@@ -20,6 +20,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -110,7 +111,7 @@ func updateAlbumView(c echo.Context) error {
 		return err
 	}
 	hookWriteShare := false
-	switch c.QueryParam("action") {
+	switch getParam(c, "action") {
 	case "status":
 		pub := c.FormValue("public")
 		if pub == "" {
@@ -341,7 +342,7 @@ func uploadView(c echo.Context) error {
 	}
 }
 
-func pubAlbumView(c echo.Context) error {
+func getPubAlbumView(c echo.Context) error {
 	w := album.New(rc)
 	if gtc.IsTrue(c.QueryParam("fairy")) {
 		user := c.QueryParam("user")
@@ -363,11 +364,37 @@ func pubAlbumView(c echo.Context) error {
 	}
 }
 
-// 认领其他用户专辑需由所属者确认方可领取成功
-func claimPubAlbumView(c echo.Context) error {
-	return nil
+func listUserClaimView(c echo.Context) error {
+	w := album.New(rc)
+	if gtc.IsTrue(c.QueryParam("fairy")) {
+		user := getUser(c)
+		owner := c.QueryParam("owner")
+		albumID := getAlbumID(owner, c.QueryParam("album"))
+		if owner == "" || albumID == "" {
+			return errors.New("invalid param")
+		}
+		has, err := w.HasClaim(user, fmt.Sprintf("%s:%s", owner, albumID))
+		if err != nil {
+			return err
+		}
+		if !has {
+			return errors.New("not found claim")
+		}
+		data, err := w.GetAlbumFairies(owner, albumID)
+		if err != nil {
+			return err
+		}
+		return c.JSON(200, vars.NewResData(data))
+	} else {
+		data, err := w.ListClaimAlbums(getUser(c))
+		if err != nil {
+			return err
+		}
+		return c.JSON(200, vars.NewResData(data))
+	}
 }
 
-func listUserClaimView(c echo.Context) error {
+// 认领其他用户专辑（需由所属者确认方可领取成功）
+func claimUserAlbumView(c echo.Context) error {
 	return nil
 }

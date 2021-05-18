@@ -44,8 +44,7 @@ func StartApi(config *sys.Setting) {
 
 	api := e.Group("/api")
 	api.GET("/config", configView)
-	api.GET("/album", pubAlbumView)
-	api.POST("/album/claim", claimPubAlbumView, loginRequired) // 认领其他用户专辑
+	api.GET("/album", getPubAlbumView)
 
 	auth := api.Group("/auth")
 	auth.POST("/signup", signUpView)
@@ -53,16 +52,20 @@ func StartApi(config *sys.Setting) {
 
 	user := api.Group("/user", loginRequired)
 	user.POST("/upload", uploadView)
+
+	user.POST("/album", createAlbumView)            // 创建专辑
 	user.GET("/album", listAlbumView)               // 获取用户所有专辑信息
 	user.GET("/album/:id", getAlbumView)            // 获取用户某个专辑信息
 	user.GET("/album/:id/fairy", getAlbumFairyView) // 仅获取专辑下所有照片信息
-	user.POST("/album", createAlbumView)
-	user.PUT("/album/:id", updateAlbumView)
-	user.DELETE("/album/:id", dropAlbumView)
+	user.PUT("/album/:id", updateAlbumView)         // 更新专辑属性
+	user.DELETE("/album/:id", dropAlbumView)        // 删除专辑
+
 	user.GET("/fairy", listFairyView) // 获取用户所有照片信息
 	user.POST("/fairy", createFairyView)
 	user.DELETE("/fairy/:id", dropFairyView)
-	user.GET("/claim", listUserClaimView)
+
+	user.GET("/claim", listUserClaimView)         // 获取用户认领专辑信息
+	user.POST("/claim/album", claimUserAlbumView) // 认领其他用户专辑
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf("%s:%d", cfg.Host, cfg.Port)))
 }

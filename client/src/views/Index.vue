@@ -108,7 +108,6 @@ export default {
     components: { Welcome },
     data() {
         return {
-            upTip: '支持上传 jpg/jpeg/png/webp 类型图片（不超过10MB）',
             af: {
                 album_name: '',
                 desc: '',
@@ -136,6 +135,10 @@ export default {
         },
         upLimit: (state) => {
             return state.upload_limit || 10
+        },
+        upTip: (state) => {
+            let limit = state.upload_limit || 10
+            return `支持上传Web通用图片和视频（不超过${limit}MB）`
         }
     }),
     methods: {

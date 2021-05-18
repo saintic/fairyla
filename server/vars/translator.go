@@ -71,6 +71,7 @@ var precise = map[string]map[string]string{
 		"illegal token":             "非法Token",
 		"unsupported file type":     "不支持的文件类型",
 		"invalid action param":      "无效的action参数",
+		"not found claim":           "未发现此认领专辑",
 
 		// project message(too long)
 		"the number of albums exceeds the limit": "专辑数量限制",
