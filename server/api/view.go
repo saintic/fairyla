@@ -205,7 +205,7 @@ func createFairyView(c echo.Context) error {
 	}
 	a.Owner = albumOwner
 	// 上传到专属专辑属主是本人，上传到认领专辑属主也是本人，但在他人专辑下
-	f, err := album.NewFairy(user, albumID, src, desc)
+	f, err := album.NewFairy(albumID, src, desc)
 	if err != nil {
 		return err
 	}

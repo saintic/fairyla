@@ -62,3 +62,12 @@ func IsVideo(filename string) bool {
 	ext := filepath.Ext(filepath.Base(filename))
 	return gtc.StrInSlice(ext, vars.AllowVideo)
 }
+
+func DeleteSlice(slice []string, val string) (new []string) {
+	for _, s := range slice {
+		if s != val {
+			new = append(new, s)
+		}
+	}
+	return new
+}

@@ -1,6 +1,7 @@
 package util
 
 import (
+	"strings"
 	"testing"
 )
 
@@ -42,5 +43,23 @@ func TestUtil(t *testing.T) {
 	}
 	if IsVideo("a.mp4") != true || IsVideo("a.xx") == true {
 		t.Fatal("IsVideo error")
+	}
+
+	st := []string{"a", "b", "c"}
+	st1 := DeleteSlice(st, "a")
+	if strings.Join(st1, "") != "bc" {
+		t.Fatal("Delete slice error(1)")
+	}
+	st2 := DeleteSlice(st, "b")
+	if strings.Join(st2, "") != "ac" {
+		t.Fatal("Delete slice error(2)")
+	}
+	st3 := DeleteSlice(st, "c")
+	if strings.Join(st3, "") != "ab" {
+		t.Fatal("Delete slice error(3)")
+	}
+	st4 := DeleteSlice(st, "d")
+	if strings.Join(st4, "") != "abc" {
+		t.Fatal("Delete slice error(4)")
 	}
 }
