@@ -12,7 +12,7 @@
                 :default-active="this.$route.path"
             >
                 <el-menu-item index="/ta">
-                    <i class="saintic-icon saintic-icon-goddess"></i> 她是
+                    <i class="saintic-icon saintic-icon-goddess"></i> Ta是
                 </el-menu-item>
                 <el-menu-item index v-if="isLogin">
                     <el-avatar

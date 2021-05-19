@@ -8,14 +8,15 @@
         <p>或分享给Ta，共同维护；</p>
         <p>或参观并认领公开的专辑~</p>
         <br />
+        <p>甚至还可以参与进来设计功能更新~</p>
         <p>
-            甚至还可以参与进来 {
+            技术栈：Go + Vue3 + Element-Plus，{ 联系：
             <el-link
                 type="info"
                 href="mailto:me@tcw.im"
                 icon="saintic-icon saintic-icon-email saintic-icon-1-5"
             ></el-link>
-            } 设计功能更新~
+            }
         </p>
         <br />
         <p>{{ poesy }}</p>
@@ -28,7 +29,7 @@ import axios from 'axios'
 
 const poesy = ref('')
 
-setInterval(() => {
+function setPoesy() {
     axios
         .get('https://open.saintic.com/api/sentence/renwu.nvzi.json')
         .then((result) => {
@@ -37,7 +38,9 @@ setInterval(() => {
                 poesy.value = res.data.sentence
             }
         })
-}, 10000)
+}
+setPoesy()
+setInterval(setPoesy, 10000)
 </script>
 
 <style scoped>
