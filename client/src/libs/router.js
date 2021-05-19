@@ -51,7 +51,7 @@ const routes = [
         path: '/ta',
         name: 'TaAlbum',
         component: () => import('@/views/ta/Ta.vue'),
-        meta: { title: '她是' }
+        meta: { title: 'Ta是' }
     },
     {
         path: '/ta/:owner/:name',

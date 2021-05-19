@@ -23,11 +23,11 @@ import router from './libs/router.js'
 import store from './libs/store.js'
 import { http } from './libs/util.js'
 
-var app = createApp(App)
+const app = createApp(App)
 app.use(router)
 app.use(ElementPlus, { locale })
 app.config.globalProperties.$http = http
 app.config.globalProperties.$store = store
-var vm = app.mount('#app')
-window.app = app
-window.vm = vm
+let vm = app.mount('#app')
+//window.app = app
+//window.vm = vm
