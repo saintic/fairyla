@@ -44,29 +44,29 @@ func StartApi(config *sys.Setting) {
 
 	api := e.Group("/api")
 	api.GET("/config", configView)
-	api.GET("/album", getPubAlbumView)
+	api.GET("/album", pubAlbumView)
 
 	auth := api.Group("/auth")
 	auth.POST("/signup", signUpView)
 	auth.POST("/signin", signInView)
 
-	user := api.Group("/user", loginRequired)
+	user := api.Group("/user", loginRequired) // 用户接口，需登录
 	user.POST("/upload", uploadView)
 
-	user.POST("/album", createAlbumView)            // 创建专辑
-	user.GET("/album", listAlbumView)               // 获取用户所有专辑信息
-	user.GET("/album/names", listAlbumNamesView)    // 获取用户所有专辑名（包含认领）
-	user.GET("/album/:id", getAlbumView)            // 获取用户某个专辑信息
-	user.GET("/album/:id/fairy", getAlbumFairyView) // 仅获取专辑下所有照片信息
-	user.PUT("/album/:id", updateAlbumView)         // 更新专辑属性
-	user.DELETE("/album/:id", dropAlbumView)        // 删除专辑
+	user.POST("/album", createAlbumView)
+	user.PUT("/album/:id", updateAlbumView)
+	user.DELETE("/album/:id", dropAlbumView)
+	user.GET("/album", listAlbumView)
+	user.GET("/album/names", listAlbumNamesView)
+	user.GET("/album/:id", getAlbumView)
+	user.GET("/album/:id/fairy", listFariesOfAlbumView)
 
-	user.GET("/fairy", listFairyView) // 获取用户所有照片信息
 	user.POST("/fairy", createFairyView)
 	user.DELETE("/fairy/:id", dropFairyView)
+	user.GET("/fairy", listFairyView) // TODO 屏蔽
 
-	user.GET("/claim", listUserClaimView)         // 获取用户认领专辑信息
-	user.POST("/claim/album", claimUserAlbumView) // 认领其他用户专辑
+	user.GET("/claim", listClaimView)
+	user.POST("/claim", createClaimView)
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf("%s:%d", cfg.Host, cfg.Port)))
 }

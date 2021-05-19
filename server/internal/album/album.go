@@ -34,7 +34,7 @@ import (
 
 // 专辑属性
 type Album struct {
-	ID          string   `json:"id"`    // 专辑ID，唯一性，索引，由Name而来
+	ID          string   `json:"id"`    // 专辑ID，唯一性，索引，由User和Name而来
 	Name        string   `json:"name"`  // 专辑名称，不具备唯一性
 	Owner       string   `json:"owner"` // 所属用户
 	Ta          string   `json:"ta"`    // 认领用户
@@ -49,6 +49,7 @@ type Album struct {
 type Fairy struct {
 	ID      string `json:"id"`       // 专辑ID，唯一性，索引，由Src而来
 	AlbumID string `json:"album_id"` // 所属专辑ID
+	Creator string `json:"creator"`  // 创建者（可能是专辑属主或认领者）
 	CTime   int64  `json:"ctime"`
 	Desc    string `json:"desc"`
 	Src     string `json:"src"`      // 照片存储地址，理论上要求唯一
@@ -64,18 +65,18 @@ type AlbumFairy struct {
 // 专辑名转成ID
 func AlbumName2ID(owner, name string) string {
 	// such as: md.a.<User>.<MD5>
-	return fmt.Sprintf("%s%s.%s", vars.AlbumPreID, owner, gtc.MD5(owner+name))
+	return fmt.Sprintf("%s%s.%s", vars.AlbumPre, owner, gtc.MD5(owner+name))
 }
 
 // 从专辑ID解析出用户名
 func AlbumID2User(albumID string) string {
-	aID := strings.TrimPrefix(albumID, vars.AlbumPreID)
+	aID := strings.TrimPrefix(albumID, vars.AlbumPre)
 	return strings.Split(aID, ".")[0]
 }
 
 func NewAlbum(owner, name string) (a *Album, err error) {
 	if owner == "" || name == "" {
-		err = errors.New("invalid fairy param")
+		err = errors.New("invalid album param")
 		return
 	}
 	// Name在用户中唯一，即ID唯一
@@ -102,6 +103,7 @@ func (a *Album) SetSteady(f *Fairy) {
 	a.SteadyFairy = f
 }
 
+// 判断专辑ID是否存在，完全匹配专辑属主和ID
 func (a *Album) Exist(rc *db.Conn) (bool, error) {
 	return rc.HExists(vars.GenAlbumKey(a.Owner), a.ID)
 }
@@ -109,14 +111,13 @@ func (a *Album) Exist(rc *db.Conn) (bool, error) {
 // 专辑认领入库
 func (a *Album) Claim(rc *db.Conn) error {
 	if a.Ta != "" {
-		key := vars.GenClaimKey(a.Ta)
-		_, err := rc.SAdd(key, a.ID)
+		_, err := rc.SAdd(vars.GenClaimKey(a.Ta), a.ID)
 		return err
 	}
 	return nil
 }
 
-func NewFairy(albumID, src, desc string) (f *Fairy, err error) {
+func NewFairy(creator, albumID, src, desc string) (f *Fairy, err error) {
 	if albumID == "" {
 		err = errors.New("invalid fairy param")
 		return
@@ -133,10 +134,8 @@ func NewFairy(albumID, src, desc string) (f *Fairy, err error) {
 		return
 	}
 	now := util.Now()
-	ID := fmt.Sprintf("%s-%s-%d", albumID, src, now)
-	f = &Fairy{
-		vars.FairyPreID + gtc.MD5(ID), albumID, now, desc, src, isVideo,
-	}
+	ID := vars.FairyPre + gtc.MD5(fmt.Sprintf("%s-%s-%d", albumID, src, now))
+	f = &Fairy{ID, albumID, creator, now, desc, src, isVideo}
 	return
 }
 
@@ -220,8 +219,8 @@ func (w wrap) DropFairy(albumID, fairyID string) error {
 }
 
 // 列出用户所有专辑数据（不包含专辑下照片）
-func (w wrap) ListAlbums(user string) (albums []Album, err error) {
-	data, err := w.HGetAll(vars.GenAlbumKey(user))
+func (w wrap) ListAlbums(owner string) (albums []Album, err error) {
+	data, err := w.HGetAll(vars.GenAlbumKey(owner))
 	if err != nil {
 		return
 	}
@@ -240,8 +239,13 @@ func (w wrap) ListAlbums(user string) (albums []Album, err error) {
 }
 
 // 获取用户某张专辑数据（不包含专辑下照片）
-func (w wrap) GetAlbum(user, albumID string) (a Album, err error) {
-	val, err := w.HGet(vars.GenAlbumKey(user), albumID)
+func (w wrap) GetAlbum(owner, albumID string) (a Album, err error) {
+	// 可不校验，owner和albumID中的user不对应，获取Nil为空错误直接返回
+	if owner != AlbumID2User(albumID) {
+		err = errors.New("not found album")
+		return
+	}
+	val, err := w.HGet(vars.GenAlbumKey(owner), albumID)
 	if err != nil {
 		return
 	}
@@ -253,8 +257,8 @@ func (w wrap) GetAlbum(user, albumID string) (a Album, err error) {
 }
 
 // 获取用户某张专辑数据（包含专辑下照片）
-func (w wrap) GetAlbumFairies(user, albumID string) (af AlbumFairy, err error) {
-	a, err := w.GetAlbum(user, albumID)
+func (w wrap) GetAlbumFairies(owner, albumID string) (af AlbumFairy, err error) {
+	a, err := w.GetAlbum(owner, albumID)
 	if err != nil {
 		return
 	}
@@ -265,7 +269,7 @@ func (w wrap) GetAlbumFairies(user, albumID string) (af AlbumFairy, err error) {
 	return AlbumFairy{a, f}, nil
 }
 
-// 仅获取用户某个专辑下所有照片数据（不包含专辑数据）
+// 仅获取某个专辑下所有照片数据（即：不包含专辑数据）
 func (w wrap) GetFairies(albumID string) (fairies []Fairy, err error) {
 	data, err := w.HGetAll(vars.GenFairyKey(albumID))
 	if err != nil {
@@ -285,14 +289,14 @@ func (w wrap) GetFairies(albumID string) (fairies []Fairy, err error) {
 	return
 }
 
-// 列出用户所有专辑ID及其下照片数据
+// 列出用户所有专辑ID及其下照片数据（也许要屏蔽此接口）
 func (w wrap) ListFairies(user string) (out map[string][]Fairy, err error) {
-	data, err := w.HGetAll(vars.GenAlbumKey(user))
+	albumIDs, err := w.HKeys(vars.GenAlbumKey(user))
 	if err != nil {
 		return
 	}
 	out = make(map[string][]Fairy)
-	for albumID := range data {
+	for _, albumID := range albumIDs {
 		fs, e := w.GetFairies(albumID)
 		if e != nil {
 			err = e
@@ -305,7 +309,7 @@ func (w wrap) ListFairies(user string) (out map[string][]Fairy, err error) {
 
 // 获取用户某个专辑某个照片数据
 func (w wrap) GetFairy(albumID, fairyID string) (f Fairy, err error) {
-	val, err := w.HGet(vars.GenFairyKey(albumID), albumID)
+	val, err := w.HGet(vars.GenFairyKey(albumID), fairyID)
 	if err != nil {
 		return
 	}
@@ -351,14 +355,14 @@ func (w wrap) HasUser(user string) (bool, error) {
 	return w.SIsMember(vars.UserIndex, user)
 }
 
-// 用户是否有此认领的专辑（claimkey格式是 owner:album_id）
+// 用户是否有此认领的专辑
 func (w wrap) HasClaim(user, albumID string) (bool, error) {
 	return w.SIsMember(vars.GenClaimKey(user), albumID)
 }
 
-// 列出用户下所有认领的专辑数据（不包含专辑下照片）
-func (w wrap) ListClaimAlbums(user string) (data []Album, err error) {
-	albumIDs, err := w.SMembers(vars.GenClaimKey(user))
+// 列出用户名下所有认领的专辑数据（不包含专辑下照片）
+func (w wrap) ListClaimAlbums(owner string) (data []Album, err error) {
+	albumIDs, err := w.SMembers(vars.GenClaimKey(owner))
 	if err != nil {
 		return
 	}

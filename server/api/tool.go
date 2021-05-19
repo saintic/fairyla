@@ -25,25 +25,34 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+// 从登录态接口中获取登录的用户名
 func getUser(c echo.Context) string {
 	return c.Get("user").(string)
 }
 
-// 从 album(name or id) 解析专辑ID
-func getAlbumID(user, albumID string) string {
-	if albumID == "" {
-		return albumID
+// 从 name/id 中解析专辑ID
+func getAlbumID(user, name string) string {
+	if name == "" {
+		return name
 	}
-	if !strings.HasPrefix(albumID, vars.AlbumPreID) {
-		// id is name
-		albumID = album.AlbumName2ID(user, albumID)
+	if strings.HasPrefix(name, vars.AlbumPre) {
+		// name is id
+		return name
+	} else {
+		return album.AlbumName2ID(user, name)
 	}
-	return albumID
 }
 
+// 从参数中自动获取专辑ID
 func autoAlbumID(c echo.Context) string {
 	albumID := c.Param("id")
 	return getAlbumID(getUser(c), albumID)
+}
+
+// 从登录态和参数中获取用户名和专辑ID，对比用户名是否一致
+func eqUserAlbumID(c echo.Context) bool {
+	albumID := autoAlbumID(c)
+	return getUser(c) == album.AlbumID2User(albumID)
 }
 
 // 从 query 或 form 中查找参数

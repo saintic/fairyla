@@ -179,7 +179,7 @@ export default {
         },
         upErr(err) {
             let msg = JSON.parse(err.message)
-            this.$message.error(msg)
+            this.$message.error(msg.message || 'Error')
         }
     },
     created() {

@@ -47,8 +47,8 @@ var (
 )
 
 const (
-	AlbumPreID = "md.a."
-	FairyPreID = "md.f."
+	AlbumPre = "md.a."
+	FairyPre = "md.f."
 
 	// 上传限制，单位MB
 	UploadLimitSize int64 = 20
