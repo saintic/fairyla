@@ -5,4 +5,5 @@ Dockerfile
 Makefile
 README
 server/bin/
+server/ui/
 client/node_modules/
