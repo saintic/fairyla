@@ -17,10 +17,11 @@
 package api
 
 import (
-	"fairyla/internal/album"
-	"fairyla/vars"
 	"strconv"
 	"strings"
+
+	"fairyla/internal/album"
+	"fairyla/vars"
 
 	"github.com/labstack/echo/v4"
 )

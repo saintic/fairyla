@@ -6,6 +6,7 @@
 import Fairy from '@/components/Fairy.vue'
 import { formatUnixTimestamp } from '@/libs/util.js'
 import { TaLabel, ClaimLabel } from '@/libs/vars.js'
+import { mapState } from '@/libs/store.js'
 
 export default {
     Name: 'AlbumFairy',
@@ -32,7 +33,8 @@ export default {
         isClaim() {
             // 来源于Claim为True，其他来源为False
             return this.source === ClaimLabel
-        }
+        },
+        ...mapState(['isLogin', 'user'])
     },
     created() {
         let owner = this.$route.params.owner, // 来源于Ta时，此专辑属主
@@ -58,6 +60,7 @@ export default {
             }
             // Add function buttons
             let taBtns = [
+                /*
                 {
                     name: '认领',
                     plain: true,
@@ -66,6 +69,7 @@ export default {
                         console.log('click ta')
                     }
                 }
+                */
             ]
             let claimBtns = []
             let homeBtns = [
@@ -84,6 +88,13 @@ export default {
                             if (!ta) {
                                 this.$message.error({
                                     message: '请输入用户名',
+                                    customClass: 'el-message--slim'
+                                })
+                                return false
+                            }
+                            if (ta === this.user) {
+                                this.$message.error({
+                                    message: '不能分享给自己',
                                     customClass: 'el-message--slim'
                                 })
                                 return false
@@ -119,12 +130,14 @@ export default {
                     }
                 }
             ]
-            if (this.source === TaLabel) {
-                this.btns = taBtns
-            } else if (this.source === ClaimLabel) {
-                this.btns = claimBtns
-            } else {
-                this.btns = homeBtns
+            if (this.isLogin) {
+                if (this.source === TaLabel) {
+                    this.btns = taBtns
+                } else if (this.source === ClaimLabel) {
+                    this.btns = claimBtns
+                } else {
+                    this.btns = homeBtns
+                }
             }
         })
     }

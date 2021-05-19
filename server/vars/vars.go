@@ -75,7 +75,11 @@ func ResOK() res {
 	return res{true, "ok"}
 }
 
-func ResErr(lang, msg string) res {
+func ResErr(msg string) res {
+	return res{false, msg}
+}
+
+func ResErrLocale(lang, msg string) res {
 	return res{false, msgTranslator(lang, msg)}
 }
 

@@ -45,7 +45,7 @@ func customHTTPErrorHandler(err error, c echo.Context) {
 	if msg == vars.RedigoNil {
 		msg = "no data"
 	}
-	c.JSON(code, vars.ResErr(getLocale(c), msg))
+	c.JSON(code, vars.ResErrLocale(getLocale(c), msg))
 }
 
 // 注册
@@ -102,11 +102,15 @@ func pubAlbumView(c echo.Context) error {
 		if user != album.AlbumID2User(albumID) {
 			return errors.New("album id does not match user")
 		}
-		data, err := w.GetAlbumFairies(user, albumID)
+		af, err := w.GetAlbumFairies(user, albumID)
 		if err != nil {
 			return err
 		}
-		return c.JSON(200, vars.NewResData(data))
+		if af.Public {
+			return c.JSON(200, vars.NewResData(af))
+		} else {
+			return c.JSON(404, vars.ResErr("not found"))
+		}
 	} else {
 		data, err := w.ListPublicAlbums()
 		if err != nil {
@@ -249,6 +253,16 @@ func updateAlbumView(c echo.Context) error {
 		if !has {
 			return errors.New("not found username")
 		}
+		if ta == user {
+			return errors.New("cannot share to yourself")
+		}
+		if a.Ta != "" && a.Ta == ta {
+			return errors.New("already belong ta")
+		}
+		err = (&a).Claim(rc, true)
+		if err != nil {
+			return err
+		}
 		a.Ta = ta
 		hookWriteShare = true
 	default:
@@ -259,7 +273,7 @@ func updateAlbumView(c echo.Context) error {
 		return err
 	}
 	if hookWriteShare {
-		err = (&a).Claim(rc)
+		err = (&a).Claim(rc, false)
 		if err != nil {
 			return err
 		}

@@ -32,3 +32,6 @@ clean:
 	find bin -name '*.tar.gz' -exec rm -f {} +
 	find bin -name '*.zip' -exec rm -f {} +
 	find bin -name 'fairyla.*-amd64*' -exec rm -f {} +
+
+test:
+	go test -v ./...

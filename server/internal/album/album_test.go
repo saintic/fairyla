@@ -1,16 +1,17 @@
 package album
 
 import (
-	"fairyla/vars"
 	"strings"
 	"testing"
+
+	"fairyla/vars"
 
 	"tcw.im/gtc"
 )
 
 func TestAlbum(t *testing.T) {
 	ani_s := AlbumName2ID("u", "n")
-	ani_d := vars.AlbumPre + "u" + gtc.MD5("un")
+	ani_d := vars.AlbumPre + "u." + gtc.MD5("un")
 	if ani_s != ani_d {
 		t.Fatal("AlbumName2ID error")
 	}

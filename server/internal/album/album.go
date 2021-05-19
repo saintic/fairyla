@@ -108,13 +108,16 @@ func (a *Album) Exist(rc *db.Conn) (bool, error) {
 	return rc.HExists(vars.GenAlbumKey(a.Owner), a.ID)
 }
 
-// 专辑认领入库
-func (a *Album) Claim(rc *db.Conn) error {
+// 专辑认领入库或清除
+func (a *Album) Claim(rc *db.Conn, isRemove bool) (err error) {
 	if a.Ta != "" {
-		_, err := rc.SAdd(vars.GenClaimKey(a.Ta), a.ID)
-		return err
+		if isRemove {
+			_, err = rc.SRem(vars.GenClaimKey(a.Ta), a.ID)
+		} else {
+			_, err = rc.SAdd(vars.GenClaimKey(a.Ta), a.ID)
+		}
 	}
-	return nil
+	return
 }
 
 func NewFairy(creator, albumID, src, desc string) (f *Fairy, err error) {
