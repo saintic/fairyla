@@ -27,14 +27,6 @@
                 >
                 </el-input>
             </el-form-item>
-            <el-form-item prop="code">
-                <el-input
-                    type="text"
-                    v-model="registerForm.code"
-                    autocomplete="off"
-                    placeholder="请输入内测邀请码"
-                ></el-input>
-            </el-form-item>
             <el-form-item>
                 <el-checkbox
                     v-model="checked"
@@ -74,7 +66,6 @@ export default {
             registerForm: {
                 username: '',
                 password: '',
-                code: ''
             },
             registerRule: {
                 username: [
@@ -124,7 +115,6 @@ export default {
                         .post('/auth/signup', {
                             username: this.registerForm.username,
                             password: this.registerForm.password,
-                            code: this.registerForm.code
                         })
                         .then((res) => {
                             this.registering = false
