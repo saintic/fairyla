@@ -81,6 +81,8 @@ export default {
                             '请输入分享给Ta的用户名（覆盖已有分享）',
                             '温馨提示',
                             {
+                                confirmButtonText: '确定',
+                                cancelButtonText: '取消',
                                 customClass: 'el-message-box--slim'
                             }
                         ).then(({ value }) => {

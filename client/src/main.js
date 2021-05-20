@@ -15,14 +15,12 @@
 */
 
 import { createApp } from 'vue'
-import lang from 'element-plus/lib/locale/lang/zh-cn'
 import App from './App.vue'
 import router from './libs/router.js'
 import store from './libs/store.js'
 import { http } from './libs/util.js'
 
 import {
-    locale,
     ElAvatar,
     ElButton,
     ElButtonGroup,
@@ -93,8 +91,6 @@ const components = [
 ]
 
 const plugins = [ElLoading, ElMessage, ElMessageBox, ElNotification]
-
-locale(lang)
 
 const app = createApp(App)
 

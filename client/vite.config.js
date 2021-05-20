@@ -34,6 +34,7 @@ export default defineConfig({
         }
     },
     build: {
-        outDir: join(__dirname, '../server/ui')
+        outDir: join(__dirname, '../server/ui'),
+        emptyOutDir: true
     }
 })
