@@ -30,9 +30,11 @@
             </el-form-item>
             <el-form-item>
                 <el-checkbox v-model="checked" class="rememberme"
-                    >记住我</el-checkbox
+                    >记住我(7d)</el-checkbox
                 >
+                <!--
                 <el-link type="info" class="forgot">忘记密码？</el-link>
+                -->
             </el-form-item>
             <el-form-item style="width: 100%">
                 <el-button

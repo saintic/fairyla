@@ -29,18 +29,14 @@ import axios from 'axios'
 
 const poesy = ref('')
 
-function setPoesy() {
-    axios
-        .get('https://open.saintic.com/api/sentence/renwu.nvzi.json')
-        .then((result) => {
-            let res = result.data
-            if (res.code === 0) {
-                poesy.value = res.data.sentence
-            }
-        })
-}
-setPoesy()
-setInterval(setPoesy, 10000)
+axios
+    .get('https://open.saintic.com/api/sentence/renwu.nvzi.json')
+    .then((result) => {
+        let res = result.data
+        if (res.code === 0) {
+            poesy.value = res.data.sentence
+        }
+    })
 </script>
 
 <style scoped>

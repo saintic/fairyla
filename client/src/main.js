@@ -47,6 +47,7 @@ import {
     ElOptionGroup,
     ElPopconfirm,
     ElRow,
+    ElResult,
     ElSelect,
     ElSubmenu,
     ElTag,
@@ -83,6 +84,7 @@ const components = [
     ElOptionGroup,
     ElPopconfirm,
     ElRow,
+    ElResult,
     ElSelect,
     ElSubmenu,
     ElTag,
@@ -105,7 +107,6 @@ plugins.forEach((plugin) => {
 })
 
 app.use(router)
-//app.use(ElementPlus, { locale })
 app.config.globalProperties.$http = http
 app.config.globalProperties.$store = store
 let vm = app.mount('#app')
