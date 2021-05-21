@@ -259,10 +259,10 @@ es-module-lexer@^0.4.1:
   resolved "https://registry.npm.taobao.org/es-module-lexer/download/es-module-lexer-0.4.1.tgz?cache=0&sync_timestamp=1614787593987&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fes-module-lexer%2Fdownload%2Fes-module-lexer-0.4.1.tgz#dda8c6a14d8f340a24e34331e0fab0cb50438e0e"
   integrity sha1-3ajGoU2PNAok40Mx4Pqwy1BDjg4=
 
-esbuild@^0.11.20:
-  version "0.11.20"
-  resolved "https://registry.nlark.com/esbuild/download/esbuild-0.11.20.tgz#7cefa1aee8b372c184e42457885f7ce5d3e62a1e"
-  integrity sha1-fO+hruizcsGE5CRXiF985dPmKh4=
+esbuild@^0.11.23:
+  version "0.11.23"
+  resolved "https://registry.nlark.com/esbuild/download/esbuild-0.11.23.tgz?cache=0&sync_timestamp=1621409384062&other_urls=https%3A%2F%2Fregistry.nlark.com%2Fesbuild%2Fdownload%2Fesbuild-0.11.23.tgz#c42534f632e165120671d64db67883634333b4b8"
+  integrity sha1-xCU09jLhZRIGcdZNtniDY0MztLg=
 
 estree-walker@^2.0.1:
   version "2.0.2"
@@ -276,7 +276,7 @@ follow-redirects@^1.10.0:
 
 fsevents@~2.3.1:
   version "2.3.2"
-  resolved "https://registry.npm.taobao.org/fsevents/download/fsevents-2.3.2.tgz?cache=0&sync_timestamp=1612536409579&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Ffsevents%2Fdownload%2Ffsevents-2.3.2.tgz#8a526f78b8fdf4623b709e0b975c52c24c02fd1a"
+  resolved "https://registry.npm.taobao.org/fsevents/download/fsevents-2.3.2.tgz?cache=0&sync_timestamp=1612536422255&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Ffsevents%2Fdownload%2Ffsevents-2.3.2.tgz#8a526f78b8fdf4623b709e0b975c52c24c02fd1a"
   integrity sha1-ilJveLj99GI7cJ4Ll1xSwkwC/Ro=
 
 function-bind@^1.1.1:
@@ -521,13 +521,13 @@ postcss@^8.1.10:
     source-map "^0.6.1"
 
 postcss@^8.2.10:
-  version "8.2.15"
-  resolved "https://registry.nlark.com/postcss/download/postcss-8.2.15.tgz#9e66ccf07292817d226fc315cbbf9bc148fbca65"
-  integrity sha1-nmbM8HKSgX0ib8MVy7+bwUj7ymU=
+  version "8.3.0"
+  resolved "https://registry.nlark.com/postcss/download/postcss-8.3.0.tgz#b1a713f6172ca427e3f05ef1303de8b65683325f"
+  integrity sha1-sacT9hcspCfj8F7xMD3otlaDMl8=
   dependencies:
     colorette "^1.2.2"
     nanoid "^3.1.23"
-    source-map "^0.6.1"
+    source-map-js "^0.6.2"
 
 resize-observer-polyfill@^1.5.1:
   version "1.5.1"
@@ -536,16 +536,16 @@ resize-observer-polyfill@^1.5.1:
 
 resolve@^1.19.0:
   version "1.20.0"
-  resolved "https://registry.npm.taobao.org/resolve/download/resolve-1.20.0.tgz?cache=0&sync_timestamp=1613055183799&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fresolve%2Fdownload%2Fresolve-1.20.0.tgz#629a013fb3f70755d6f0b7935cc1c2c5378b1975"
+  resolved "https://registry.npm.taobao.org/resolve/download/resolve-1.20.0.tgz#629a013fb3f70755d6f0b7935cc1c2c5378b1975"
   integrity sha1-YpoBP7P3B1XW8LeTXMHCxTeLGXU=
   dependencies:
     is-core-module "^2.2.0"
     path-parse "^1.0.6"
 
 rollup@^2.38.5:
-  version "2.47.0"
-  resolved "https://registry.nlark.com/rollup/download/rollup-2.47.0.tgz?cache=0&sync_timestamp=1620105121968&other_urls=https%3A%2F%2Fregistry.nlark.com%2Frollup%2Fdownload%2Frollup-2.47.0.tgz#9d958aeb2c0f6a383cacc0401dff02b6e252664d"
-  integrity sha1-nZWK6ywPajg8rMBAHf8CtuJSZk0=
+  version "2.48.0"
+  resolved "https://registry.nlark.com/rollup/download/rollup-2.48.0.tgz?cache=0&sync_timestamp=1621511609642&other_urls=https%3A%2F%2Fregistry.nlark.com%2Frollup%2Fdownload%2Frollup-2.48.0.tgz#fceb01ed771f991f29f7bd2ff7838146e55acb74"
+  integrity sha1-/OsB7XcfmR8p970v94OBRuVay3Q=
   optionalDependencies:
     fsevents "~2.3.1"
 
@@ -565,6 +565,11 @@ snake-case@^3.0.4:
   dependencies:
     dot-case "^3.0.4"
     tslib "^2.0.3"
+
+source-map-js@^0.6.2:
+  version "0.6.2"
+  resolved "https://registry.npm.taobao.org/source-map-js/download/source-map-js-0.6.2.tgz#0bb5de631b41cfbda6cfba8bd05a80efdfd2385e"
+  integrity sha1-C7XeYxtBz72mz7qL0FqA79/SOF4=
 
 source-map@^0.6.1:
   version "0.6.1"
@@ -627,11 +632,11 @@ vite-plugin-style-import@^0.10.0:
     magic-string "^0.25.7"
 
 vite@^2.1.5:
-  version "2.3.2"
-  resolved "https://registry.nlark.com/vite/download/vite-2.3.2.tgz?cache=0&sync_timestamp=1620841235360&other_urls=https%3A%2F%2Fregistry.nlark.com%2Fvite%2Fdownload%2Fvite-2.3.2.tgz#cfac76b04d4dee1c7303b55f563b5b62d32f41fe"
-  integrity sha1-z6x2sE1N7hxzA7VfVjtbYtMvQf4=
+  version "2.3.3"
+  resolved "https://registry.nlark.com/vite/download/vite-2.3.3.tgz?cache=0&sync_timestamp=1621261449875&other_urls=https%3A%2F%2Fregistry.nlark.com%2Fvite%2Fdownload%2Fvite-2.3.3.tgz#7e88a71abd03985c647789938d784cce0ee3b0fd"
+  integrity sha1-foinGr0DmFxkd4mTjXhMzg7jsP0=
   dependencies:
-    esbuild "^0.11.20"
+    esbuild "^0.11.23"
     postcss "^8.2.10"
     resolve "^1.19.0"
     rollup "^2.38.5"
@@ -639,9 +644,9 @@ vite@^2.1.5:
     fsevents "~2.3.1"
 
 vue-router@4:
-  version "4.0.7"
-  resolved "https://registry.nlark.com/vue-router/download/vue-router-4.0.7.tgz#46f17ac7f3233c41f0267d55b2baf2dd6ccc8553"
-  integrity sha1-RvF6x/MjPEHwJn1Vsrry3WzMhVM=
+  version "4.0.8"
+  resolved "https://registry.nlark.com/vue-router/download/vue-router-4.0.8.tgz#55d4290a3122444edbc91a3cd2492bb1d0cef494"
+  integrity sha1-VdQpCjEiRE7byRo80kkrsdDO9JQ=
   dependencies:
     "@vue/devtools-api" "^6.0.0-beta.10"
 

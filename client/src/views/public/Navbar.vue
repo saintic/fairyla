@@ -14,15 +14,12 @@
                 <el-menu-item index="/ta">
                     <i class="saintic-icon saintic-icon-goddess"></i> Ta是
                 </el-menu-item>
-                <el-menu-item index v-if="isLogin">
-                    <el-avatar
-                        class="avatar"
-                        :src="avatar"
-                        :size="30"
-                    ></el-avatar>
-                </el-menu-item>
                 <el-submenu v-if="isLogin">
                     <template #title>{{ user }}</template>
+                    <el-menu-item index="/" class="back-home">
+                        <i class="saintic-icon saintic-icon-home"></i>
+                        首页上传
+                    </el-menu-item>
                     <!--
                     <el-menu-item index="/my/profile">
                         <i class="saintic-icon saintic-icon-user"></i>
@@ -86,7 +83,6 @@ export default {
     position: absolute;
     left: 0;
     top: 0;
-    width: 200px;
 }
 .nav .nav-right {
     position: absolute;
@@ -99,8 +95,20 @@ export default {
 .nav .nav-right .avatar {
     background: #fff;
 }
+.back-home {
+    display: none;
+}
 .el-menu--collapse .el-menu .el-submenu,
 .el-menu--popup {
     min-width: 120px !important;
+}
+
+@media (max-width: 480px) {
+    .nav .nav-left .logo {
+        display: none;
+    }
+    .back-home {
+        display: block;
+    }
 }
 </style>

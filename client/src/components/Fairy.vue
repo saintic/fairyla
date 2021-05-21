@@ -71,12 +71,14 @@
                 </section>
             </article>
         </section>
+        <Backtop />
     </section>
 </template>
 
 <script setup>
 import { defineProps } from 'vue'
 import { isObject } from '@/libs/util.js'
+import Backtop from './Backtop.vue'
 
 defineProps({
     album: {

@@ -25,7 +25,7 @@
                                 filterable
                             >
                                 <el-option
-                                    v-for="item in album_names"
+                                    v-for="item in albumNames"
                                     :key="item"
                                     :value="item"
                                 ></el-option>
@@ -59,11 +59,13 @@
                                         :on-success="upSuccess"
                                         :on-error="upErr"
                                         :headers="headers"
+                                        :disabled="upDisabled"
                                     >
                                         <el-button
                                             size="mini"
                                             type="primary"
-                                            icon="el-icon-upload"
+                                            :icon="upIcon"
+                                            :disabled="upDisabled"
                                             >上传</el-button
                                         >
                                     </el-upload>
@@ -122,8 +124,10 @@ export default {
                     }
                 ]
             },
-            album_names: [],
-            acceptMimes: 'image/*,video/*'
+            albumNames: [],
+            acceptMimes: 'image/*,video/*',
+            upDisabled: false,
+            upIcon: 'el-icon-upload'
         }
     },
     computed: mapState({
@@ -146,9 +150,9 @@ export default {
             this.$refs['fairy'].validate((valid) => {
                 if (!valid) return
                 this.$http.post('/user/fairy', this.af).then((res) => {
-                    this.$message.success('已提交')
-                    if (!this.album_names.includes(this.af.album_name)) {
-                        this.album_names.push(this.af.album_name)
+                    this.$message.success('已添加照片')
+                    if (!this.albumNames.includes(this.af.album_name)) {
+                        this.albumNames.push(this.af.album_name)
                     }
                     this.resetForm()
                 })
@@ -157,20 +161,31 @@ export default {
         resetForm() {
             this.$refs['fairy'].resetFields()
         },
+        upStatus(uploading) {
+            if (uploading === true) {
+                this.upDisabled = true
+                this.upIcon = 'el-icon-loading'
+            } else {
+                this.upDisabled = false
+                this.upIcon = 'el-icon-upload'
+            }
+        },
         upBefore(file) {
             let isRightSize = file.size / 1024 / 1024 < this.upLimit
             if (!isRightSize) {
                 this.$message.error('文件大小超过限制')
-                return
+                return false
             }
             let isImage = new RegExp('image/*').test(file.type)
             let isVideo = new RegExp('video/*').test(file.type)
             if (!isImage && !isVideo) {
                 this.$message.error('不支持上传的文件类型')
+                return false
             }
-            return isRightSize && (isImage || isVideo)
+            this.upStatus(true)
         },
         upSuccess(res) {
+            this.upStatus(false)
             if (res.success) {
                 this.af.src = res.data.src
             } else {
@@ -178,6 +193,7 @@ export default {
             }
         },
         upErr(err) {
+            this.upStatus(false)
             let msg = JSON.parse(err.message)
             this.$message.error(msg.message || 'Error')
         }
@@ -186,7 +202,7 @@ export default {
         if (this.isLogin) {
             this.$http.get('/user/album/names').then((res) => {
                 res.data.map((name) => {
-                    this.album_names.push(name)
+                    this.albumNames.push(name)
                 })
             })
         }

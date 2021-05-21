@@ -51,7 +51,6 @@ import {
     ElTag,
     ElTooltip,
     ElUpload,
-    ElLoading,
     ElMessage,
     ElMessageBox,
     ElNotification
@@ -90,7 +89,7 @@ const components = [
     ElUpload
 ]
 
-const plugins = [ElLoading, ElMessage, ElMessageBox, ElNotification]
+const plugins = [ElMessage, ElMessageBox, ElNotification]
 
 const app = createApp(App)
 
@@ -105,6 +104,7 @@ plugins.forEach((plugin) => {
 app.use(router)
 app.config.globalProperties.$http = http
 app.config.globalProperties.$store = store
+app.config.globalProperties.$ELEMENT = { size: 'mini' }
 let vm = app.mount('#app')
 //window.app = app
 //window.vm = vm
