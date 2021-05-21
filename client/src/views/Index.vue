@@ -200,11 +200,13 @@ export default {
     },
     created() {
         if (this.isLogin) {
-            this.$http.get('/user/album/names').then((res) => {
-                res.data.map((name) => {
-                    this.albumNames.push(name)
+            this.$http
+                .get('/user/album/names', { hiddenError: true })
+                .then((res) => {
+                    res.data.map((name) => {
+                        this.albumNames.push(name)
+                    })
                 })
-            })
         }
     }
 }

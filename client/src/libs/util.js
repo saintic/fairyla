@@ -20,7 +20,7 @@ import { STORAGE_KEY, ErrMsgMap } from './vars.js'
 
 export const http = axios.create({
     baseURL: '/api',
-    timeout: 5000,
+    timeout: 3000,
     withCredentials: false,
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     transformRequest: [
@@ -65,18 +65,22 @@ http.interceptors.response.use(
     (response) => {
         // 2xx 范围内的状态码都会触发该函数。
         // 接口返回success字段不为true表示请求错误
-        let data = response.data
+        let config = response.config,
+            data = response.data
         if (!data.success) {
-            let prefix = getErrMsgPrefix(response.config.url),
-                text = data.message || 'Error'
-            ElMessage.error(prefix + text)
+            if (config.hiddenError !== true) {
+                let prefix = getErrMsgPrefix(response.config.url),
+                    text = data.message || 'Error'
+                ElMessage.error(prefix + text)
+            }
             return Promise.reject(new Error(text))
         } else {
             return data
         }
     },
     (error) => {
-        let prefix = getErrMsgPrefix(error.config.url),
+        let config = error.config,
+            prefix = getErrMsgPrefix(config.url),
             text = 'Error'
 
         if (error.response) {
@@ -125,7 +129,9 @@ http.interceptors.response.use(
             // 请求已经成功发起，但没有收到响应
             text = error.message
         }
-        ElMessage.error(prefix + text)
+        if (config.hiddenError !== true) {
+            ElMessage.error(prefix + text)
+        }
         return Promise.reject(error)
     }
 )

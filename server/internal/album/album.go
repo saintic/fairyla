@@ -175,6 +175,22 @@ func (w wrap) WriteAlbum(a *Album) error {
 	return err
 }
 
+// 删除用户某个专辑及其下照片
+func (w wrap) DropAlbum(owner, albumID string) error {
+	a, err := w.GetAlbum(owner, albumID)
+	if err != nil {
+		return err
+	}
+	pipe := w.Pipeline()
+	pipe.HDel(vars.GenAlbumKey(owner), albumID)
+	pipe.Del(vars.GenFairyKey(albumID))
+	if a.Ta != "" {
+		pipe.SRem(vars.GenClaimKey(a.Ta), albumID)
+	}
+	_, err = pipe.Execute()
+	return err
+}
+
 // 删除用户所有专辑及其下照片
 func (w wrap) DropAlbums(owner string) error {
 	index := vars.GenAlbumKey(owner)
@@ -182,21 +198,13 @@ func (w wrap) DropAlbums(owner string) error {
 	if err != nil {
 		return err
 	}
-	pipe := w.Pipeline()
 	for _, aid := range albumIDs {
-		pipe.Del(vars.GenFairyKey(aid))
+		err = w.DropAlbum(owner, aid)
+		if err != nil {
+			return err
+		}
 	}
-	_, err = pipe.Execute()
-	return err
-}
-
-// 删除用户某个专辑及其下照片
-func (w wrap) DropAlbum(owner, albumID string) error {
-	pipe := w.Pipeline()
-	pipe.HDel(vars.GenAlbumKey(owner), albumID)
-	pipe.Del(vars.GenFairyKey(albumID))
-	_, err := pipe.Execute()
-	return err
+	return nil
 }
 
 // Only check the basic parameters and (overwrite) write

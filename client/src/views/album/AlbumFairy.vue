@@ -37,7 +37,7 @@ export default {
         ...mapState(['isLogin', 'user'])
     },
     created() {
-        let owner = this.$route.params.owner, // 来源于Ta时，此专辑属主
+        let owner = this.$route.params.owner, // 来源于Ta、Claim时的专辑属主
             name = this.$route.params.name, // 专辑名
             url = `/user/album/${name}?fairy=true`
         if (this.isTa) url = `/album?fairy=true&user=${owner}&album=${name}`
@@ -129,6 +129,33 @@ export default {
                                 this.album.public = !this.album.public
                                 this.btns[1].name = this.statusText
                             })
+                    }
+                },
+                {
+                    name: '删除',
+                    type: 'danger',
+                    icon: 'el-icon-delete',
+                    click: () => {
+                        this.$confirm(
+                            '此操作将永久删除该专辑（及照片）, 是否继续?',
+                            '温馨提示',
+                            {
+                                type: 'error',
+                                confirmButtonText: '确定',
+                                cancelButtonText: '取消',
+                                customClass: 'el-message-box--slim'
+                            }
+                        ).then(() => {
+                            this.$http
+                                .delete(`/user/album/${name}`)
+                                .then((res) => {
+                                    this.$message.success({
+                                        message: '已删除专辑',
+                                        customClass: 'el-message--slim'
+                                    })
+                                    this.$router.push({ path: '/' })
+                                })
+                        })
                     }
                 }
             ]
