@@ -43,6 +43,13 @@ func StartApi(config *sys.Setting) {
 	e.Static("/", cfg.Dir)
 
 	api := e.Group("/api")
+	api.Match([]string{"GET", "HEAD"}, "/healthz", func(c echo.Context) error {
+		ping, err := rc.Ping()
+		if err != nil || !ping {
+			return c.JSONBlob(503, []byte(`"ERR"`))
+		}
+		return c.JSONBlob(200, []byte(`"OK"`))
+	})
 	api.GET("/config", configView)
 	api.GET("/album", pubAlbumView)
 

@@ -42,9 +42,6 @@ func customHTTPErrorHandler(err error, c echo.Context) {
 		code = he.Code
 		msg = he.Message.(string)
 	}
-	if msg == vars.RedigoNil {
-		msg = "no data"
-	}
 	c.JSON(code, vars.ResErrLocale(getLocale(c), msg))
 }
 

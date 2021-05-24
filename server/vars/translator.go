@@ -55,7 +55,7 @@ var precise = map[string]map[string]string{
 		"invalid param":            "无效参数",
 		"missing or malformed jwt": "Token丢失或格式不正确",
 		"invalid or expired jwt":   "Token无效或已过期",
-		"redigo: nil returned":     "暂无数据",
+		RedigoNil:                  "暂无数据",
 
 		// project message
 		"album already exists":     "专辑已存在",

@@ -1,0 +1,23 @@
+version: '3'
+services:
+  fairyla:
+    container_name: fairyla
+    image: staugur/fairyla:latest
+    restart: always
+    ports:
+      - "10210"
+    environment:
+      - fairyla_host=127.0.0.1
+      - fairyla_redis_url=redis://@redis:6379
+      - fairyla_sapic_api=https://picbed.pro
+      - fairyla_sapic_token=<Please Fill It>
+    volumes:
+      - frontend:/fairyla/
+    depends_on:
+      - "redis"
+  redis:
+    container_name: redis
+    image: "redis:alpine"
+    command: ["redis-server", "--appendonly", "yes"]
+volumes:
+  frontend:

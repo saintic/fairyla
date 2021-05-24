@@ -30,6 +30,8 @@ COPY --from=builder /build/server/fairyla /bin/
 
 COPY --from=builder /build/server/ui /fairyla/
 
+COPY --from=builder /build/NOTICE /fairyla/
+
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
 EXPOSE 10210

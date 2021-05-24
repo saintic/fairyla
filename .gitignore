@@ -121,5 +121,6 @@ dist
 # vendor/
 server/bin/
 server/ui/
+server/NOTICE
 .DS_Store
 nohup.out
