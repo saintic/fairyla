@@ -23,7 +23,7 @@ spec:
       containers:
         - name: fairyla
           image: docker.io/staugur/fairyla:latest
-          imagePullPolicy: Always
+          imagePullPolicy: Always # 可修改image使用tag并注释此行
           env:
             - name: fairyla_redis_url     # redis服务IP地址
               value: "redis://localhost"

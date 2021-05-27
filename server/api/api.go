@@ -70,7 +70,6 @@ func StartApi(config *sys.Setting) {
 
 	user.POST("/fairy", createFairyView)
 	user.DELETE("/fairy/:id", dropFairyView)
-	user.GET("/fairy", listFairyView) // TODO 屏蔽
 
 	user.GET("/claim", listClaimView)
 	user.POST("/claim", createClaimView)

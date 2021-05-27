@@ -1,9 +1,10 @@
 .git
 .github/
-LICENSE
 Dockerfile
 Makefile
-README
+README.md
 server/bin/
 server/ui/
 client/node_modules/
+release/
+.tmp-*

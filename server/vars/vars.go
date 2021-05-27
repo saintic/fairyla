@@ -56,6 +56,7 @@ const (
 	AlbumLimitNum = 9
 
 	RedigoNil = "redigo: nil returned"
+
 	// 允许多种方式获取JWT认证值
 	AllowExtraJWT = true
 )

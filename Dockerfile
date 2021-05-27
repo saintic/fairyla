@@ -1,5 +1,5 @@
 # build dependencies with alpine
-FROM golang:1.16.3-alpine3.13 AS builder
+FROM golang:1.16.4-alpine3.13 AS builder
 
 LABEL maintainer=me@tcw.im
 
@@ -22,15 +22,15 @@ RUN cd client && yarn --no-lockfile && yarn build && cd ../server && \
     CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags "-s -w" -o fairyla
 
 # run application with a small image
-FROM scratch
+ARG runos=scratch
+
+FROM ${runos}
 
 WORKDIR /fairyla
 
 COPY --from=builder /build/server/fairyla /bin/
 
-COPY --from=builder /build/server/ui /fairyla/
-
-COPY --from=builder /build/NOTICE /fairyla/
+COPY --from=builder /build/server/ui /build/NOTICE /build/LICENSE /fairyla/
 
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 

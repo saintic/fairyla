@@ -475,16 +475,6 @@ func dropFairyView(c echo.Context) error {
 	return c.JSON(200, vars.ResOK())
 }
 
-// 获取用户所有照片信息
-func listFairyView(c echo.Context) error {
-	w := album.New(rc)
-	data, err := w.ListFairies(getUser(c))
-	if err != nil {
-		return err
-	}
-	return c.JSON(200, vars.NewResData(data))
-}
-
 /*
  * ClaimView 认领专辑视图
  *
