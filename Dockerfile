@@ -1,5 +1,8 @@
+ARG buildos=golang:1.16.4-alpine3.13
+ARG runos=scratch
+
 # build dependencies with alpine
-FROM golang:1.16.4-alpine3.13 AS builder
+FROM $buildos AS builder
 
 LABEL maintainer=me@tcw.im
 
@@ -22,9 +25,7 @@ RUN cd client && yarn --no-lockfile && yarn build && cd ../server && \
     CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags "-s -w" -o fairyla
 
 # run application with a small image
-ARG runos=scratch
-
-FROM ${runos}
+FROM $runos
 
 WORKDIR /fairyla
 

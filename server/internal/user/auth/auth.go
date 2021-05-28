@@ -38,10 +38,7 @@ func Register(c *db.Conn, username, password string) error {
 	if len(password) < 6 {
 		return errors.New("password is too short")
 	}
-	pwhash, err := util.GeneratePasswordHash(password)
-	if err != nil {
-		return err
-	}
+	pwhash := util.GeneratePasswordHash(password)
 	has, err := c.SIsMember(vars.UserIndex, username)
 	if err != nil {
 		return err

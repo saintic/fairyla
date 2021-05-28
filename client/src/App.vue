@@ -24,6 +24,22 @@ export default {
         window.addEventListener('beforeunload', (e) => {
             this.$store.actions.saveConfig2Local()
         })
+    },
+    mounted() {
+        let url = '/api/user/event'
+        let es = new EventSource(url)
+        es.addEventListener('message', (event) => {
+            console.log(event.data)
+        })
+        es.addEventListener('error', (event) => {
+            if (event.readyState == EventSource.CLOSED) {
+                console.log('event was closed')
+            }
+        })
+        es.addEventListener('close', (event) => {
+            console.log(event.type)
+            es.close()
+        })
     }
 }
 </script>

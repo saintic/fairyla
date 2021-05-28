@@ -37,7 +37,7 @@ spec:
             httpGet:
               scheme: HTTP
               port: 10210
-              path: /api/healthz
+              path: /api/ready
             initialDelaySeconds: 3
             timeoutSeconds: 3
           livenessProbe:

@@ -117,6 +117,10 @@ func pubAlbumView(c echo.Context) error {
 	}
 }
 
+/*
+ * 用户通用视图
+ */
+
 // 上传图片、视频
 func uploadView(c echo.Context) error {
 	file, err := c.FormFile("file")
@@ -185,6 +189,16 @@ func uploadView(c echo.Context) error {
 	} else {
 		return errors.New(ret.Msg)
 	}
+}
+
+// 用户消息
+func eventView(c echo.Context) error {
+	c.Response().Header().Set("Content-Type", "text/event-stream")
+	c.Response().Header().Set("Cache-Control", "no-cache")
+	c.Response().Header().Set("Connection", "keep-alive")
+	ret, _ := json.Marshal(vars.ResOK())
+	res := fmt.Sprintf("data: %s\n\n", string(ret))
+	return c.String(200, res)
 }
 
 /*

@@ -43,12 +43,12 @@ func StartApi(config *sys.Setting) {
 	e.Static("/", cfg.Dir)
 
 	api := e.Group("/api")
-	api.Match([]string{"GET", "HEAD"}, "/healthz", func(c echo.Context) error {
+	api.Match([]string{"GET", "HEAD"}, "/ready", func(c echo.Context) error {
 		ping, err := rc.Ping()
 		if err != nil || !ping {
-			return c.JSONBlob(503, []byte(`"ERR"`))
+			return c.JSONBlob(503, []byte(`"err"`))
 		}
-		return c.JSONBlob(200, []byte(`"OK"`))
+		return c.JSONBlob(200, []byte(`"ok"`))
 	})
 	api.GET("/config", configView)
 	api.GET("/album", pubAlbumView)
@@ -58,6 +58,7 @@ func StartApi(config *sys.Setting) {
 	auth.POST("/signin", signInView)
 
 	user := api.Group("/user", loginRequired) // 用户接口，需登录
+	user.GET("/event", eventView)
 	user.POST("/upload", uploadView)
 
 	user.POST("/album", createAlbumView)
