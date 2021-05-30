@@ -29,6 +29,7 @@ import (
 
 	"fairyla/internal/album"
 	"fairyla/internal/user/auth"
+	"fairyla/internal/user/event"
 	"fairyla/vars"
 
 	"github.com/labstack/echo/v4"
@@ -189,16 +190,6 @@ func uploadView(c echo.Context) error {
 	} else {
 		return errors.New(ret.Msg)
 	}
-}
-
-// 用户消息
-func eventView(c echo.Context) error {
-	c.Response().Header().Set("Content-Type", "text/event-stream")
-	c.Response().Header().Set("Cache-Control", "no-cache")
-	c.Response().Header().Set("Connection", "keep-alive")
-	ret, _ := json.Marshal(vars.ResOK())
-	res := fmt.Sprintf("data: %s\n\n", string(ret))
-	return c.String(200, res)
 }
 
 /*
@@ -531,5 +522,77 @@ func listClaimView(c echo.Context) error {
 
 // 认领其他用户专辑（需由所属者确认方可领取成功）
 func createClaimView(c echo.Context) error {
-	return nil
+	user := getUser(c)
+	owner := c.FormValue("owner")
+	id := c.FormValue("album")
+	if owner == "" || id == "" {
+		return errors.New("invalid param")
+	}
+	if user == owner {
+		return errors.New("already belong ta")
+	}
+	w := album.New(rc)
+	err := w.CreateClaim(user, owner, getAlbumID(owner, id))
+	if err != nil {
+		return err
+	}
+	return c.JSON(200, vars.ResOK())
+}
+
+/*
+ * EventView 用户事件视图
+ *
+ * 状态：已登录
+ */
+
+// 创建事件
+func createEventView(c echo.Context) error {
+	user := getUser(c)
+	action := getParam(c, "action")
+	if action == "message" {
+		msg := c.FormValue("message")
+		class := c.FormValue("classify")
+		m, err := event.NewMessage(user, msg, class)
+		if err != nil {
+			return err
+		}
+		err = m.Write(rc)
+		if err != nil {
+			return err
+		}
+		return c.JSON(200, vars.ResOK())
+	}
+	return errors.New("invalid action param")
+}
+
+// 查询事件
+func listEventView(c echo.Context) error {
+	w := event.New(rc)
+	ms, err := w.ListMessages(getUser(c), c.FormValue("classify"))
+	if err != nil {
+		return err
+	}
+	Accept := c.Request().Header.Get("Accept")
+	if strings.Contains(Accept, "application/json") {
+		return c.JSON(200, vars.NewResData(ms))
+	}
+	ret, err := json.Marshal(ms)
+	if err != nil {
+		return err
+	}
+	c.Response().Header().Set("Content-Type", "text/event-stream")
+	c.Response().Header().Set("Cache-Control", "no-cache")
+	c.Response().Header().Set("Connection", "keep-alive")
+	res := fmt.Sprintf("retry: 30000\ndata: %s\n\n", string(ret))
+	return c.String(200, res)
+}
+
+// 删除事件
+func dropEventView(c echo.Context) error {
+	w := event.New(rc)
+	err := w.DropMessages(getUser(c), c.Param("id"))
+	if err != nil {
+		return err
+	}
+	return c.JSON(200, vars.ResOK())
 }

@@ -54,7 +54,7 @@ func New(c *db.Conn) wrap {
 	return wrap{c}
 }
 
-func (w wrap) hasUser(user string) (bool, error) {
+func (w wrap) HasUser(user string) (bool, error) {
 	return w.SIsMember(vars.UserIndex, user)
 }
 
@@ -64,7 +64,7 @@ func (w wrap) UpdateProfile(p Profile) error {
 	if !util.IsName(user) {
 		return errors.New("invalid name")
 	}
-	has, err := w.hasUser(user)
+	has, err := w.HasUser(user)
 	if err != nil {
 		return err
 	}
@@ -84,7 +84,7 @@ func (w wrap) UpdateProfile(p Profile) error {
 
 // 更新用户设置
 func (w wrap) UpdateSetting(user string, s Setting) error {
-	has, err := w.hasUser(user)
+	has, err := w.HasUser(user)
 	if err != nil {
 		return err
 	}

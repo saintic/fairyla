@@ -32,15 +32,15 @@ func getUser(c echo.Context) string {
 }
 
 // 从 name/id 中解析专辑ID
-func getAlbumID(user, name string) string {
-	if name == "" {
-		return name
+func getAlbumID(user, nameOrID string) string {
+	if nameOrID == "" {
+		return nameOrID
 	}
-	if strings.HasPrefix(name, vars.AlbumPre) {
+	if strings.HasPrefix(nameOrID, vars.AlbumPre) {
 		// name is id
-		return name
+		return nameOrID
 	} else {
-		return album.AlbumName2ID(user, name)
+		return album.AlbumName2ID(user, nameOrID)
 	}
 }
 

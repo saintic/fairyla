@@ -74,6 +74,7 @@ var precise = map[string]map[string]string{
 		"not found claim":          "未发现此认领专辑",
 		"cannot share to yourself": "不能分享给自己",
 		"already belong ta":        "已经属于ta",
+		"invalid classify":         "无效的classify参数",
 
 		// project message(too long)
 		"the number of albums exceeds the limit": "专辑数量限制",

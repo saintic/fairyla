@@ -46,13 +46,14 @@ export const mutations = {
 }
 
 export const actions = {
-    fetchConfig() {
+    fetchConfig(cb) {
         //get public config
         http.get('/config').then(function (res) {
             for (let k in res.data) {
                 mutations.commit(k, res.data[k])
             }
             actions.saveConfig2Local()
+            typeof cb === 'function' && cb()
         })
     },
     saveConfig2Local() {

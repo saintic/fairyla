@@ -59,18 +59,26 @@ export default {
                 }
             }
             // Add function buttons
-            let taBtns = [
-                /*
-                {
+            let taBtns = []
+            if (this.isLogin && this.user !== owner) {
+                taBtns.push({
                     name: '认领',
                     plain: true,
                     type: 'success',
                     click: () => {
-                        console.log('click ta')
+                        this.$http
+                            .post('/user/claim', { owner: owner, album: name })
+                            .then((res) => {
+                                this.$message.success({
+                                    message: '已申请，等待批准',
+                                    customClass: 'el-message--slim'
+                                })
+                                this.btns[0].name = '待确认'
+                                this.btns[0].disabled = true
+                            })
                     }
-                }
-                */
-            ]
+                })
+            }
             let claimBtns = []
             let homeBtns = [
                 {

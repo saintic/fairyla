@@ -25,6 +25,7 @@ import (
 	"sort"
 	"strings"
 
+	"fairyla/internal/user/event"
 	"fairyla/pkg/db"
 	"fairyla/pkg/util"
 	"fairyla/vars"
@@ -386,4 +387,37 @@ func (w wrap) ListClaimAlbums(owner string) (data []Album, err error) {
 		data = append(data, a)
 	}
 	return
+}
+
+func (w wrap) CreateClaim(by, to, albumID string) error {
+	has, err := w.HasUser(to)
+	if err != nil {
+		return err
+	}
+	if !has {
+		return errors.New("not found username")
+	}
+	a, err := w.GetAlbum(to, albumID)
+	if err != nil {
+		return err
+	}
+	exist, err := a.Exist(w.Conn)
+	if err != nil {
+		return err
+	}
+	if !exist {
+		return errors.New("invalid album param")
+	}
+	_, err = w.HSet(vars.GenClaimedKey(to), albumID, by)
+	if err != nil {
+		return err
+	}
+	tpl := fmt.Sprintf(
+		"您好，用户【%s】认领了您的专辑【%s】，希望共同维护，请及时处理。", by, a.Name,
+	)
+	m, _ := event.NewMessage(to, tpl, "notify")
+	m.Opt.Title = "专辑认领通知"
+	m.Opt.Theme = "info"
+	m.Opt.NotifyJump = "/album/" + a.Name
+	return m.Write(w.Conn)
 }
