@@ -73,8 +73,9 @@ var precise = map[string]map[string]string{
 		"invalid action param":     "无效的action参数",
 		"not found claim":          "未发现此认领专辑",
 		"cannot share to yourself": "不能分享给自己",
-		"already belong ta":        "已经属于ta",
+		"cannot claim your album":  "不能认领自己的专辑",
 		"invalid classify":         "无效的classify参数",
+		"pending for approval":     "等待审批",
 
 		// project message(too long)
 		"the number of albums exceeds the limit": "专辑数量限制",
@@ -88,5 +89,6 @@ var precise = map[string]map[string]string{
 var fuzzy = map[string]map[*regexp.Regexp]string{
 	"zh": {
 		regexp.MustCompile("(.*)connection refused"): "${1}连接拒绝",
+		regexp.MustCompile("already belong (.*)"):    "已经属于${1}",
 	},
 }

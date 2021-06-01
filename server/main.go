@@ -27,7 +27,7 @@ import (
 )
 
 // fairy server version
-const version = "0.1.0"
+const version = "0.1.0-beta"
 
 var (
 	v bool

@@ -35,15 +35,22 @@ import (
 
 // 专辑属性
 type Album struct {
-	ID          string   `json:"id"`    // 专辑ID，唯一性，索引，由User和Name而来
-	Name        string   `json:"name"`  // 专辑名称，不具备唯一性
-	Owner       string   `json:"owner"` // 所属用户
-	Ta          string   `json:"ta"`    // 认领用户
-	CTime       int64    `json:"ctime"`
-	Public      bool     `json:"public"`
-	Label       []string `json:"label"`
-	LatestFairy *Fairy   `json:"latest_fairy"` // 最近上传的fairy
-	SteadyFairy *Fairy   `json:"steady_fairy"` // 固定设置的fairy
+	ID     string   `json:"id"`    // 专辑ID，唯一性，索引，由User和Name而来
+	Name   string   `json:"name"`  // 专辑名称，不具备唯一性
+	Owner  string   `json:"owner"` // 所属用户
+	Ta     string   `json:"ta"`    // 认领用户
+	CTime  int64    `json:"ctime"`
+	Public bool     `json:"public"`
+	Label  []string `json:"label"`
+	// 专辑封面：自动设置为最近上传的或固定的fairy
+	LatestFairy *Fairy `json:"latest_fairy"`
+	SteadyFairy *Fairy `json:"steady_fairy"`
+	// 专辑额外配置项
+	Opt *AlbumOption `json:"opt"`
+}
+
+type AlbumOption struct {
+	ClaimingBy []string `json:"claiming_by"`
 }
 
 // 照片属性
@@ -83,7 +90,7 @@ func NewAlbum(owner, name string) (a *Album, err error) {
 	// Name在用户中唯一，即ID唯一
 	a = &Album{
 		ID: AlbumName2ID(owner, name), Owner: owner, Name: name, Public: true,
-		CTime: util.Now(),
+		CTime: util.Now(), Opt: &AlbumOption{},
 	}
 	return
 }
@@ -116,6 +123,13 @@ func (a *Album) Claim(rc *db.Conn, isRemove bool) (err error) {
 			_, err = rc.SRem(vars.GenClaimKey(a.Ta), a.ID)
 		} else {
 			_, err = rc.SAdd(vars.GenClaimKey(a.Ta), a.ID)
+			// 分享后发送通知
+			tpl := fmt.Sprintf(
+				"您好，用户【%s】已将专辑【%s】分享给您共同维护。", a.Owner, a.Name,
+			)
+			m, _ := event.NewMessage(a.Ta, tpl, "message")
+			m.Opt.Theme = "success"
+			m.Write(rc)
 		}
 	}
 	return
@@ -265,6 +279,9 @@ func (w wrap) GetAlbum(owner, albumID string) (a Album, err error) {
 	if err != nil {
 		return
 	}
+	if a.Opt == nil {
+		a.Opt = &AlbumOption{}
+	}
 	return
 }
 
@@ -380,16 +397,18 @@ func (w wrap) ListClaimAlbums(owner string) (data []Album, err error) {
 	}
 	for _, albumID := range albumIDs {
 		a, e := w.GetAlbum(AlbumID2User(albumID), albumID)
-		if e != nil {
-			err = e
-			return
+		if e == nil {
+			data = append(data, a)
 		}
-		data = append(data, a)
 	}
 	return
 }
 
+// 认领他人专辑，by是认领者，to、albumID分别是专辑属主和ID
 func (w wrap) CreateClaim(by, to, albumID string) error {
+	if by == to {
+		return errors.New("cannot claim your album")
+	}
 	has, err := w.HasUser(to)
 	if err != nil {
 		return err
@@ -408,12 +427,21 @@ func (w wrap) CreateClaim(by, to, albumID string) error {
 	if !exist {
 		return errors.New("invalid album param")
 	}
-	_, err = w.HSet(vars.GenClaimedKey(to), albumID, by)
+	if a.Ta != "" && a.Ta == by {
+		return errors.New("already belong you")
+	}
+	bies := a.Opt.ClaimingBy
+	if gtc.StrInSlice(by, bies) {
+		return errors.New("pending for approval")
+	}
+	bies = append(bies, by)
+	a.Opt.ClaimingBy = bies
+	err = w.WriteAlbum(&a)
 	if err != nil {
 		return err
 	}
 	tpl := fmt.Sprintf(
-		"您好，用户【%s】认领了您的专辑【%s】，希望共同维护，请及时处理。", by, a.Name,
+		"您好，用户【%s】认领了您的专辑【%s】，希望共同维护，点此处理。", by, a.Name,
 	)
 	m, _ := event.NewMessage(to, tpl, "notify")
 	m.Opt.Title = "专辑认领通知"

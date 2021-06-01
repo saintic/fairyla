@@ -75,6 +75,7 @@ func loginRequired(next echo.HandlerFunc) echo.HandlerFunc {
 			}
 			return echo.NewHTTPError(400, err.Error())
 		}
+		// login successfully
 		c.Set("user", user)
 		return next(c)
 	}

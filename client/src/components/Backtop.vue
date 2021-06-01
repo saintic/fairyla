@@ -100,8 +100,8 @@ export default {
 .back_to_top {
     position: fixed;
     z-index: 99999;
-    bottom: 2rem;
-    right: 1.5rem;
+    bottom: 2.5rem;
+    right: 1.8rem;
     background-color: #fff;
     color: #409eff;
     border-radius: 50%;

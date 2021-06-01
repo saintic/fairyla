@@ -44,19 +44,9 @@ export default {
                 try {
                     let data = JSON.parse(event.data)
                     this.handleEvent(data)
-                    //es.close()
                 } catch (e) {
                     console.error(e)
                 }
-            })
-            es.addEventListener('error', (event) => {
-                if (event.readyState == EventSource.CLOSED) {
-                    console.log('event was closed')
-                }
-            })
-            es.addEventListener('close', (event) => {
-                console.log(event.type)
-                es.close()
             })
         },
         handleEvent(data) {
@@ -121,10 +111,9 @@ export default {
             })
         },
         deleteEvent(id) {
-            console.log('delete', id)
             this.$http.delete(`/user/event/${id}`).then(() => {
                 this.$message.success({
-                    message: '事件已读，已经删除！',
+                    message: '事件已标识为已读',
                     customClass: 'el-message--slim'
                 })
             })

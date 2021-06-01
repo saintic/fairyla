@@ -1,5 +1,7 @@
 <template>
-    <Fairy :album="album" :fairies="fairies" :urls="urls" :btns="btns" />
+    <div>
+        <Fairy :album="album" :fairies="fairies" :urls="urls" :btns="btns" />
+    </div>
 </template>
 
 <script>
@@ -15,7 +17,12 @@ export default {
         source: String // 来源于：Ta、Home(default)、Claim
     },
     data() {
-        return { album: {}, fairies: [], urls: [], btns: [] }
+        return {
+            album: {},
+            fairies: [],
+            urls: [],
+            btns: {}
+        }
     },
     computed: {
         statusText() {
@@ -40,10 +47,8 @@ export default {
         let owner = this.$route.params.owner, // 来源于Ta、Claim时的专辑属主
             name = this.$route.params.name, // 专辑名
             url = `/user/album/${name}?fairy=true`
-        if (this.isTa) url = `/album?fairy=true&user=${owner}&album=${name}`
-        if (this.isClaim) {
-            url = `/user/claim?fairy=true&owner=${owner}&album=${name}`
-        }
+        if (this.isTa) url = `/album/${owner}/${name}?fairy=true`
+        if (this.isClaim) url = `/user/claim/${owner}/${name}?fairy=true`
         if (!name || ((this.isTa || this.isClaim) && !owner)) {
             this.$router.go(-1)
         }
@@ -59,87 +64,82 @@ export default {
                 }
             }
             // Add function buttons
-            let taBtns = []
+            let taBtns = this.rendeTaBtns(owner, name),
+                claimBtns = this.rendeClaimBtns(owner, name),
+                homeBtns = this.rendeHomeBtns(name)
+            if (this.isLogin) {
+                if (this.source === TaLabel) {
+                    this.btns = taBtns
+                } else if (this.source === ClaimLabel) {
+                    this.btns = claimBtns
+                } else {
+                    this.btns = homeBtns
+                }
+            }
+        })
+    },
+    methods: {
+        rendeTaBtns(owner, albumName) {
+            let taBtns = {}
             if (this.isLogin && this.user !== owner) {
-                taBtns.push({
+                taBtns['taClaim'] = {
                     name: '认领',
                     plain: true,
                     type: 'success',
                     click: () => {
                         this.$http
-                            .post('/user/claim', { owner: owner, album: name })
-                            .then((res) => {
+                            .post('/user/claim', { owner, album: albumName })
+                            .then(() => {
                                 this.$message.success({
                                     message: '已申请，等待批准',
                                     customClass: 'el-message--slim'
                                 })
-                                this.btns[0].name = '待确认'
-                                this.btns[0].disabled = true
+                                this.btns['taClaim'].name = '待批准'
+                                this.btns['taClaim'].disabled = true
                             })
                     }
-                })
+                }
+                let by = this.album.opt.claiming_by
+                if (Array.isArray(by) && by.includes(this.user)) {
+                    taBtns['taClaim'].name = '待批准'
+                    taBtns['taClaim'].disabled = true
+                }
+                if (this.album.ta && this.album.ta === this.user) {
+                    taBtns['taClaim'].name = '已认领'
+                    taBtns['taClaim'].disabled = true
+                }
             }
-            let claimBtns = []
-            let homeBtns = [
-                {
+            return taBtns
+        },
+        rendeClaimBtns(owner, albumName) {
+            let claimBtns = {}
+            return claimBtns
+        },
+        rendeHomeBtns(name) {
+            let homeBtns = {
+                Share: {
                     name: this.shareText,
                     type: 'success',
-                    click: () => {
-                        this.$prompt(
-                            '请输入分享给Ta的用户名（覆盖已有分享）',
-                            '温馨提示',
-                            {
-                                confirmButtonText: '确定',
-                                cancelButtonText: '取消',
-                                customClass: 'el-message-box--slim'
-                            }
-                        ).then(({ value }) => {
-                            let ta = value
-                            if (!ta) {
-                                this.$message.error({
-                                    message: '请输入用户名',
-                                    customClass: 'el-message--slim'
-                                })
-                                return false
-                            }
-                            if (ta === this.user) {
-                                this.$message.error({
-                                    message: '不能分享给自己',
-                                    customClass: 'el-message--slim'
-                                })
-                                return false
-                            }
-                            this.$http
-                                .put(`/user/album/${name}?action=share`, { ta })
-                                .then((res) => {
-                                    this.$message.success({
-                                        message: `专辑已分享给${ta}`,
-                                        customClass: 'el-message--slim'
-                                    })
-                                    this.album.ta = ta
-                                    this.btns[0].name = this.shareText
-                                })
-                        })
-                    }
+                    click: this.shareTo
                 },
-                {
+                Status: {
                     name: this.statusText,
                     type: 'warning',
                     click: () => {
                         this.$http
                             .put(`/user/album/${name}?action=status`)
-                            .then((res) => {
+                            .then(() => {
                                 this.$message.success({
                                     message: `专辑已 <b>${this.statusText}</b>`,
                                     dangerouslyUseHTMLString: true,
                                     customClass: 'el-message--slim'
                                 })
                                 this.album.public = !this.album.public
-                                this.btns[1].name = this.statusText
+                                this.btns['Status'].name = this.statusText
                             })
                     }
                 },
-                {
+                Delete: {
                     name: '删除',
                     type: 'danger',
                     icon: 'el-icon-delete',
@@ -156,7 +156,7 @@ export default {
                         ).then(() => {
                             this.$http
                                 .delete(`/user/album/${name}`)
-                                .then((res) => {
+                                .then(() => {
                                     this.$message.success({
                                         message: '已删除专辑',
                                         customClass: 'el-message--slim'
@@ -166,17 +166,60 @@ export default {
                         })
                     }
                 }
-            ]
-            if (this.isLogin) {
-                if (this.source === TaLabel) {
-                    this.btns = taBtns
-                } else if (this.source === ClaimLabel) {
-                    this.btns = claimBtns
-                } else {
-                    this.btns = homeBtns
+            }
+            let by = this.album.opt.claiming_by
+            if (Array.isArray(by) && by.length > 0) {
+                homeBtns['Share']['badge'] = {
+                    dot: true,
+                    type: 'success'
                 }
             }
-        })
+            return homeBtns
+        },
+        shareTo() {
+            let msg = '请输入分享给Ta的用户名（覆盖已有分享）'
+            let by = this.album.opt.claiming_by
+            if (Array.isArray(by) && by.length > 0) {
+                let plus = '<br>此专辑有认领者：' + by.join(', ')
+                msg += plus
+            }
+            this.$prompt(msg, '温馨提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                dangerouslyUseHTMLString: true,
+                customClass: 'el-message-box--slim',
+                inputPlaceholder: '分享给Ta（或在认领者中选择）'
+            }).then(({ value }) => {
+                let ta = value
+                if (!ta) {
+                    this.$message.error({
+                        message: '请输入用户名',
+                        customClass: 'el-message--slim'
+                    })
+                    return false
+                }
+                if (ta === this.user) {
+                    this.$message.error({
+                        message: '不能分享给自己',
+                        customClass: 'el-message--slim'
+                    })
+                    return false
+                }
+                let name = this.album.name
+                this.$http
+                    .put(`/user/album/${name}?action=share`, { ta })
+                    .then(() => {
+                        this.$message.success({
+                            message: `专辑已分享给${ta}`,
+                            customClass: 'el-message--slim'
+                        })
+                        this.album.ta = ta
+                        this.album.opt.claiming_by = []
+                        this.btns['Share'].name = this.shareText
+                        this.btns['Share'].badge = null
+                    })
+            })
+        }
     }
 }
 </script>

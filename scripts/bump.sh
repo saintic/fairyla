@@ -21,7 +21,7 @@ VERSION=$(grep "const version" ${SERVER_DIR}/main.go | tr -d '"' | awk '{print $
 BUMP_DIR=${BASE_DIR}/.tmp-${VERSION}
 
 usage() {
-    echo $"Usage: $0 {function}"
+    echo $"Usage: $0 docker|pack|release"
 }
 
 tarpkg() {

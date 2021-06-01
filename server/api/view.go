@@ -46,6 +46,14 @@ func customHTTPErrorHandler(err error, c echo.Context) {
 	c.JSON(code, vars.ResErrLocale(getLocale(c), msg))
 }
 
+func readyView(c echo.Context) error {
+	ping, err := rc.Ping()
+	if err != nil || !ping {
+		return c.JSONBlob(503, []byte(`"err"`))
+	}
+	return c.JSONBlob(200, []byte(`"ok"`))
+}
+
 // 注册
 func signUpView(c echo.Context) error {
 	username := c.FormValue("username")
@@ -88,33 +96,55 @@ func configView(c echo.Context) error {
 	return c.JSON(200, vars.NewResData(data))
 }
 
-// 列出所有公共专辑或获取某个公共专辑属性及其下照片
-func pubAlbumView(c echo.Context) error {
+// 列出所有公共专辑
+func listPublicAlbumView(c echo.Context) error {
 	w := album.New(rc)
-	if gtc.IsTrue(c.QueryParam("fairy")) {
-		user := c.QueryParam("user")
-		albumID := getAlbumID(user, c.QueryParam("album"))
-		if user == "" || albumID == "" {
-			return errors.New("invalid param")
-		}
-		if user != album.AlbumID2User(albumID) {
-			return errors.New("album id does not match user")
-		}
-		af, err := w.GetAlbumFairies(user, albumID)
+	data, err := w.ListPublicAlbums()
+	if err != nil {
+		return err
+	}
+	return c.JSON(200, vars.NewResData(data))
+}
+
+// 获取某个公共专辑信息及其下照片
+func getPublicAlbumView(c echo.Context) error {
+	w := album.New(rc)
+	owner := c.Param("owner")
+	albumID := getAlbumID(owner, c.Param("id"))
+	withFairy := gtc.IsTrue(c.QueryParam("fairy"))
+	if owner == "" || albumID == "" {
+		return errors.New("invalid param")
+	}
+	if owner != album.AlbumID2User(albumID) {
+		return errors.New("album id does not match user")
+	}
+	is404 := false
+	var ret interface{}
+	if withFairy {
+		af, err := w.GetAlbumFairies(owner, albumID)
 		if err != nil {
 			return err
 		}
 		if af.Public {
-			return c.JSON(200, vars.NewResData(af))
+			ret = af
 		} else {
-			return c.JSON(404, vars.ResErr("not found"))
+			is404 = true
 		}
 	} else {
-		data, err := w.ListPublicAlbums()
+		a, err := w.GetAlbum(owner, albumID)
 		if err != nil {
 			return err
 		}
-		return c.JSON(200, vars.NewResData(data))
+		if a.Public {
+			ret = a
+		} else {
+			is404 = true
+		}
+	}
+	if is404 {
+		return c.JSON(404, vars.ResErr("not found"))
+	} else {
+		return c.JSON(200, vars.NewResData(ret))
 	}
 }
 
@@ -261,12 +291,17 @@ func updateAlbumView(c echo.Context) error {
 		if a.Ta != "" && a.Ta == ta {
 			return errors.New("already belong ta")
 		}
-		err = (&a).Claim(rc, true)
-		if err != nil {
-			return err
+		// 先删除当前
+		if a.Ta != "" {
+			err = (&a).Claim(rc, true)
+			if err != nil {
+				return err
+			}
 		}
 		a.Ta = ta
 		hookWriteShare = true
+		// 入库前，清空认领申请列表
+		a.Opt.ClaimingBy = []string{}
 	default:
 		return errors.New("invalid action param")
 	}
@@ -274,6 +309,7 @@ func updateAlbumView(c echo.Context) error {
 	if err != nil {
 		return err
 	}
+	// 专辑数据入库后的后续钩子处理
 	if hookWriteShare {
 		err = (&a).Claim(rc, false)
 		if err != nil {
@@ -332,19 +368,22 @@ func getAlbumView(c echo.Context) error {
 	w := album.New(rc)
 	user := getUser(c)
 	albumID := autoAlbumID(c)
-	if gtc.IsTrue(c.QueryParam("fairy")) {
+	withFairy := gtc.IsTrue(c.QueryParam("fairy"))
+	var ret interface{}
+	if withFairy {
 		data, err := w.GetAlbumFairies(user, albumID)
 		if err != nil {
 			return err
 		}
-		return c.JSON(200, vars.NewResData(data))
+		ret = data
 	} else {
 		data, err := w.GetAlbum(user, albumID)
 		if err != nil {
 			return err
 		}
-		return c.JSON(200, vars.NewResData(data))
+		ret = data
 	}
+	return c.JSON(200, vars.NewResData(ret))
 }
 
 // 仅获取专辑下所有照片信息
@@ -486,40 +525,6 @@ func dropFairyView(c echo.Context) error {
  * 状态：已登录
  */
 
-// 获取用户认领专辑信息
-func listClaimView(c echo.Context) error {
-	w := album.New(rc)
-	if gtc.IsTrue(c.QueryParam("fairy")) {
-		user := getUser(c)
-		owner := c.QueryParam("owner")
-		albumID := getAlbumID(owner, c.QueryParam("album"))
-		if owner == "" || albumID == "" {
-			return errors.New("invalid param")
-		}
-		if owner != album.AlbumID2User(albumID) {
-			return errors.New("album id does not match user")
-		}
-		has, err := w.HasClaim(user, albumID)
-		if err != nil {
-			return err
-		}
-		if !has {
-			return errors.New("not found claim")
-		}
-		data, err := w.GetAlbumFairies(owner, albumID)
-		if err != nil {
-			return err
-		}
-		return c.JSON(200, vars.NewResData(data))
-	} else {
-		data, err := w.ListClaimAlbums(getUser(c))
-		if err != nil {
-			return err
-		}
-		return c.JSON(200, vars.NewResData(data))
-	}
-}
-
 // 认领其他用户专辑（需由所属者确认方可领取成功）
 func createClaimView(c echo.Context) error {
 	user := getUser(c)
@@ -529,7 +534,7 @@ func createClaimView(c echo.Context) error {
 		return errors.New("invalid param")
 	}
 	if user == owner {
-		return errors.New("already belong ta")
+		return errors.New("cannot claim your album")
 	}
 	w := album.New(rc)
 	err := w.CreateClaim(user, owner, getAlbumID(owner, id))
@@ -537,6 +542,53 @@ func createClaimView(c echo.Context) error {
 		return err
 	}
 	return c.JSON(200, vars.ResOK())
+}
+
+// 获取用户认领专辑列表
+func listClaimView(c echo.Context) error {
+	w := album.New(rc)
+	data, err := w.ListClaimAlbums(getUser(c))
+	if err != nil {
+		return err
+	}
+	return c.JSON(200, vars.NewResData(data))
+}
+
+// 获取用户认领的专辑数据及其下照片
+func getClaimView(c echo.Context) error {
+	w := album.New(rc)
+	user := getUser(c)
+	owner := c.Param("owner")
+	albumID := getAlbumID(owner, c.Param("id"))
+	withFairy := gtc.IsTrue(c.QueryParam("fairy"))
+	if owner == "" || albumID == "" {
+		return errors.New("invalid param")
+	}
+	if owner != album.AlbumID2User(albumID) {
+		return errors.New("album id does not match user")
+	}
+	has, err := w.HasClaim(user, albumID)
+	if err != nil {
+		return err
+	}
+	if !has {
+		return errors.New("not found claim")
+	}
+	var ret interface{}
+	if withFairy {
+		af, err := w.GetAlbumFairies(owner, albumID)
+		if err != nil {
+			return err
+		}
+		ret = af
+	} else {
+		a, err := w.GetAlbum(owner, albumID)
+		if err != nil {
+			return err
+		}
+		ret = a
+	}
+	return c.JSON(200, vars.NewResData(ret))
 }
 
 /*

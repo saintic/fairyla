@@ -42,11 +42,6 @@ var (
 	GenClaimKey = func(user string) string {
 		return fmt.Sprintf("claim:%s", user)
 	}
-	// 用户收到的认领通知
-	// :tmp:claimed:<User> Hash类型 Key是用户专辑album_id Value是申请者，string
-	GenClaimedKey = func(user string) string {
-		return fmt.Sprintf("tmp:claimed:%s", user)
-	}
 	// :tmp:event:<User> Hash类型 Key是event_id Value是事件内容，JSON格式
 	GenEventKey = func(user string) string {
 		return fmt.Sprintf("tmp:event:%s", user)

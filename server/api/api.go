@@ -43,15 +43,10 @@ func StartApi(config *sys.Setting) {
 	e.Static("/", cfg.Dir)
 
 	api := e.Group("/api")
-	api.Match([]string{"GET", "HEAD"}, "/ready", func(c echo.Context) error {
-		ping, err := rc.Ping()
-		if err != nil || !ping {
-			return c.JSONBlob(503, []byte(`"err"`))
-		}
-		return c.JSONBlob(200, []byte(`"ok"`))
-	})
+	api.Match([]string{"GET", "HEAD"}, "/ready", readyView)
 	api.GET("/config", configView)
-	api.GET("/album", pubAlbumView)
+	api.GET("/album", listPublicAlbumView)
+	api.GET("/album/:owner/:id", getPublicAlbumView)
 
 	auth := api.Group("/auth")
 	auth.POST("/signup", signUpView)
@@ -73,6 +68,7 @@ func StartApi(config *sys.Setting) {
 
 	user.POST("/claim", createClaimView)
 	user.GET("/claim", listClaimView)
+	user.GET("/claim/:owner/:id", getClaimView)
 
 	user.POST("/event", createEventView)
 	user.GET("/event", listEventView)

@@ -8,18 +8,12 @@
                 <div class="post-info">
                     &nbsp;&nbsp; 所属：{{ album.owner }}
                 </div>
-                <div class="post-info" v-if="btns.length > 0">
-                    <el-button
-                        v-for="(btn, index) in btns"
+                <div class="post-info" v-if="Object.keys(btns).length > 0">
+                    <fairy-btn
+                        v-for="(btn, index) in Object.values(btns)"
                         :key="index"
-                        size="mini"
-                        :type="btn.type || 'primary'"
-                        :plain="btn.plain"
-                        :disabled="btn.disabled"
-                        :icon="btn.icon"
-                        @click="btn.click"
-                        >{{ btn.name }}</el-button
-                    >
+                        :btn="btn"
+                    ></fairy-btn>
                 </div>
                 <div class="post-main" v-for="f in fairies" :key="f.id">
                     <video
@@ -79,6 +73,7 @@
 import { defineProps } from 'vue'
 import { isObject } from '@/libs/util.js'
 import Backtop from './Backtop.vue'
+import FairyBtn from './FairyBtn.vue'
 
 defineProps({
     album: {
@@ -101,10 +96,10 @@ defineProps({
     },
     urls: Array,
     btns: {
-        type: Array,
+        type: Object,
         validator: (value) => {
-            if (!Array.isArray(value)) return false
-            for (let v of value) {
+            if (!isObject(value)) return false
+            for (let v of Object.values(value)) {
                 if (!isObject(v)) return false
             }
             return true
