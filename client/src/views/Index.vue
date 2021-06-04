@@ -102,12 +102,28 @@
 
 <script>
 import { mapState } from '@/libs/store.js'
-import { IndexSlogan } from '@/libs/vars.js'
+import { IndexDefaultSlogan } from '@/libs/vars.js'
 import Welcome from '@/components/Welcome.vue'
 
 export default {
     name: 'Index',
     components: { Welcome },
+    computed: mapState({
+        isLogin: 'isLogin',
+        user: 'user',
+        headers: (state) => ({ Authorization: 'Bearer ' + state.token }),
+        slogan(state) {
+            let ui = state.userinfo || {}
+            return ui.slogan || state.slogan || IndexDefaultSlogan
+        },
+        upLimit(state) {
+            return state.upload_limit || 10
+        },
+        upTip(state) {
+            let limit = state.upload_limit || 10
+            return `支持上传Web通用图片和视频（不超过${limit}MB）`
+        }
+    }),
     data() {
         return {
             af: {
@@ -130,21 +146,6 @@ export default {
             upIcon: 'el-icon-upload'
         }
     },
-    computed: mapState({
-        isLogin: 'isLogin',
-        user: 'user',
-        headers: (state) => ({ Authorization: 'Bearer ' + state.token }),
-        slogan: (state) => {
-            return state.slogan || IndexSlogan
-        },
-        upLimit: (state) => {
-            return state.upload_limit || 10
-        },
-        upTip: (state) => {
-            let limit = state.upload_limit || 10
-            return `支持上传Web通用图片和视频（不超过${limit}MB）`
-        }
-    }),
     methods: {
         submitForm() {
             this.$refs['fairy'].validate((valid) => {

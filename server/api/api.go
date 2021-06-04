@@ -53,6 +53,11 @@ func StartApi(config *sys.Setting) {
 	auth.POST("/signin", signInView)
 
 	user := api.Group("/user", loginRequired) // 用户接口，需登录
+
+	user.GET("/", getUserView)
+	user.PUT("/profile", updateUserProfileView)
+	user.PUT("/setting", updateUserSettingView)
+
 	user.POST("/upload", uploadView)
 
 	user.POST("/album", createAlbumView)
@@ -70,7 +75,7 @@ func StartApi(config *sys.Setting) {
 	user.GET("/claim", listClaimView)
 	user.GET("/claim/:owner/:id", getClaimView)
 
-	user.POST("/event", createEventView)
+	user.POST("/_event", createEventView)
 	user.GET("/event", listEventView)
 	user.DELETE("/event/:id", dropEventView)
 

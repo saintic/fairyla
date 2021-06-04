@@ -16,7 +16,7 @@
 
 import { createRouter, createWebHashHistory } from 'vue-router'
 import Index from '@/views/Index.vue'
-import { mutations, actions } from './store.js'
+import { mutations, actions, state } from './store.js'
 import { TitleSep, TitleSuffix, TaLabel, ClaimLabel } from './vars.js'
 
 const routes = [
@@ -43,6 +43,10 @@ const routes = [
         redirect() {
             mutations.clearLogin()
             actions.removeConfig()
+            if (state._sse) {
+                state._sse.close()
+                mutations.commit('_sse', null)
+            }
             return '/'
         },
         meta: { requiresAuth: true }
@@ -66,16 +70,10 @@ const routes = [
         component: () => import('@/views/home/Home.vue'),
         meta: { requiresAuth: true, title: '个人中心' },
         children: [
-            /*
             {
-                path: 'profile',
-                component: () => import('@/views/home/UserProfile.vue')
+                path: 'self',
+                component: () => import('@/views/home/UserSelf.vue')
             },
-            {
-                path: 'setting',
-                component: () => import('@/views/home/UserSetting.vue')
-            },
-            */
             {
                 path: 'album',
                 name: 'UserAlbum',

@@ -21,7 +21,7 @@ import (
 	"errors"
 	"fmt"
 
-	"fairyla/internal/user"
+	uif "fairyla/internal/user"
 	"fairyla/pkg/db"
 	"fairyla/pkg/util"
 	"fairyla/vars"
@@ -78,7 +78,7 @@ func (m *Message) Write(rc *db.Conn) error {
 		return errors.New("invalid param")
 	}
 	// check owner
-	w := user.New(rc)
+	w := uif.New(rc)
 	has, err := w.HasUser(m.Owner)
 	if err != nil {
 		return err

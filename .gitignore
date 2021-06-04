@@ -125,4 +125,5 @@ server/NOTICE
 .DS_Store
 nohup.out
 release/
+dist/
 .tmp-*

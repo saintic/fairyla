@@ -91,7 +91,10 @@ export default {
                         })
                         .then((res) => {
                             this.logining = false
-                            this.$message.success('登录成功')
+                            this.$message.success({
+                                message: '登录成功',
+                                customClass: 'el-message--slim'
+                            })
                             this.$store.mutations.setLogin(
                                 this.loginForm.username,
                                 res.data.token

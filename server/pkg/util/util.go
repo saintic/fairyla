@@ -29,6 +29,7 @@ import (
 
 var (
 	namePat = regexp.MustCompile(`^[a-z][0-9a-z\_\-]{1,31}$`)
+	mailPat = regexp.MustCompile(`\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*`)
 )
 
 func IsName(name string) bool {
@@ -70,4 +71,8 @@ func DeleteSlice(slice []string, val string) (new []string) {
 		}
 	}
 	return new
+}
+
+func IsEmail(email string) bool {
+	return mailPat.MatchString(email)
 }

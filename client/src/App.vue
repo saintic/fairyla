@@ -24,6 +24,16 @@ export default {
             event: {}
         }
     },
+    computed: {
+        jwt() {
+            return this.$store.state.token
+        }
+    },
+    watch: {
+        jwt() {
+            this.getEvent()
+        }
+    },
     created() {
         this.$store.actions.fetchConfig(this.getEvent())
         window.addEventListener('beforeunload', (e) => {
@@ -35,11 +45,14 @@ export default {
             return new Promise((resolve) => setTimeout(resolve, ms))
         },
         getEvent() {
-            if (!this.$store.state.isLogin) {
+            let token = this.$store.state.token
+            if (!token) return false
+            if (!this.$store.state.isLogin || this.$store.state._sse) {
                 return false
             }
-            let url = '/api/user/event?jwt=' + this.$store.state.token
-            let es = new EventSource(url)
+            let url = `/api/user/event?jwt=${token}`,
+                es = new EventSource(url)
+            this.$store.state._sse = es
             es.addEventListener('message', (event) => {
                 try {
                     let data = JSON.parse(event.data)

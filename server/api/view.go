@@ -28,8 +28,10 @@ import (
 	"time"
 
 	"fairyla/internal/album"
+	uif "fairyla/internal/user"
 	"fairyla/internal/user/auth"
 	"fairyla/internal/user/event"
+	"fairyla/pkg/util"
 	"fairyla/vars"
 
 	"github.com/labstack/echo/v4"
@@ -58,7 +60,11 @@ func readyView(c echo.Context) error {
 func signUpView(c echo.Context) error {
 	username := c.FormValue("username")
 	password := c.FormValue("password")
-	err := auth.Register(rc, username, password)
+	email := c.FormValue("email")
+	p := uif.NewProfile(username)
+	s := uif.NewSetting()
+	p.Email = email
+	err := auth.Register(rc, username, password, p, s)
 	if err != nil {
 		return err
 	}
@@ -91,6 +97,10 @@ func configView(c echo.Context) error {
 	user, err := checkJWT(c)
 	if err == nil {
 		data["isLogin"] = true
+		userinfo, err := uif.New(rc).UserData(user)
+		if err == nil {
+			data["userinfo"] = userinfo
+		}
 	}
 	data["user"] = user
 	return c.JSON(200, vars.NewResData(data))
@@ -149,8 +159,70 @@ func getPublicAlbumView(c echo.Context) error {
 }
 
 /*
- * 用户通用视图
+ * UserView 用户视图
+ *
+ * 状态：已登录
+ *
+ * - create、drop、update、get、list：增、删、改、查（单）、查（多）
  */
+
+func getUserView(c echo.Context) error {
+	w := uif.New(rc)
+	user := getUser(c)
+	data, err := w.UserData(user)
+	if err != nil {
+		return err
+	}
+	return c.JSON(200, vars.NewResData(data))
+}
+
+// 更新用户资料
+func updateUserProfileView(c echo.Context) error {
+	alias := c.FormValue("alias")
+	bio := c.FormValue("bio")
+	email := c.FormValue("email")
+	user := getUser(c)
+	w := uif.New(rc)
+	p, err := w.UserProfile(user)
+	if err != nil {
+		return err
+	}
+	if alias != "" {
+		p.Alias = alias
+	}
+	if bio != "" {
+		p.Bio = bio
+	}
+	if email != "" && util.IsEmail(email) {
+		p.Email = email
+	}
+	err = w.UpdateProfile(p)
+	if err != nil {
+		return err
+	}
+	return c.JSON(200, vars.NewResData(p))
+}
+
+// 更新用户设置
+func updateUserSettingView(c echo.Context) error {
+	adp := gtc.IsTrue(c.FormValue("album_default_public"))
+	slogan := c.FormValue("slogan")
+	user := getUser(c)
+	w := uif.New(rc)
+	s, err := w.UserSetting(user)
+	if err != nil {
+		return err
+	}
+	s.AlbumDefaultPublic = adp
+	if slogan != "" {
+		s.Slogan = slogan
+	}
+	err = w.UpdateSetting(user, s)
+	if err != nil {
+		return err
+	}
+	return c.JSON(200, vars.NewResData(s))
+}
 
 // 上传图片、视频
 func uploadView(c echo.Context) error {
@@ -226,8 +298,6 @@ func uploadView(c echo.Context) error {
  * AlbumView 专辑视图
  *
  * 状态：已登录
- *
- * - create、drop、update、get、list：增、删、改、查（单）、查（多）
  */
 
 // 创建专辑
@@ -238,6 +308,7 @@ func createAlbumView(c echo.Context) error {
 	if err != nil {
 		return err
 	}
+	a.FillStatus(rc)
 	has, err := a.Exist(rc)
 	if err != nil {
 		return err
@@ -267,8 +338,9 @@ func updateAlbumView(c echo.Context) error {
 	if err != nil {
 		return err
 	}
+	action := getParam(c, "action")
 	hookWriteShare := false
-	switch getParam(c, "action") {
+	switch action {
 	case "status":
 		pub := c.FormValue("public")
 		if pub == "" {
@@ -302,6 +374,24 @@ func updateAlbumView(c echo.Context) error {
 		hookWriteShare = true
 		// 入库前，清空认领申请列表
 		a.Opt.ClaimingBy = []string{}
+	case "label", "add_label", "remove_label":
+		label := c.FormValue("label")
+		label = strings.TrimSuffix(strings.TrimSpace(label), ",")
+		if label == "" {
+			return errors.New("invalid param")
+		}
+		labels := strings.Split(label, ",")
+		if action == "add_label" || action == "remove_label" {
+			for _, l := range labels {
+				if action == "add_label" {
+					a.AddLabel(l)
+				} else {
+					a.RemoveLabel(l)
+				}
+			}
+		} else {
+			a.Label = labels
+		}
 	default:
 		return errors.New("invalid action param")
 	}
@@ -436,6 +526,7 @@ func createFairyView(c echo.Context) error {
 		if err != nil {
 			return err
 		}
+		a.FillStatus(rc)
 		if exist {
 			da, err := w.GetAlbum(albumOwner, albumID)
 			if err != nil {

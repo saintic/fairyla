@@ -47,6 +47,8 @@ spec:
               path: /api/config
             initialDelaySeconds: 10
             timeoutSeconds: 5
+          securityContext:
+            readOnlyRootFilesystem: true
 ---
 apiVersion: v1
 kind: Service

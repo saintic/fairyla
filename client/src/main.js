@@ -48,6 +48,9 @@ import {
     ElResult,
     ElSelect,
     ElSubmenu,
+    ElSwitch,
+    ElTabs,
+    ElTabPane,
     ElTag,
     ElTooltip,
     ElUpload,
@@ -84,6 +87,9 @@ const components = [
     ElResult,
     ElSelect,
     ElSubmenu,
+    ElSwitch,
+    ElTabs,
+    ElTabPane,
     ElTag,
     ElTooltip,
     ElUpload
@@ -106,5 +112,5 @@ app.config.globalProperties.$http = http
 app.config.globalProperties.$store = store
 app.config.globalProperties.$ELEMENT = { size: 'mini' }
 let vm = app.mount('#app')
-//window.app = app
-//window.vm = vm
+window.app = app
+window.vm = vm

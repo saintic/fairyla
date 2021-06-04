@@ -25,6 +25,7 @@ import (
 	"sort"
 	"strings"
 
+	uif "fairyla/internal/user"
 	"fairyla/internal/user/event"
 	"fairyla/pkg/db"
 	"fairyla/pkg/util"
@@ -36,7 +37,7 @@ import (
 // 专辑属性
 type Album struct {
 	ID     string   `json:"id"`    // 专辑ID，唯一性，索引，由User和Name而来
-	Name   string   `json:"name"`  // 专辑名称，不具备唯一性
+	Name   string   `json:"name"`  // 专辑名称，不具备唯一性，不可更改
 	Owner  string   `json:"owner"` // 所属用户
 	Ta     string   `json:"ta"`    // 认领用户
 	CTime  int64    `json:"ctime"`
@@ -96,11 +97,15 @@ func NewAlbum(owner, name string) (a *Album, err error) {
 }
 
 func (a *Album) AddLabel(label string) {
-	a.Label = append(a.Label, label)
+	if label != "" {
+		a.Label = append(a.Label, label)
+	}
 }
 
 func (a *Album) RemoveLabel(label string) {
-	a.Label = util.DeleteSlice(a.Label, label)
+	if label != "" {
+		a.Label = util.DeleteSlice(a.Label, label)
+	}
 }
 
 func (a *Album) SetLatest(f *Fairy) {
@@ -133,6 +138,16 @@ func (a *Album) Claim(rc *db.Conn, isRemove bool) (err error) {
 		}
 	}
 	return
+}
+
+func (a *Album) FillStatus(rc *db.Conn) error {
+	w := uif.New(rc)
+	s, err := w.UserSetting(a.Owner)
+	if err != nil {
+		return err
+	}
+	a.Public = s.AlbumDefaultPublic
+	return nil
 }
 
 func NewFairy(creator, albumID, src, desc string) (f *Fairy, err error) {

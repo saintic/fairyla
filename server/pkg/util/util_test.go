@@ -62,4 +62,17 @@ func TestUtil(t *testing.T) {
 	if strings.Join(st4, "") != "abc" {
 		t.Fatal("Delete slice error(4)")
 	}
+
+	okMails := []string{"a@b.com", "x-y@z.io", "hello.world@linux.org"}
+	errMails := []string{"a@b.", "xx.com", "123456"}
+	for _, v := range okMails {
+		if IsEmail(v) != true {
+			t.Fatalf("IsEmail should be true: %s\n", v)
+		}
+	}
+	for _, v := range errMails {
+		if IsEmail(v) == true {
+			t.Fatalf("IsEmail should be false: %s\n", v)
+		}
+	}
 }

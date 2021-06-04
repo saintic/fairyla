@@ -15,21 +15,15 @@
                     <i class="saintic-icon saintic-icon-goddess"></i> Ta是
                 </el-menu-item>
                 <el-submenu v-if="isLogin">
-                    <template #title>{{ user }}</template>
+                    <template #title>{{ alias || user }}</template>
                     <el-menu-item index="/" class="back-home">
                         <i class="saintic-icon saintic-icon-home"></i>
                         首页上传
                     </el-menu-item>
-                    <!--
-                    <el-menu-item index="/my/profile">
-                        <i class="saintic-icon saintic-icon-user"></i>
-                        个人资料
-                    </el-menu-item>
-                    <el-menu-item index="/my/setting">
+                    <el-menu-item index="/my/self">
                         <i class="saintic-icon saintic-icon-setting"></i>
-                        用户设置
+                        资料设置
                     </el-menu-item>
-                    -->
                     <el-menu-item index="/my/album">
                         <i class="saintic-icon saintic-icon-user-album"></i>
                         我的专辑
@@ -38,6 +32,7 @@
                         <i class="saintic-icon saintic-icon-album"></i>
                         共享专辑
                     </el-menu-item>
+                    <el-menu-item>-------------</el-menu-item>
                     <el-menu-item index="/logout">
                         <i class="saintic-icon saintic-icon-logoff"></i>
                         登出
@@ -67,7 +62,14 @@ export default {
             avatar: defaultAvatar
         }
     },
-    computed: mapState(['isLogin', 'user'])
+    computed: {
+        ...mapState(['isLogin', 'user']),
+        ...mapState({
+            alias(state) {
+                return state.userinfo.alias
+            }
+        })
+    }
 }
 </script>
 

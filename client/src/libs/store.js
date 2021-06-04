@@ -42,6 +42,13 @@ export const mutations = {
     },
     commit(key, value) {
         state[key] = value
+    },
+    commitNested(nested, key, value) {
+        if (state.hasOwnProperty(nested)) {
+            state[nested][key] = value
+        } else {
+            state[nested] = { [key]: value }
+        }
     }
 }
 
@@ -57,7 +64,13 @@ export const actions = {
         })
     },
     saveConfig2Local() {
-        setStorage({ ...state })
+        let s = {}
+        for (let k of Object.keys(state)) {
+            if (!k.startsWith('_') && !k.startsWith('$')) {
+                s[k] = state[k]
+            }
+        }
+        setStorage(s)
     },
     removeConfig() {
         clearStorage()

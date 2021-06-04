@@ -27,6 +27,14 @@
                 >
                 </el-input>
             </el-form-item>
+            <el-form-item prop="email">
+                <el-input
+                    type="email"
+                    v-model="registerForm.email"
+                    autocomplete="off"
+                    placeholder="用户邮箱"
+                ></el-input>
+            </el-form-item>
             <el-form-item>
                 <el-checkbox
                     v-model="checked"
@@ -66,6 +74,7 @@ export default {
             registerForm: {
                 username: '',
                 password: '',
+                email: ''
             },
             registerRule: {
                 username: [
@@ -112,10 +121,7 @@ export default {
                 if (valid) {
                     this.registering = true
                     this.$http
-                        .post('/auth/signup', {
-                            username: this.registerForm.username,
-                            password: this.registerForm.password,
-                        })
+                        .post('/auth/signup', this.registerForm)
                         .then((res) => {
                             this.registering = false
                             this.$message.success('注册成功，请登录！')

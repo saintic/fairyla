@@ -17,11 +17,13 @@
 package auth
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strings"
 	"time"
 
+	uif "fairyla/internal/user"
 	"fairyla/pkg/db"
 	"fairyla/pkg/util"
 	"fairyla/vars"
@@ -31,7 +33,7 @@ import (
 
 const module = "auth"
 
-func Register(c *db.Conn, username, password string) error {
+func Register(c *db.Conn, username, password string, p uif.Profile, s uif.Setting) error {
 	if !util.IsName(username) {
 		return errors.New("invalid username")
 	}
@@ -46,9 +48,26 @@ func Register(c *db.Conn, username, password string) error {
 	if has {
 		return errors.New("username already exists")
 	}
+	if p.Name == "" {
+		return errors.New("invalid param")
+	}
+	if p.Email != "" && !util.IsEmail(p.Email) {
+		return errors.New("invalid email")
+	}
+	pval, err := json.Marshal(p)
+	if err != nil {
+		return err
+	}
+	sval, err := json.Marshal(s)
+	if err != nil {
+		return err
+	}
+	index := vars.GenUserKey(username)
 	pipe := c.Pipeline()
 	pipe.SAdd(vars.UserIndex, username)
-	pipe.HSet(vars.GenUserKey(username), module, pwhash)
+	pipe.HSet(index, module, pwhash)
+	pipe.HSet(index, uif.Module("p"), string(pval))
+	pipe.HSet(index, uif.Module("s"), string(sval))
 	_, err = pipe.Execute()
 	return err
 }

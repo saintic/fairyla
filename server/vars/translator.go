@@ -76,6 +76,7 @@ var precise = map[string]map[string]string{
 		"cannot claim your album":  "不能认领自己的专辑",
 		"invalid classify":         "无效的classify参数",
 		"pending for approval":     "等待审批",
+		"invalid email":            "邮箱错误",
 
 		// project message(too long)
 		"the number of albums exceeds the limit": "专辑数量限制",

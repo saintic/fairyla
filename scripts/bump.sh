@@ -8,7 +8,7 @@
 
 SHELL_DIR=$(cd $(dirname $0);pwd)
 BASE_DIR=$(dirname $SHELL_DIR)
-PKG_DIR=${BASE_DIR}/release
+PKG_DIR=${BASE_DIR}/dist
 
 BINARY=fairyla
 LINUX=${BINARY}.linux-amd64
@@ -22,6 +22,7 @@ BUMP_DIR=${BASE_DIR}/.tmp-${VERSION}
 
 usage() {
     echo $"Usage: $0 docker|pack|release"
+    exit 1
 }
 
 tarpkg() {
@@ -34,8 +35,8 @@ tarpkg() {
 }
 
 verpack() {
-    set -e
     mkdir ${PKG_DIR}
+    set -e
     # compile frontend
     cd ${BASE_DIR}/client && yarn build --outDir ${BUMP_DIR}/${UI}
     # copy license
@@ -51,6 +52,8 @@ verpack() {
     tarpkg darwin
     mv ${SERVER_DIR}/bin/${WIN} ${BINARY}.exe
     tarpkg windows
+    # tar assets
+    tar zcvf ${PKG_DIR}/${BINARY}-assets.${VERSION}.tar.gz ${UI}
     # clean tmp
     cd ${PKG_DIR}
     rm -rf ${BUMP_DIR} ${SERVER_DIR}/bin/

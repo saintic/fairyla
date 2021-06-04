@@ -31,18 +31,40 @@ const (
 )
 
 type Profile struct {
-	Name  string // 用户名，唯一
-	Alias string // 昵称，别名
-	Bio   string
+	Name  string `json:"name"`  // 用户名，唯一
+	Alias string `json:"alias"` // 昵称，别名
+	Bio   string `json:"bio"`   // 宣言
+	Email string `json:"email"`
 }
 
 type Setting struct {
-	AlbumDefaultPublic bool
+	AlbumDefaultPublic bool   `json:"album_default_public"` //默认专辑状态
+	Slogan             string `json:"slogan"`               // 覆盖系统Slogan
 }
 
 type User struct {
 	Profile
 	Setting
+}
+
+func NewProfile(user string) Profile {
+	return Profile{Name: user}
+}
+
+func NewSetting() Setting {
+	return Setting{AlbumDefaultPublic: true}
+}
+
+// 子模块名称
+func Module(m string) string {
+	switch m {
+	case "p", "profile":
+		return pmodule
+	case "s", "setting":
+		return smodule
+	default:
+		return ""
+	}
 }
 
 // 对外接口
@@ -64,12 +86,15 @@ func (w wrap) UpdateProfile(p Profile) error {
 	if !util.IsName(user) {
 		return errors.New("invalid name")
 	}
+	if p.Email != "" && !util.IsEmail(p.Email) {
+		return errors.New("invalid email")
+	}
 	has, err := w.HasUser(user)
 	if err != nil {
 		return err
 	}
 	if !has {
-		return errors.New("not found user")
+		return errors.New("not found username")
 	}
 	val, err := json.Marshal(p)
 	if err != nil {
@@ -89,7 +114,7 @@ func (w wrap) UpdateSetting(user string, s Setting) error {
 		return err
 	}
 	if !has {
-		return errors.New("not found user")
+		return errors.New("not found username")
 	}
 	val, err := json.Marshal(s)
 	if err != nil {
@@ -102,18 +127,56 @@ func (w wrap) UpdateSetting(user string, s Setting) error {
 	return nil
 }
 
+func (w wrap) UserProfile(user string) (p Profile, err error) {
+	index := vars.GenUserKey(user)
+	exist, err := w.HExists(index, pmodule)
+	if err != nil {
+		return
+	}
+	if exist {
+		data, e := w.HGet(index, pmodule)
+		if e != nil {
+			err = e
+			return
+		}
+		err = json.Unmarshal([]byte(data), &p)
+		if err != nil {
+			return
+		}
+	} else {
+		p = NewProfile(user)
+	}
+	return
+}
+
+func (w wrap) UserSetting(user string) (s Setting, err error) {
+	index := vars.GenUserKey(user)
+	exist, err := w.HExists(index, smodule)
+	if err != nil {
+		return
+	}
+	if exist {
+		data, e := w.HGet(index, smodule)
+		if e != nil {
+			err = e
+			return
+		}
+		err = json.Unmarshal([]byte(data), &s)
+		if err != nil {
+			return
+		}
+	} else {
+		s = NewSetting()
+	}
+	return
+}
+
 func (w wrap) UserData(user string) (u User, err error) {
-	data, err := w.HGetAll(vars.GenUserKey(user))
+	p, err := w.UserProfile(user)
 	if err != nil {
 		return
 	}
-	p := Profile{}
-	s := Setting{}
-	err = json.Unmarshal([]byte(data[pmodule]), &p)
-	if err != nil {
-		return
-	}
-	err = json.Unmarshal([]byte(data[smodule]), &s)
+	s, err := w.UserSetting(user)
 	if err != nil {
 		return
 	}
