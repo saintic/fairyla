@@ -419,19 +419,19 @@ func (w wrap) ListClaimAlbums(owner string) (data []Album, err error) {
 	return
 }
 
-// 认领他人专辑，by是认领者，to、albumID分别是专辑属主和ID
-func (w wrap) CreateClaim(by, to, albumID string) error {
-	if by == to {
+// 认领他人专辑，by是认领者，owner、albumID分别是专辑属主和ID
+func (w wrap) CreateClaim(by, owner, albumID string) error {
+	if by == owner {
 		return errors.New("cannot claim your album")
 	}
-	has, err := w.HasUser(to)
+	has, err := w.HasUser(owner)
 	if err != nil {
 		return err
 	}
 	if !has {
 		return errors.New("not found username")
 	}
-	a, err := w.GetAlbum(to, albumID)
+	a, err := w.GetAlbum(owner, albumID)
 	if err != nil {
 		return err
 	}
@@ -458,9 +458,35 @@ func (w wrap) CreateClaim(by, to, albumID string) error {
 	tpl := fmt.Sprintf(
 		"您好，用户【%s】认领了您的专辑【%s】，希望共同维护，点此处理。", by, a.Name,
 	)
-	m, _ := event.NewMessage(to, tpl, "notify")
+	m, _ := event.NewMessage(owner, tpl, "notify")
 	m.Opt.Title = "专辑认领通知"
 	m.Opt.Theme = "info"
 	m.Opt.NotifyJump = "/album/" + a.Name
 	return m.Write(w.Conn)
+}
+
+// 删除认领的他人专辑，by是认领者，owner、albumID分别是专辑属主和ID
+func (w wrap) DropClaim(by, owner, albumID string) error {
+	if by == owner {
+		return errors.New("invalid username")
+	}
+	if has, err := w.HasUser(owner); !has {
+		return err
+	}
+	a, err := w.GetAlbum(owner, albumID)
+	if err != nil {
+		return err
+	}
+	if exist, err := a.Exist(w.Conn); !exist {
+		return err
+	}
+	if a.Ta != by {
+		return errors.New("refuse to delete")
+	}
+	err = (&a).Claim(w.Conn, true)
+	if err != nil {
+		return err
+	}
+	a.Ta = ""
+	return w.WriteAlbum(&a)
 }

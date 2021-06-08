@@ -88,7 +88,7 @@ export default {
                     type: 'success',
                     click: () => {
                         this.$http
-                            .post('/user/claim', { owner, album: albumName })
+                            .post(`/user/claim/${owner}/${albumName}`)
                             .then(() => {
                                 this.$message.success({
                                     message: '已申请，等待批准',
@@ -112,7 +112,24 @@ export default {
             return taBtns
         },
         rendeClaimBtns(owner, albumName) {
-            let claimBtns = {}
+            let claimBtns = {
+                CanelShare: {
+                    name: '取消共享',
+                    type: 'info',
+                    plain: true,
+                    click: () => {
+                        this.$http
+                            .delete(`/user/claim/${owner}/${albumName}`)
+                            .then(() => {
+                                this.$message.success({
+                                    message: '已取消共享此专辑',
+                                    customClass: 'el-message--slim'
+                                })
+                                this.$router.push({ name: 'Index' })
+                            })
+                    }
+                }
+            }
             return claimBtns
         },
         rendeHomeBtns(name) {

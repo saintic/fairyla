@@ -714,13 +714,10 @@ func dropFairyView(c echo.Context) error {
 // 认领其他用户专辑（需由所属者确认方可领取成功）
 func createClaimView(c echo.Context) error {
 	user := getUser(c)
-	owner := c.FormValue("owner")
-	id := c.FormValue("album")
+	owner := c.Param("owner")
+	id := c.Param("id")
 	if owner == "" || id == "" {
 		return errors.New("invalid param")
-	}
-	if user == owner {
-		return errors.New("cannot claim your album")
 	}
 	w := album.New(rc)
 	err := w.CreateClaim(user, owner, getAlbumID(owner, id))
@@ -728,16 +725,6 @@ func createClaimView(c echo.Context) error {
 		return err
 	}
 	return c.JSON(200, vars.ResOK())
-}
-
-// 获取用户认领专辑列表
-func listClaimView(c echo.Context) error {
-	w := album.New(rc)
-	data, err := w.ListClaimAlbums(getUser(c))
-	if err != nil {
-		return err
-	}
-	return c.JSON(200, vars.NewResData(data))
 }
 
 // 获取用户认领的专辑数据及其下照片
@@ -775,6 +762,35 @@ func getClaimView(c echo.Context) error {
 		ret = a
 	}
 	return c.JSON(200, vars.NewResData(ret))
+}
+
+// 获取用户认领专辑列表
+func listClaimView(c echo.Context) error {
+	w := album.New(rc)
+	data, err := w.ListClaimAlbums(getUser(c))
+	if err != nil {
+		return err
+	}
+	return c.JSON(200, vars.NewResData(data))
+}
+
+// 删除认领的用户专辑
+func dropClaimView(c echo.Context) error {
+	user := getUser(c)
+	owner := c.Param("owner")
+	albumID := getAlbumID(owner, c.Param("id"))
+	if owner == "" || albumID == "" {
+		return errors.New("invalid param")
+	}
+	w := album.New(rc)
+	if has, _ := w.HasClaim(user, albumID); !has {
+		return errors.New("not found claim")
+	}
+	err := w.DropClaim(user, owner, albumID)
+	if err != nil {
+		return err
+	}
+	return c.JSON(200, vars.ResOK())
 }
 
 /*

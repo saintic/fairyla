@@ -74,9 +74,10 @@ func StartApi(config *sys.Setting) {
 	user.POST("/fairy", createFairyView)
 	user.DELETE("/fairy/:id", dropFairyView)
 
-	user.POST("/claim", createClaimView)
-	user.GET("/claim", listClaimView)
+	user.POST("/claim/:owner/:id", createClaimView)
+	user.DELETE("/claim/:owner/:id", dropClaimView)
 	user.GET("/claim/:owner/:id", getClaimView)
+	user.GET("/claim", listClaimView)
 
 	user.POST("/_event", createEventView)
 	user.GET("/event", listEventView)

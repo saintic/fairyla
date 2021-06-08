@@ -10,7 +10,6 @@
                 mode="horizontal"
                 router
                 :default-active="this.$route.path"
-                menu-trigger="click"
             >
                 <el-menu-item index="/ta">
                     <i class="saintic-icon saintic-icon-goddess"></i> Ta是
@@ -93,8 +92,7 @@ export default {
     right: 0;
     top: 0;
 }
-.nav .nav-item-deliver {
-    height: 5px;
+.nav-item-deliver {
     border: none;
     border-top: 5px ridge green;
 }
