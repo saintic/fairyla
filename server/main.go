@@ -41,6 +41,7 @@ var (
 	sapic_url   string
 	sapic_token string
 	sapic_field string
+	open_token  string
 )
 
 func init() {
@@ -58,6 +59,8 @@ func init() {
 	flag.StringVar(&sapic_url, "sapic-url", "", "Sapic Api URL")
 	flag.StringVar(&sapic_token, "sapic-token", "", "Sapic Api LinkToken")
 	flag.StringVar(&sapic_field, "sapic-field", "picbed", "Sapic Api Upload Field Name")
+
+	flag.StringVar(&open_token, "open-token", "", "Api Token(open.saintic.com)")
 }
 
 func main() {
@@ -65,6 +68,7 @@ func main() {
 	config := sys.New(
 		host, port, rawurl, sapic_url, sapic_token, sapic_field, dir,
 	)
+	config.OpenToken = open_token
 	if v {
 		fmt.Println(version)
 	} else if s {

@@ -10,6 +10,7 @@
                 mode="horizontal"
                 router
                 :default-active="this.$route.path"
+                menu-trigger="click"
             >
                 <el-menu-item index="/ta">
                     <i class="saintic-icon saintic-icon-goddess"></i> Ta是
@@ -32,7 +33,7 @@
                         <i class="saintic-icon saintic-icon-album"></i>
                         共享专辑
                     </el-menu-item>
-                    <hr class="deliver" />
+                    <hr class="nav-item-deliver" />
                     <el-menu-item index="/logout">
                         <i class="saintic-icon saintic-icon-logoff"></i>
                         登出
@@ -75,12 +76,6 @@ export default {
 </script>
 
 <style>
-.deliver {
-    height: 5px;
-    border: none;
-    border-top: 5px ridge green;
-}
-
 .nav {
     height: 60px;
     position: relative;
@@ -97,6 +92,11 @@ export default {
     position: absolute;
     right: 0;
     top: 0;
+}
+.nav .nav-item-deliver {
+    height: 5px;
+    border: none;
+    border-top: 5px ridge green;
 }
 .nav .nav-left .logo {
     max-height: 100%;

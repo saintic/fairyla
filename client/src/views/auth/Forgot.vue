@@ -56,9 +56,7 @@ export default {
                     }
                 ]
             },
-            loginRoute: {
-                name: 'Login'
-            }
+            loginRoute: { name: 'Login' }
         }
     },
     methods: {

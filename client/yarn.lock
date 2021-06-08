@@ -40,7 +40,7 @@
 
 "@vitejs/plugin-vue@^1.2.1":
   version "1.2.3"
-  resolved "https://registry.nlark.com/@vitejs/plugin-vue/download/@vitejs/plugin-vue-1.2.3.tgz#2e8e008b1cc3a6ad1dfbec75743c7ffd9b4872a6"
+  resolved "https://registry.nlark.com/@vitejs/plugin-vue/download/@vitejs/plugin-vue-1.2.3.tgz?cache=0&sync_timestamp=1622507070421&other_urls=https%3A%2F%2Fregistry.nlark.com%2F%40vitejs%2Fplugin-vue%2Fdownload%2F%40vitejs%2Fplugin-vue-1.2.3.tgz#2e8e008b1cc3a6ad1dfbec75743c7ffd9b4872a6"
   integrity sha1-Lo4AixzDpq0d++x1dDx//ZtIcqY=
 
 "@vue/compiler-core@3.1.1":
@@ -133,7 +133,7 @@ async-validator@^3.4.0:
 
 axios@^0.21.1:
   version "0.21.1"
-  resolved "https://registry.nlark.com/axios/download/axios-0.21.1.tgz#22563481962f4d6bde9a76d516ef0e5d3c09b2b8"
+  resolved "https://registry.npm.taobao.org/axios/download/axios-0.21.1.tgz#22563481962f4d6bde9a76d516ef0e5d3c09b2b8"
   integrity sha1-IlY0gZYvTWvemnbVFu8OXTwJsrg=
   dependencies:
     follow-redirects "^1.10.0"
@@ -259,9 +259,9 @@ es-module-lexer@^0.4.1:
   integrity sha1-3ajGoU2PNAok40Mx4Pqwy1BDjg4=
 
 esbuild@^0.12.5:
-  version "0.12.6"
-  resolved "https://registry.nlark.com/esbuild/download/esbuild-0.12.6.tgz#85bc755c7cf3005d4f34b4f10f98049ce0ee67ce"
-  integrity sha1-hbx1XHzzAF1PNLTxD5gEnODuZ84=
+  version "0.12.7"
+  resolved "https://registry.nlark.com/esbuild/download/esbuild-0.12.7.tgz#0243ff94b241d9c815720083633731bc5b601b24"
+  integrity sha1-AkP/lLJB2cgVcgCDYzcxvFtgGyQ=
 
 estree-walker@^2.0.1:
   version "2.0.2"
