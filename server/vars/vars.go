@@ -21,11 +21,10 @@ import (
 )
 
 var (
-	UserIndex  = "users"                    // redis type set
+	// 用户索引 Set类型
+	UserIndex = "users"
+	// :user:<User> Hash类型 auth密码 profile资料 setting配置
 	GenUserKey = func(user string) string { // redis type hash
-		// :user:auth 密码
-		// :user:profile 资料
-		// :user:setting 配置
 		return "user:" + user
 	}
 
@@ -52,13 +51,15 @@ var (
 )
 
 const (
+	DefaultSiteName = "Fairyla - 是小仙女啦"
+
 	AlbumPre = "md.a."
 	FairyPre = "md.f."
 
 	// 上传限制，单位MB
 	UploadLimitSize int64 = 20
 	// 用户专辑数量限制
-	AlbumLimitNum = 9
+	AlbumLimitNum = 99
 
 	RedigoNil = "redigo: nil returned"
 

@@ -56,6 +56,7 @@ var precise = map[string]map[string]string{
 		"missing or malformed jwt": "Token丢失或格式不正确",
 		"invalid or expired jwt":   "Token无效或已过期",
 		RedigoNil:                  "暂无数据",
+		"Invalid Api Token":        "无效的Token",
 
 		// project message
 		"album already exists":     "专辑已存在",

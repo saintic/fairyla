@@ -32,9 +32,9 @@
                 <el-checkbox v-model="checked" class="rememberme"
                     >记住我(7d)</el-checkbox
                 >
-                <!--
-                <el-link type="info" class="forgot">忘记密码？</el-link>
-                -->
+                <router-link :to="forgotRoute">
+                    <el-button type="text" class="forgot">忘记密码？</el-button>
+                </router-link>
             </el-form-item>
             <el-form-item style="width: 100%">
                 <el-button
@@ -75,44 +75,42 @@ export default {
                     }
                 ]
             },
-            checked: false
+            checked: false,
+            forgotRoute: { name: 'Forgot' }
         }
     },
     methods: {
         handleSubmit(event) {
             this.$refs.loginForm.validate((valid) => {
-                if (valid) {
-                    this.logining = true
-                    this.$http
-                        .post('/auth/signin', {
-                            username: this.loginForm.username,
-                            password: this.loginForm.password,
-                            remember: this.checked
+                if (!valid) return
+                this.logining = true
+                this.$http
+                    .post('/auth/signin', {
+                        username: this.loginForm.username,
+                        password: this.loginForm.password,
+                        remember: this.checked
+                    })
+                    .then((res) => {
+                        this.logining = false
+                        this.$message.success({
+                            message: '登录成功',
+                            customClass: 'el-message--slim'
                         })
-                        .then((res) => {
-                            this.logining = false
-                            this.$message.success({
-                                message: '登录成功',
-                                customClass: 'el-message--slim'
-                            })
-                            this.$store.mutations.setLogin(
-                                this.loginForm.username,
-                                res.data.token
-                            )
-                            this.$store.actions.saveConfig2Local()
-                            this.$store.actions.fetchConfig()
-                            let rdt = this.$route.query.redirect || ''
-                            if (!rdt.startsWith('/')) {
-                                rdt = '/'
-                            }
-                            this.$router.push({ path: rdt })
-                        })
-                        .catch((e) => {
-                            this.logining = false
-                        })
-                } else {
-                    return false
-                }
+                        this.$store.mutations.setLogin(
+                            this.loginForm.username,
+                            res.data.token
+                        )
+                        this.$store.actions.saveConfig2Local()
+                        this.$store.actions.fetchConfig()
+                        let rdt = this.$route.query.redirect || ''
+                        if (!rdt.startsWith('/')) {
+                            rdt = '/'
+                        }
+                        this.$router.push({ path: rdt })
+                    })
+                    .catch((e) => {
+                        this.logining = false
+                    })
             })
         }
     }

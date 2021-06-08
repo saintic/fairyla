@@ -40,7 +40,6 @@ func Register(c *db.Conn, username, password string, p uif.Profile, s uif.Settin
 	if len(password) < 6 {
 		return errors.New("password is too short")
 	}
-	pwhash := util.GeneratePasswordHash(password)
 	has, err := c.SIsMember(vars.UserIndex, username)
 	if err != nil {
 		return err
@@ -62,6 +61,7 @@ func Register(c *db.Conn, username, password string, p uif.Profile, s uif.Settin
 	if err != nil {
 		return err
 	}
+	pwhash := util.GeneratePasswordHash(password)
 	index := vars.GenUserKey(username)
 	pipe := c.Pipeline()
 	pipe.SAdd(vars.UserIndex, username)
@@ -143,4 +143,39 @@ func ParseToken(c *db.Conn, token string) (claims jwt.MapClaims, err error) {
 	} else {
 		return nil, err
 	}
+}
+
+// 仅尝试验证密码
+func VerifyPasswd(c *db.Conn, username, password string) (ok bool, err error) {
+	pwhash, err := c.HGet(vars.GenUserKey(username), module)
+	if err != nil {
+		return
+	}
+	if !util.CheckPasswordHash(pwhash, password) {
+		err = errors.New("wrong password")
+		return
+	}
+	return true, nil
+}
+
+// 仅直接重置密码
+func ResetPasswd(c *db.Conn, username, password string) error {
+	pwhash := util.GeneratePasswordHash(password)
+	_, err := c.HSet(vars.GenUserKey(username), module, pwhash)
+	return err
+}
+
+// 仅生成10分钟有效期的token
+func GenerateForgotJWT(c *db.Conn, username string) (token string, err error) {
+	pwhash, err := c.HGet(vars.GenUserKey(username), module)
+	if err != nil {
+		return
+	}
+	claims := jwt.MapClaims{
+		"name": username,
+		"exp":  time.Now().Add(time.Minute * 10).Unix(),
+	}
+	jt := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+	return jt.SignedString([]byte(pwhash))
 }

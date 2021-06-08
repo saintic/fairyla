@@ -15,7 +15,7 @@
                     <i class="saintic-icon saintic-icon-goddess"></i> Ta是
                 </el-menu-item>
                 <el-submenu v-if="isLogin">
-                    <template #title>{{ alias || user }}</template>
+                    <template #title>{{ username }}</template>
                     <el-menu-item index="/" class="back-home">
                         <i class="saintic-icon saintic-icon-home"></i>
                         首页上传
@@ -32,7 +32,7 @@
                         <i class="saintic-icon saintic-icon-album"></i>
                         共享专辑
                     </el-menu-item>
-                    <el-menu-item>-------------</el-menu-item>
+                    <hr class="deliver" />
                     <el-menu-item index="/logout">
                         <i class="saintic-icon saintic-icon-logoff"></i>
                         登出
@@ -65,8 +65,9 @@ export default {
     computed: {
         ...mapState(['isLogin', 'user']),
         ...mapState({
-            alias(state) {
-                return state.userinfo.alias
+            username(state) {
+                let ui = state.userinfo || {}
+                return ui.alias || state.user
             }
         })
     }
@@ -74,6 +75,12 @@ export default {
 </script>
 
 <style>
+.deliver {
+    height: 5px;
+    border: none;
+    border-top: 5px ridge green;
+}
+
 .nav {
     height: 60px;
     position: relative;

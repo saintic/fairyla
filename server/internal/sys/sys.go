@@ -28,14 +28,17 @@ import (
 )
 
 type Setting struct {
-	Dir    string // html & assets
-	Redis  string
-	Host   string
-	Port   uint
-	Sapic  Sapic
-	ICP    string // beian.miit.gov.cn
-	Beian  string // www.beian.gov.cn
-	Slogan string
+	Dir       string // html & assets
+	Host      string
+	Port      uint
+	Sapic     Sapic
+	Redis     string // storage redis db url
+	OpenToken string // send mail api token
+
+	ICP      string // beian.miit.gov.cn
+	Beian    string // www.beian.gov.cn
+	Slogan   string
+	SiteName string
 }
 
 type Sapic struct {
@@ -74,8 +77,9 @@ func parseApiURL(url string) string {
 // New from cli options first
 func New(host string, port uint, redis, api, token, field, dir string) *Setting {
 	c := &Setting{
-		Redis: redis, Host: host, Port: port, Dir: dir,
 		Sapic: Sapic{parseApiURL(api), field, token},
+		Redis: redis, Host: host, Port: port, Dir: dir,
+		SiteName: vars.DefaultSiteName,
 	}
 	c.parseEnv()
 	return c
@@ -109,6 +113,7 @@ func (s *Setting) parseEnv() {
 	if token != "" {
 		s.Sapic.Token = token
 	}
+
 	// other options
 	sep := "fairyla_"
 	for _, e := range os.Environ() {
@@ -125,6 +130,10 @@ func (s *Setting) parseEnv() {
 				s.Dir = v
 			case "slogan":
 				s.Slogan = v
+			case "opentoken":
+				s.OpenToken = v
+			case "sitename":
+				s.SiteName = v
 			}
 		}
 	}
@@ -135,9 +144,17 @@ func (s *Setting) String() string {
 	if s.Sapic.Token != "" {
 		token = fmt.Sprintf("<%s>", s.Sapic.Token)
 	}
-	return fmt.Sprintf(
-		"UI @ %s\nHost: %s\nPort: %d\nRedis: %s\nSapic:\n Api: %s\n Field: %s\n LinkToken: %s",
+	return fmt.Sprintf(`UI @ %s
+Host: %s
+Port: %d
+Redis: %s
+Sapic:
+    Api: %s
+    Field: %s
+    LinkToken: %s
+OpenToken: %s`,
 		s.Dir, s.Host, s.Port, s.Redis, s.Sapic.Api, s.Sapic.Field, token,
+		s.OpenToken,
 	)
 }
 
@@ -165,5 +182,6 @@ func (s *Setting) SitePublic() map[string]interface{} {
 	cfg["beian"] = s.Beian
 	cfg["slogan"] = s.Slogan
 	cfg["upload_limit"] = vars.UploadLimitSize
+	cfg["site_name"] = s.SiteName
 	return cfg
 }

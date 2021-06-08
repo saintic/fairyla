@@ -51,11 +51,14 @@ func StartApi(config *sys.Setting) {
 	auth := api.Group("/auth")
 	auth.POST("/signup", signUpView)
 	auth.POST("/signin", signInView)
+	auth.POST("/forgot", forgotView)
+	auth.POST("/reset_passwd", resetPasswdView)
 
 	user := api.Group("/user", loginRequired) // 用户接口，需登录
 
 	user.GET("/", getUserView)
 	user.PUT("/profile", updateUserProfileView)
+	user.PUT("/passwd", updateUserPasswdView)
 	user.PUT("/setting", updateUserSettingView)
 
 	user.POST("/upload", uploadView)

@@ -24,6 +24,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 	"strings"
 	"time"
 
@@ -90,11 +91,86 @@ func signInView(c echo.Context) error {
 	return c.JSON(200, vars.NewResData(data))
 }
 
+// 忘记密码
+func forgotView(c echo.Context) error {
+	username := c.FormValue("username")
+	w := uif.New(rc)
+	if has, err := w.HasUser(username); !has {
+		return err
+	}
+	p, err := w.UserProfile(username)
+	if err != nil {
+		return err
+	}
+	if p.Email == "" {
+		return errors.New("invalid email")
+	}
+	// 生成邮箱验证码
+	token, err := auth.GenerateForgotJWT(rc, username)
+	if err != nil {
+		return err
+	}
+	// 发送邮箱验证码
+	siteURL := fmt.Sprintf("%s://%s", c.Scheme(), c.Request().Host)
+	resetURI := "/reset_passwd"
+	verifyURL := fmt.Sprintf("%s/#%s?jwt=%s", siteURL, resetURI, token)
+	tpl, err := vars.NewForgot(siteURL, cfg.SiteName, username, verifyURL)
+	if err != nil {
+		return err
+	}
+	resp, err := http.PostForm(
+		"https://open.saintic.com/api/sendmail",
+		url.Values{
+			"token":     {cfg.OpenToken},
+			"from_name": {cfg.SiteName},
+			"to":        {p.Email},
+			"subject":   {fmt.Sprintf("重置密码 | %s", cfg.SiteName)},
+			"html":      {tpl},
+		},
+	)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+	ret := struct {
+		Code int    `json:"code"`
+		Msg  string `json:"msg"`
+	}{}
+	err = json.Unmarshal(body, &ret)
+	if err != nil {
+		return err
+	}
+	if ret.Code == 0 && ret.Msg == "" {
+		return c.JSON(200, vars.ResOK())
+	}
+	return errors.New(ret.Msg)
+}
+
+// 重置密码（依附于忘记密码，不接受普通token认证）
+func resetPasswdView(c echo.Context) error {
+	// 由 loginRequired 验证令牌，通过进入此视图，即可直接重置
+	token := c.FormValue("jwt")
+	passwd := c.FormValue("password")
+	user, err := checkJWT(token)
+	if err != nil {
+		return err
+	}
+	err = auth.ResetPasswd(rc, user, passwd)
+	if err != nil {
+		return err
+	}
+	return c.JSON(200, vars.ResOK())
+}
+
 // 前端公共配置、用户状态等
 func configView(c echo.Context) error {
 	data := cfg.SitePublic()
 	data["isLogin"] = false
-	user, err := checkJWT(c)
+	user, err := autoCheckJWT(c)
 	if err == nil {
 		data["isLogin"] = true
 		userinfo, err := uif.New(rc).UserData(user)
@@ -203,9 +279,23 @@ func updateUserProfileView(c echo.Context) error {
 	return c.JSON(200, vars.NewResData(p))
 }
 
+// 更改密码
+func updateUserPasswdView(c echo.Context) error {
+	opwd := c.FormValue("old_passwd")
+	npwd := c.FormValue("new_passwd")
+	user := getUser(c)
+	if ok, err := auth.VerifyPasswd(rc, user, opwd); !ok {
+		return err
+	}
+	if err := auth.ResetPasswd(rc, user, npwd); err != nil {
+		return err
+	}
+	return c.JSON(200, vars.ResOK())
+}
+
 // 更新用户设置
 func updateUserSettingView(c echo.Context) error {
-	adp := gtc.IsTrue(c.FormValue("album_default_public"))
+	adp := c.FormValue("album_default_public")
 	slogan := c.FormValue("slogan")
 	user := getUser(c)
 	w := uif.New(rc)
@@ -213,9 +303,14 @@ func updateUserSettingView(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	s.AlbumDefaultPublic = adp
+	if adp != "" {
+		s.AlbumDefaultPublic = gtc.IsTrue(adp)
+	}
 	if slogan != "" {
 		s.Slogan = slogan
+		if gtc.IsFalse(slogan) { // 取消
+			s.Slogan = ""
+		}
 	}
 	err = w.UpdateSetting(user, s)
 	if err != nil {

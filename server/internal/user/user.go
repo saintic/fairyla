@@ -76,6 +76,7 @@ func New(c *db.Conn) wrap {
 	return wrap{c}
 }
 
+// 判断用户名是否存在
 func (w wrap) HasUser(user string) (bool, error) {
 	return w.SIsMember(vars.UserIndex, user)
 }

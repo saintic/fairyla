@@ -14,6 +14,7 @@
    limitations under the License.
 */
 
+// 站点标题分隔符及默认后缀（名称）
 export const TitleSep = ' | '
 export const TitleSuffix = 'Fairyla - 是小仙女啦'
 

@@ -51,11 +51,7 @@ func getJWT(c echo.Context) (token string, err error) {
 	return
 }
 
-func checkJWT(c echo.Context) (user string, err error) {
-	token, err := getJWT(c)
-	if err != nil {
-		return
-	}
+func checkJWT(token string) (user string, err error) {
 	claims, err := auth.ParseToken(rc, token)
 	if err != nil {
 		err = ErrJWTInvalid
@@ -65,10 +61,18 @@ func checkJWT(c echo.Context) (user string, err error) {
 	return
 }
 
+func autoCheckJWT(c echo.Context) (user string, err error) {
+	token, err := getJWT(c)
+	if err != nil {
+		return
+	}
+	return checkJWT(token)
+}
+
 // API登录拦截器
 func loginRequired(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		user, err := checkJWT(c)
+		user, err := autoCheckJWT(c)
 		if err != nil {
 			if err == ErrJWTMissing || err == ErrJWTInvalid {
 				return err

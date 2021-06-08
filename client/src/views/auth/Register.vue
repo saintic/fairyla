@@ -118,21 +118,18 @@ export default {
                 if (!this.checked) {
                     return this.$message.error('注册需同意服务条款与隐私政策')
                 }
-                if (valid) {
-                    this.registering = true
-                    this.$http
-                        .post('/auth/signup', this.registerForm)
-                        .then((res) => {
-                            this.registering = false
-                            this.$message.success('注册成功，请登录！')
-                            this.$router.push({ path: '/login' })
-                        })
-                        .catch((e) => {
-                            this.registering = false
-                        })
-                } else {
-                    return false
-                }
+                if (!valid) return
+                this.registering = true
+                this.$http
+                    .post('/auth/signup', this.registerForm)
+                    .then((res) => {
+                        this.registering = false
+                        this.$message.success('注册成功，请登录！')
+                        this.$router.push({ path: '/login' })
+                    })
+                    .catch((e) => {
+                        this.registering = false
+                    })
             })
         },
         showTerms() {

@@ -29,6 +29,7 @@
                                 v-model="userProfile.bio"
                                 placeholder="个人介绍、交友宣言"
                                 clearable
+                                :rows="3"
                             ></el-input>
                         </el-form-item>
                         <el-form-item>
@@ -50,18 +51,18 @@
                             label-width="80px"
                             size="mini"
                         >
-                            <el-form-item label="新密码" prop="new_passwd">
-                                <el-input
-                                    v-model="userPasswd.new_passwd"
-                                    placeholder="请输入新密码"
-                                    clearable
-                                    show-password
-                                ></el-input>
-                            </el-form-item>
                             <el-form-item label="当前密码" prop="old_passwd">
                                 <el-input
                                     v-model="userPasswd.old_passwd"
                                     placeholder="请输入当前密码"
+                                    clearable
+                                    show-password
+                                ></el-input>
+                            </el-form-item>
+                            <el-form-item label="新密码" prop="new_passwd">
+                                <el-input
+                                    v-model="userPasswd.new_passwd"
+                                    placeholder="请输入新密码"
                                     clearable
                                     show-password
                                 ></el-input>
@@ -187,7 +188,14 @@ export default {
         submitPasswdForm() {
             this.$refs['userPasswd'].validate((valid) => {
                 if (!valid) return
-                // TODO 提交表单
+                this.$http.put('/user/passwd', this.userPasswd).then(() => {
+                    this.$message.success({
+                        message: '密码已更新，请重新登录',
+                        customClass: 'el-message--slim'
+                    })
+                    this.$router.push({ name: 'Logout' })
+                    this.$router.push({ name: 'Login' })
+                })
             })
         },
         resetPasswdForm() {

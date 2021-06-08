@@ -52,6 +52,18 @@ const routes = [
         meta: { requiresAuth: true }
     },
     {
+        path: '/forgot',
+        name: 'Forgot',
+        component: () => import('@/views/auth/Forgot.vue'),
+        meta: { requiresAuth: false, title: '忘记密码' }
+    },
+    {
+        path: '/reset_passwd',
+        name: 'Reset',
+        component: () => import('@/views/auth/Reset.vue'),
+        meta: { requiresAuth: false, title: '重置密码' }
+    },
+    {
         path: '/ta',
         name: 'TaAlbum',
         component: () => import('@/views/ta/Ta.vue'),
@@ -115,10 +127,11 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from) => {
+    let siteName = state.site_name || TitleSuffix
     if (to.meta.title) {
-        document.title = to.meta.title + TitleSep + TitleSuffix
+        document.title = to.meta.title + TitleSep + siteName
     } else {
-        document.title = TitleSuffix
+        document.title = siteName
     }
     // 而不是去检查每条路由记录
     // to.matched.some(record => record.meta.requiresAuth)

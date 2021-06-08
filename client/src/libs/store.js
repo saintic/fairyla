@@ -24,6 +24,9 @@ import {
     isObject
 } from './util.js'
 
+/**
+ * 全局状态
+ */
 export const state = reactive(getStorage() || {})
 
 export const mutations = {
