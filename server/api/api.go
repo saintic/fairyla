@@ -56,7 +56,7 @@ func StartApi(config *sys.Setting) {
 
 	user := api.Group("/user", loginRequired) // 用户接口，需登录
 
-	user.GET("/", getUserView)
+	user.GET("/_", getUserView)
 	user.PUT("/profile", updateUserProfileView)
 	user.PUT("/passwd", updateUserPasswdView)
 	user.PUT("/setting", updateUserSettingView)

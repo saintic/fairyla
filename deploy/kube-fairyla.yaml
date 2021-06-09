@@ -31,6 +31,8 @@ spec:
               value: "https://picbed.pro"
             - name: fairyla_sapic_token   # sapic图床接口LinkToken
               value: "<Please Fill It>"
+            - name: fairyla_opentoken    # open.saintic.com api token
+              value: "<Please Fill It>"
           ports:
             - containerPort: 10210
           readinessProbe:
