@@ -77,8 +77,16 @@ func New(c *db.Conn) wrap {
 }
 
 // 判断用户名是否存在
-func (w wrap) HasUser(user string) (bool, error) {
-	return w.SIsMember(vars.UserIndex, user)
+func (w wrap) HasUser(user string) (has bool, err error) {
+	has, err = w.SIsMember(vars.UserIndex, user)
+	if err != nil {
+		return
+	}
+	if !has {
+		err = errors.New("not found username")
+		return
+	}
+	return true, nil
 }
 
 // 更新用户资料
@@ -90,12 +98,8 @@ func (w wrap) UpdateProfile(p Profile) error {
 	if p.Email != "" && !util.IsEmail(p.Email) {
 		return errors.New("invalid email")
 	}
-	has, err := w.HasUser(user)
-	if err != nil {
+	if has, err := w.HasUser(user); !has {
 		return err
-	}
-	if !has {
-		return errors.New("not found username")
 	}
 	val, err := json.Marshal(p)
 	if err != nil {
@@ -110,12 +114,8 @@ func (w wrap) UpdateProfile(p Profile) error {
 
 // 更新用户设置
 func (w wrap) UpdateSetting(user string, s Setting) error {
-	has, err := w.HasUser(user)
-	if err != nil {
+	if has, err := w.HasUser(user); !has {
 		return err
-	}
-	if !has {
-		return errors.New("not found username")
 	}
 	val, err := json.Marshal(s)
 	if err != nil {

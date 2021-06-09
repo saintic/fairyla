@@ -119,7 +119,6 @@ func (s *Setting) parseEnv() {
 	for _, e := range os.Environ() {
 		env := strings.Split(e, "=")
 		if len(env) >= 2 && strings.HasPrefix(env[0], sep) {
-			fmt.Println(env)
 			field := strings.TrimPrefix(env[0], sep)
 			v := env[1]
 			switch field {
