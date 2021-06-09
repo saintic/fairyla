@@ -75,11 +75,11 @@ func parseApiURL(url string) string {
 }
 
 // New from cli options first
-func New(host string, port uint, redis, api, token, field, dir string) *Setting {
+func New(host string, port uint, redis, api, token, field, dir, opentoken string) *Setting {
 	c := &Setting{
 		Sapic: Sapic{parseApiURL(api), field, token},
 		Redis: redis, Host: host, Port: port, Dir: dir,
-		SiteName: vars.DefaultSiteName,
+		SiteName: vars.DefaultSiteName, OpenToken: opentoken,
 	}
 	c.parseEnv()
 	return c
@@ -119,6 +119,7 @@ func (s *Setting) parseEnv() {
 	for _, e := range os.Environ() {
 		env := strings.Split(e, "=")
 		if len(env) >= 2 && strings.HasPrefix(env[0], sep) {
+			fmt.Println(env)
 			field := strings.TrimPrefix(env[0], sep)
 			v := env[1]
 			switch field {
@@ -139,7 +140,7 @@ func (s *Setting) parseEnv() {
 	}
 }
 
-func (s *Setting) String() string {
+func (s *Setting) Pretty() string {
 	token := "<No Token>"
 	if s.Sapic.Token != "" {
 		token = fmt.Sprintf("<%s>", s.Sapic.Token)

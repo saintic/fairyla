@@ -27,7 +27,7 @@ import (
 )
 
 // fairy server version
-const version = "0.1.0"
+const version = "0.1.1"
 
 var (
 	v bool
@@ -38,10 +38,10 @@ var (
 	port   uint
 	rawurl string
 
-	sapic_url   string
-	sapic_token string
-	sapic_field string
-	open_token  string
+	sapicURL   string
+	sapicToken string
+	sapicField string
+	openToken  string
 )
 
 func init() {
@@ -56,23 +56,22 @@ func init() {
 
 	flag.StringVar(&rawurl, "redis", "", "redis url, format: redis://[:<password>@]<host>[:<port>/<db>]")
 
-	flag.StringVar(&sapic_url, "sapic-url", "", "Sapic Api URL")
-	flag.StringVar(&sapic_token, "sapic-token", "", "Sapic Api LinkToken")
-	flag.StringVar(&sapic_field, "sapic-field", "picbed", "Sapic Api Upload Field Name")
+	flag.StringVar(&sapicURL, "sapic-url", "", "Sapic Api URL")
+	flag.StringVar(&sapicToken, "sapic-token", "", "Sapic Api LinkToken")
+	flag.StringVar(&sapicField, "sapic-field", "picbed", "Sapic Api Upload Field Name")
 
-	flag.StringVar(&open_token, "open-token", "", "Api Token(open.saintic.com)")
+	flag.StringVar(&openToken, "open-token", "", "Api Token(open.saintic.com)")
 }
 
 func main() {
 	flag.Parse()
 	config := sys.New(
-		host, port, rawurl, sapic_url, sapic_token, sapic_field, dir,
+		host, port, rawurl, sapicURL, sapicToken, sapicField, dir, openToken,
 	)
-	config.OpenToken = open_token
 	if v {
 		fmt.Println(version)
 	} else if s {
-		fmt.Println(config)
+		fmt.Println(config.Pretty())
 	} else {
 		err := config.Check()
 		if err != nil {

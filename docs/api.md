@@ -14,20 +14,20 @@ message是错误消息，当success未成功时有意义。
 
 ## Misc（杂项）
 
-### GET+HEAD /ready
+#### GET+HEAD /ready
 
 k8s准备就绪探针，应用正常连通redis即响应`ok`，状态200，否则返回`err`，状态503，
 虽是JSON类型，但无基本结构，仅此一个特例。
 
-### GET /config
+#### GET /config
 
 前端全局状态、配置
 
-### GET /album
+#### GET /album
 
 公共专辑列表（Ta是）
 
-### GET /album/:owner/:id
+#### GET /album/:owner/:id
 
 公共专辑详情
 
@@ -36,15 +36,15 @@ k8s准备就绪探针，应用正常连通redis即响应`ok`，状态200，否�
 
 ## Auth（认证）
 
-### POST /auth/signup
+#### POST /auth/signup
 
 注册
 
-### POST /auth/signin
+#### POST /auth/signin
 
 登录
 
-### POST /auth/forgot
+#### POST /auth/forgot
 
 忘记密码
 

@@ -15,6 +15,7 @@
 <script>
 import Navbar from './views/public/Navbar.vue'
 import Footer from './views/public/Footer.vue'
+import { EventSourcePolyfill } from 'event-source-polyfill'
 
 export default {
     name: 'App',
@@ -50,8 +51,11 @@ export default {
             if (!this.$store.state.isLogin || this.$store.state._sse) {
                 return false
             }
-            let url = `/api/user/event?jwt=${token}`,
-                es = new EventSource(url)
+            let es = new EventSourcePolyfill('/api/user/event', {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            })
             this.$store.state._sse = es
             es.addEventListener('message', (event) => {
                 try {
