@@ -133,8 +133,7 @@ router.beforeEach((to, from) => {
     } else {
         document.title = siteName
     }
-    // 而不是去检查每条路由记录
-    // to.matched.some(record => record.meta.requiresAuth)
+    // 如果路由明确不需要授权但已登录时，直接跳转到首页
     if (to.meta.requiresAuth === false && mutations.isLogged()) {
         return { path: '/' }
     }

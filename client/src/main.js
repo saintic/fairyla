@@ -113,5 +113,4 @@ app.use(router)
 app.config.globalProperties.$http = http
 app.config.globalProperties.$store = store
 app.config.globalProperties.$ELEMENT = { size: 'mini' }
-let vm = app.mount('#app')
-//window.vm = vm
+app.mount('#app')

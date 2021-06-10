@@ -73,7 +73,7 @@ main() {
         ;;
     release)
         cd ${BASE_DIR}
-        git add . && git ci -m "bump version ${VERSION}" && git tag ${VERSION}
+        git add . && git ci -m "bump version ${VERSION}" && git tag v${VERSION}
         ;;
     *)
         usage
