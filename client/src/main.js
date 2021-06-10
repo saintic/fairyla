@@ -19,6 +19,7 @@ import App from './App.vue'
 import router from './libs/router.js'
 import store from './libs/store.js'
 import { http } from './libs/util.js'
+import NPlayer from '@nplayer/vue'
 
 import {
     ElAvatar,
@@ -107,6 +108,7 @@ plugins.forEach((plugin) => {
     app.use(plugin)
 })
 
+app.use(NPlayer)
 app.use(router)
 app.config.globalProperties.$http = http
 app.config.globalProperties.$store = store

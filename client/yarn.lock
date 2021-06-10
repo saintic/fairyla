@@ -20,6 +20,11 @@
     "@babel/helper-validator-identifier" "^7.14.0"
     to-fast-properties "^2.0.0"
 
+"@nplayer/vue@^1.0.6":
+  version "1.0.6"
+  resolved "https://registry.nlark.com/@nplayer/vue/download/@nplayer/vue-1.0.6.tgz#a31c10c7aaf4404b00d941461cb141c743a7911c"
+  integrity sha1-oxwQx6r0QEsA2UFGHLFBx0OnkRw=
+
 "@popperjs/core@^2.4.4":
   version "2.9.2"
   resolved "https://registry.npm.taobao.org/@popperjs/core/download/@popperjs/core-2.9.2.tgz?cache=0&sync_timestamp=1617290386990&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2F%40popperjs%2Fcore%2Fdownload%2F%40popperjs%2Fcore-2.9.2.tgz#adea7b6953cbb34651766b0548468e743c6a2353"
@@ -442,6 +447,11 @@ normalize-wheel@^1.0.1:
   version "1.0.1"
   resolved "https://registry.npm.taobao.org/normalize-wheel/download/normalize-wheel-1.0.1.tgz#aec886affdb045070d856447df62ecf86146ec45"
   integrity sha1-rsiGr/2wRQcNhWRH32Ls+GFG7EU=
+
+nplayer@^1.0.7:
+  version "1.0.7"
+  resolved "https://registry.nlark.com/nplayer/download/nplayer-1.0.7.tgz#feca2bc95cd0e2792dacdf7a799072bbc6f203bc"
+  integrity sha1-/soryVzQ4nktrN96eZByu8byA7w=
 
 param-case@^3.0.4:
   version "3.0.4"

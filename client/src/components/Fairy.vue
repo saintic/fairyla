@@ -16,18 +16,10 @@
                     ></fairy-btn>
                 </div>
                 <div class="post-main" v-for="f in fairies" :key="f.id">
-                    <video
-                        :title="f.desc"
-                        :src="f.src"
-                        preload="metadata"
-                        controls
-                        style="top: 0; left: 0; max-width: 90%"
-                        v-if="f.is_video"
-                    >
-                        抱歉，您的浏览器不支持内嵌视频！
-                    </video>
+                    <FairyPlay :fairy="f" v-if="f.is_video" />
                     <el-image
                         :title="f.desc"
+                        :alt="f.desc"
                         :src="f.src"
                         :lazy="true"
                         :preview-src-list="urls"
@@ -74,6 +66,7 @@ import { defineProps } from 'vue'
 import { isObject } from '@/libs/util.js'
 import Backtop from './Backtop.vue'
 import FairyBtn from './FairyBtn.vue'
+import FairyPlay from './FairyPlay.vue'
 
 defineProps({
     album: {
@@ -136,7 +129,7 @@ defineProps({
 }
 .post-main {
     text-align: center;
-    margin: 5px auto;
+    margin: 6px auto;
 }
 
 .entry {

@@ -11,7 +11,10 @@
       <img src="https://github.com/staugur/fairyla/actions/workflows/test.yml/badge.svg" alt="Go test">
   </a>
   <a href="https://hub.docker.com/r/staugur/fairyla">
-      <img src="https://github.com/staugur/fairyla/actions/workflows/publish.yml/badge.svg" alt="Publish Docker image">
+      <img src="https://github.com/staugur/fairyla/actions/workflows/docker.yml/badge.svg" alt="Publish Docker Image">
+  </a>
+  <a href="https://github.com/staugur/fairyla/actions/workflows/asset.yml">
+      <img src="https://github.com/staugur/fairyla/actions/workflows/asset.yml/badge.svg" alt="Publish Release Asset">
   </a>
   <a href="https://codecov.io/gh/staugur/fairyla">
     <img src="https://codecov.io/gh/staugur/fairyla/branch/master/graph/badge.svg?token=FXV9VCEVLP"/>

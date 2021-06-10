@@ -41,3 +41,13 @@ Axios
 https://github.com/axios/axios
 Copyright (c) 2014-present Matt Zabriskie
 Licensed under the MIT License
+
+EventSource-polyfill
+https://github.com/Yaffle/EventSource
+Copyright (c) 2018 Viktor
+Licensed under the MIT License
+
+NPlayer
+https://github.com/woopen/nplayer
+Copyright (c) wopen
+Licensed under the MIT License

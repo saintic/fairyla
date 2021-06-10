@@ -27,10 +27,10 @@ usage() {
 
 tarpkg() {
     os=$1
-    if [ "${os}" == "windows" ]; then
-        zip -r ${PKG_DIR}/${BINARY}.${VERSION}-${os}-amd64.zip ${BINARY}.exe ${UI} NOTICE LICENSE && rm -f ${BINARY}.exe
-    else
+    if [ "${os}" != "windows" ]; then
         tar zcvf ${PKG_DIR}/${BINARY}.${VERSION}-${os}-amd64.tar.gz ${BINARY} ${UI} NOTICE LICENSE && rm -f ${BINARY}
+    else
+        zip -r ${PKG_DIR}/${BINARY}.${VERSION}-${os}-amd64.zip ${BINARY}.exe ${UI} NOTICE LICENSE && rm -f ${BINARY}.exe
     fi
 }
 

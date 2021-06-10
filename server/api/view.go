@@ -349,7 +349,7 @@ func uploadView(c echo.Context) error {
 	post.Form.Add("filename", file.Filename)
 	post.Form.Add("_upload_field", cfg.Sapic.Field)
 
-	client := &http.Client{Timeout: 30 * time.Second}
+	client := &http.Client{Timeout: 60 * time.Second}
 	req, err := http.NewRequest(
 		"POST", cfg.Sapic.Api, strings.NewReader(post.Form.Encode()),
 	)
