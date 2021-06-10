@@ -37,6 +37,6 @@ COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
 EXPOSE 10210
 
-CMD ["-dir", "/fairyla"]
+ENV fairyla_dir="/fairyla"
 
 ENTRYPOINT ["fairyla"]

@@ -72,10 +72,8 @@ main() {
         verpack
         ;;
     release)
-        verpack
-        [ "$?" != "0" ] && exit 127
         cd ${BASE_DIR}
-        git add . && git ci -m "bump version ${VERSION}"
+        git add . && git ci -m "bump version ${VERSION}" && git tag ${VERSION}
         ;;
     *)
         usage

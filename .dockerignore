@@ -8,3 +8,4 @@ server/ui/
 client/node_modules/
 release/
 .tmp-*
+dist/
