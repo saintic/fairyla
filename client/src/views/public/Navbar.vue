@@ -52,14 +52,12 @@
 <script>
 import { mapState } from '@/libs/store.js'
 import defaultLogo from '@/assets/img/logo.png'
-import defaultAvatar from '@/assets/img/defaultAvatar.png'
 
 export default {
     name: 'Navbar',
     data() {
         return {
-            logo: defaultLogo,
-            avatar: defaultAvatar
+            logo: defaultLogo
         }
     },
     computed: {
