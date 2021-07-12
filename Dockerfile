@@ -1,4 +1,4 @@
-ARG buildos=golang:1.16.4-alpine3.13
+ARG buildos=golang:1.16.5-alpine3.13
 ARG runos=scratch
 
 # build dependencies with alpine
