@@ -10,7 +10,7 @@
     },
     "dependencies": {
         "@nplayer/vue": "^1.0.6",
-        "axios": "^0.21.2",
+        "axios": "^1.6.0",
         "element-plus": "^1.0.2-beta.46",
         "event-source-polyfill": "^1.0.24",
         "nplayer": "^1.0.7",
